@@ -7,9 +7,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.time.ZonedDateTime;
 
 @Entity
@@ -24,8 +22,9 @@ public class Uilness extends BaseEntity{
     @Column(name = "name")
     private String name;
 
-    @Column(name = "warningType")
-    private int warningType;
+    @ManyToOne
+    @JoinColumn(name = "warning_type", nullable = false)
+    private UilnessType uilnessType;
 
     @Column(name = "start_date")
     @JsonFormat(pattern = "yyyyMMddHHmmss")

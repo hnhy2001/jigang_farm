@@ -1,13 +1,11 @@
 package com.example.jingangfarmmanagement.query;
 
 import cz.jirutka.rsql.parser.ast.ComparisonOperator;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.data.jpa.domain.Specification;
 
 import javax.persistence.criteria.*;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,16 +19,16 @@ public class GenericRsqlSpecification<T> implements Specification<T> {
     private ComparisonOperator operator;
     private List<String> arguments;
 
+    @SneakyThrows
     @Override
-    public Predicate toPredicate(Root<T> root, CriteriaQuery<?> query, CriteriaBuilder builder) {
+    public Predicate toPredicate(Root<T> root, CriteriaQuery<?> query,
+                                 CriteriaBuilder builder) {
         Path<String> propertyExpression = parseProperty(root);
         String javaType = String.valueOf(propertyExpression.getJavaType());
-        List<Object> args = castArguments(root);
+        List<Object> args = castArguments(propertyExpression);
         Object argument = args.get(0);
         switch (RsqlSearchOperation.getSimpleOperator(operator)) {
-
             case EQUAL:
-            {
                 if (String.valueOf(argument).equals(SearchConstant.NUMBER_NULL))
                     return builder.isNull(builder.lower(propertyExpression));
                 if (String.valueOf(argument).equals(SearchConstant.OBJECT_NULL))
@@ -39,47 +37,70 @@ public class GenericRsqlSpecification<T> implements Specification<T> {
                     return builder.isNotNull(builder.lower(propertyExpression));
                 if (isDouble(javaType))
                     return builder.equal(propertyExpression, argument);
-                if (argument instanceof String) {
+                if (isInt(javaType))
+                    return builder.equal(propertyExpression, argument);
+                if (argument instanceof String)
                     return builder.like(builder.lower(propertyExpression),
                             formatArgument(argument), '\\');
-                } else if (argument == null) {
-                    return builder.isNull(root.get(property));
-                } else {
-                    return builder.equal(root.get(property), argument);
-                }
-            }
-            case NOT_EQUAL: {
-                if (argument instanceof String) {
-                    return builder.notLike(root.<String> get(property), argument.toString().replace('*', '%'));
-                } else if (argument == null) {
-                    return builder.isNotNull(root.get(property));
-                } else {
-                    return builder.notEqual(root.get(property), argument);
-                }
-            }
-            case GREATER_THAN: {
-                return builder.greaterThan(root.<String> get(property), argument.toString());
-            }
-            case GREATER_THAN_OR_EQUAL: {
-                return builder.greaterThanOrEqualTo(root.<String> get(property), argument.toString());
-            }
-            case LESS_THAN: {
-                return builder.lessThan(root.<String> get(property), argument.toString());
-            }
-            case LESS_THAN_OR_EQUAL: {
-                return builder.lessThanOrEqualTo(root.<String> get(property), argument.toString());
-            }
+                else if (argument == null)
+                    return builder.isNull(propertyExpression);
+                else return builder.equal(propertyExpression, argument);
+
+
+            case NOT_EQUAL:
+                if (argument instanceof String)
+                    return builder.notLike(propertyExpression,
+                            argument.toString().replace('*', '%'));
+                else if (argument == null)
+                    return builder.isNotNull(propertyExpression);
+                else return builder.notEqual(propertyExpression, argument);
+
+            case GREATER_THAN:
+                if (argument instanceof ZonedDateTime)
+                    return builder.greaterThan(root.get(property).as(ZonedDateTime.class),
+                            (ZonedDateTime) argument);
+                return builder.greaterThan(propertyExpression,
+                        argument.toString());
+
+            case GREATER_THAN_OR_EQUAL:
+                if (argument instanceof ZonedDateTime)
+                    return builder.greaterThanOrEqualTo(root.get(property).as(ZonedDateTime.class),
+                            (ZonedDateTime) argument);
+                return builder.greaterThanOrEqualTo(propertyExpression,
+                        argument.toString());
+
+            case LESS_THAN:
+                if (argument instanceof ZonedDateTime)
+                    return builder.lessThan(root.get(property).as(ZonedDateTime.class),
+                            (ZonedDateTime) argument);
+                return builder.lessThan(propertyExpression,
+                        argument.toString());
+
+            case LESS_THAN_OR_EQUAL:
+                if (argument instanceof ZonedDateTime)
+                    return builder.lessThanOrEqualTo(root.get(property).as(ZonedDateTime.class),
+                            (ZonedDateTime) argument);
+                return builder.lessThanOrEqualTo(propertyExpression,
+                        argument.toString());
             case IN:
-                return root.get(property).in(args);
+                return propertyExpression.in(args);
             case NOT_IN:
-                return builder.not(root.get(property).in(args));
+                return builder.not(propertyExpression.in(args));
         }
 
         return null;
     }
+
     private Boolean isDouble(String javaType) {
         return javaType.equals("class java.lang.Double");
     }
+
+    private Boolean isInt(String javaType) {
+        return javaType.equals("int");
+    }
+
+    // This method will help us diving deep into nested property using the dot convention
+    // The originial tutorial did not have this, so it can only parse the shallow properties.
     private Path<String> parseProperty(Root<T> root) {
         Path<String> path;
         if (property.contains(".")) {
@@ -107,6 +128,7 @@ public class GenericRsqlSpecification<T> implements Specification<T> {
                 .replace("%", HIBERNATE_ESCAPE_CHAR + "%")
                 .replace('*', '%');
     }
+
     private List<Object> castArguments(Path<?> propertyExpression) {
         Class<?> type = propertyExpression.getJavaType();
 
