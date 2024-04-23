@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -27,14 +28,15 @@ public class Cage extends BaseEntity{
     @JoinColumn(name = "type", nullable = false)
     private CageType type;
 
+    @OneToMany(mappedBy = "cage")
+    @JsonManagedReference
+    @JsonIgnore
+    private List<Pet> petList;
+
     @ManyToOne
     @JoinColumn(name = "farm_id", nullable = false)
     @JsonBackReference
     private Farm farm;
-
-    @OneToMany(mappedBy = "cage")
-    @JsonManagedReference
-    private List<Pet> petList;
 
     @Column(name = "description")
     private String description;

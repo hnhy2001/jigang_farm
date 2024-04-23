@@ -32,8 +32,16 @@ public class Pet extends BaseEntity{
     private Cage cage;
 
     @ManyToOne
+    @JoinColumn(name = "farm", nullable = false)
+    @JsonBackReference
+    private Farm farm;
+
+    @ManyToOne
     @JoinColumn(name = "health_condition", nullable = false)
     private HealthCondition healthCondition;
+
+    @Column(name = "weight")
+    private double weight;
 
     @Column(name = "warning")
     private String warning;

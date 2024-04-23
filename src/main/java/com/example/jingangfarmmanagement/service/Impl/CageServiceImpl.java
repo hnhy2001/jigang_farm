@@ -35,6 +35,7 @@ public class CageServiceImpl extends BaseServiceImpl<Cage> implements CageServic
         Node rootNode = new RSQLParser().parse(req.getFilter());
         Specification<Cage> spec = rootNode.accept(new CustomRsqlVisitor<>());
         Pageable pageable = getPage(req);
-        return cageReponsitory.findAll(spec, CageProjection.class, pageable);
+        Page<CageProjection> result = cageReponsitory.findAll(spec, CageProjection.class, pageable);
+        return result;
     }
 }

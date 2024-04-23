@@ -13,8 +13,8 @@ public interface CageProjection {
     String getDescription();
     String getWarning();
     List<PetWithId> getPetList();
-    CageTypeWithId getCageType();
-
+    CageTypeWithId getType();
+//
     interface PetWithId{
         Long getId();
         UilnessWithId getUilness();
@@ -23,7 +23,7 @@ public interface CageProjection {
             Long getId();
         }
     }
-
+//
     interface CageTypeWithId{
         Long getId();
         String getName();

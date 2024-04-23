@@ -75,6 +75,8 @@ public class UserServiceImpl extends BaseServiceImpl<User> implements UserServic
         historyService.create(history);
         LoginResponse loginResponse = new LoginResponse();
         loginResponse.setToken(jwtTokenProvider.generateToken(user.getUserName()));
+        loginResponse.setUserName(user.getUserName());
+        loginResponse.setFullName(user.getFullName());
         return new BaseResponse(200, "OK", loginResponse);
     }
 

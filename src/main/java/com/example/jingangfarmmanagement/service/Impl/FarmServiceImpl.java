@@ -15,6 +15,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class FarmServiceImpl extends BaseServiceImpl<Farm> implements FarmService {
     private static final String DELETED_FILTER = ";status>-1";
@@ -34,5 +36,13 @@ public class FarmServiceImpl extends BaseServiceImpl<Farm> implements FarmServic
         Specification<Farm> spec = rootNode.accept(new CustomRsqlVisitor<>());
         Pageable pageable = getPage(req);
         return farmReponsitory.findAll(spec, FarmProjection.class, pageable);
+    }
+
+    @Override
+    public List<Farm> finByFinter(SearchReq req) {
+        req.setFilter(req.getFilter().concat(DELETED_FILTER));
+        Node rootNode = new RSQLParser().parse(req.getFilter());
+        Specification<Farm> spec = rootNode.accept(new CustomRsqlVisitor<>());
+        return List.of();
     }
 }

@@ -5,6 +5,9 @@ import com.example.jingangfarmmanagement.projection.FarmProjection;
 import com.example.jingangfarmmanagement.repository.entity.Farm;
 import org.springframework.data.domain.Page;
 
+import java.util.List;
+
 public interface FarmService extends BaseService<Farm> {
     Page<FarmProjection> customSearch(SearchReq req);
+    List<Farm> finByFinter(SearchReq req);
 }
