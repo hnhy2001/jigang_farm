@@ -6,6 +6,7 @@ import com.example.jingangfarmmanagement.repository.entity.BaseEntity;
 import com.example.jingangfarmmanagement.query.CustomRsqlVisitor;
 import com.example.jingangfarmmanagement.repository.BaseRepository;
 import com.example.jingangfarmmanagement.service.BaseService;
+import com.example.jingangfarmmanagement.uitl.DateUtil;
 import com.example.jingangfarmmanagement.uitl.ObjectMapperUtils;
 import cz.jirutka.rsql.parser.RSQLParser;
 import cz.jirutka.rsql.parser.ast.Node;
@@ -56,6 +57,7 @@ public abstract class BaseServiceImpl<T extends BaseEntity> implements BaseServi
     @Override
     public T create(T t) throws Exception {
         t.setStatus(Status.ACTIVE);
+        t.setCreateDate(DateUtil.getCurrenDateTime());
         return this.getRepository().save(t);
     }
 
@@ -63,6 +65,7 @@ public abstract class BaseServiceImpl<T extends BaseEntity> implements BaseServi
     public T update(T t) throws Exception {
         T entityMy = this.getById(t.getId());
         ObjectMapperUtils.map(t, entityMy);
+        t.setUpdateDate(DateUtil.getCurrenDateTime());
         return getRepository().save(entityMy);
     }
 

@@ -23,9 +23,11 @@ public class Materials extends BaseEntity{
     @Column(name = "code")
     private String code;
 
+    @Column(name = "cargo")
+    private String cargo;
+
     @Column(name = "expiration_date")
-    @JsonFormat(pattern = "yyyyMMddHHmmss")
-    private Date expirationDate;
+    private Long expirationDate;
 
     @Column(name = "unit")
     private String unit;

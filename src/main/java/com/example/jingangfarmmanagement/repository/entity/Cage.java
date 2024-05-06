@@ -24,9 +24,8 @@ public class Cage extends BaseEntity{
     @Column(name = "name")
     private String name;
 
-    @ManyToOne
-    @JoinColumn(name = "type", nullable = false)
-    private CageType type;
+    @Column(name = "type")
+    private String type;
 
     @ManyToOne
     @JoinColumn(name = "farm_id", nullable = false)

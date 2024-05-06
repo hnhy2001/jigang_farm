@@ -11,6 +11,7 @@ import com.example.jingangfarmmanagement.model.LoginResponse;
 import com.example.jingangfarmmanagement.repository.*;
 import com.example.jingangfarmmanagement.model.req.LoginRequest;
 import com.example.jingangfarmmanagement.service.*;
+import com.example.jingangfarmmanagement.uitl.DateUtil;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -88,9 +89,11 @@ public class UserServiceImpl extends BaseServiceImpl<User> implements UserServic
         if (user.getPassword() == null){
             return new BaseResponse().fail("Mật khẩu không được để trống");
         }
-        if (userRepository.findByUserName(user.getUserName()) != null){
+
+        if (userRepository.findByUserName(user.getUserName()).isPresent()){
             return new BaseResponse().fail("Tài khoản đã tồn tại");
         }
+        user.setCreateDate(DateUtil.getCurrenDateTime());
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return new BaseResponse().success(super.create(user));
     }

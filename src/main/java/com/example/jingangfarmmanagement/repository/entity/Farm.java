@@ -21,9 +21,8 @@ public class Farm extends BaseEntity{
     @Column(name = "name")
     private String name;
 
-    @ManyToOne
-    @JoinColumn(name = "type", nullable = false)
-    private FarmType farmType;
+    @Column(name = "type")
+    private String type;
 
     @Column(name = "description")
     private String description;

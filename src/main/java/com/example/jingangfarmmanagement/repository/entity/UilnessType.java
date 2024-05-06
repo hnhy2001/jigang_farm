@@ -19,7 +19,4 @@ public class UilnessType extends BaseEntity {
 
     @Column(name = "name")
     private String name;
-
-    @Column(name = "score")
-    private int score;
 }

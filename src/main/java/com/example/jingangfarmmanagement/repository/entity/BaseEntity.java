@@ -26,14 +26,10 @@ public class BaseEntity {
     private Integer status;
 
     @Column(name = "created_date")
-    @JsonFormat(pattern = "yyyyMMddHHmmss")
-    @CreatedDate
-    private ZonedDateTime createDate;
+    private Long createDate;
 
     @Column(name = "updated_date")
-    @JsonFormat(pattern = "yyyyMMddHHmmss")
-    @LastModifiedDate
-    private ZonedDateTime updateDate;
+    private Long updateDate;
 
     @Column(name = "created_by")
     @CreatedBy

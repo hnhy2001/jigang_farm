@@ -22,19 +22,11 @@ public class Uilness extends BaseEntity{
     @Column(name = "name")
     private String name;
 
-    @ManyToOne
-    @JoinColumn(name = "warning_type", nullable = false)
-    private UilnessType uilnessType;
+    @Column(name = "type")
+    private String type;
 
-    @Column(name = "start_date")
-    @JsonFormat(pattern = "yyyyMMddHHmmss")
-    @CreatedDate
-    private ZonedDateTime startDate;
-
-    @Column(name = "end_date")
-    @JsonFormat(pattern = "yyyyMMddHHmmss")
-    @LastModifiedDate
-    private ZonedDateTime endDate;
+    @Column(name = "score")
+    private int score;
 
     @Column(name = "recoment", length = 1000)
     private String recoment;

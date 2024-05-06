@@ -21,14 +21,10 @@ public class TreatmentHistory extends BaseEntity{
     private Pet pet;
 
     @Column(name = "start_date")
-    @JsonFormat(pattern = "yyyyMMddHHmmss")
-    @CreatedDate
-    private ZonedDateTime startDate;
+    private Long startDate;
 
     @Column(name = "end_date")
-    @JsonFormat(pattern = "yyyyMMddHHmmss")
-    @LastModifiedDate
-    private ZonedDateTime endDate;
+    private Long endDate;
 
 //    @ManyToOne
 //    @JoinColumn(name = "uilness", nullable = false)
@@ -36,9 +32,6 @@ public class TreatmentHistory extends BaseEntity{
 
     @Column(name = "uilness")
     private String uilness;
-
-    @Column(name = "type")
-    private String type;
 
     @Column(name = "infor")
     private String infor;
