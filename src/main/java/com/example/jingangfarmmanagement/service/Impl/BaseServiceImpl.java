@@ -28,6 +28,7 @@ public abstract class BaseServiceImpl<T extends BaseEntity> implements BaseServi
         return this.getRepository().findAll();
     }
 
+
     @Override
     public Page<T> search(SearchReq req) {
         req.setFilter(req.getFilter().concat(DELETED_FILTER));
@@ -35,6 +36,11 @@ public abstract class BaseServiceImpl<T extends BaseEntity> implements BaseServi
         Specification<T> spec = rootNode.accept(new CustomRsqlVisitor<T>());
         Pageable pageable = getPage(req);
         return this.getRepository().findAll(spec, pageable);
+    }
+
+    @Override
+    public List<T> getByActive() {
+        return this.getRepository().findAllByStatus(1);
     }
 
     protected Pageable getPage(SearchReq req) {

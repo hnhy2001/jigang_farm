@@ -8,6 +8,6 @@ import java.util.List;
 
 @Data
 public class ChangeCageReq {
-    List<Pet> petList;
+    List<Long> petList;
     Cage cage;
 }

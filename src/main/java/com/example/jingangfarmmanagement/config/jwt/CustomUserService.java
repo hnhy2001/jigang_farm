@@ -3,7 +3,6 @@ package com.example.jingangfarmmanagement.config.jwt;
 import com.example.jingangfarmmanagement.repository.entity.User;
 import com.example.jingangfarmmanagement.repository.UserRepository;
 import com.example.jingangfarmmanagement.service.RoleService;
-import com.example.jingangfarmmanagement.service.UserRoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -16,11 +15,6 @@ import java.util.Optional;
 public class CustomUserService implements UserDetailsService {
     @Autowired
     UserRepository userRepository;
-    @Autowired
-    UserRoleService roleUserService;
-
-    @Autowired
-    RoleService roleService;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -28,6 +22,6 @@ public class CustomUserService implements UserDetailsService {
         if (!userOptional.isPresent()) {
             throw new UsernameNotFoundException(username);
         }
-        return new CustomUserDetails(roleUserService, roleService, userOptional.get());
+        return new CustomUserDetails(userOptional.get());
     }
 }

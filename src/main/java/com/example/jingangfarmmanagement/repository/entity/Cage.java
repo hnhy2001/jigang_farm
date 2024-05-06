@@ -28,14 +28,8 @@ public class Cage extends BaseEntity{
     @JoinColumn(name = "type", nullable = false)
     private CageType type;
 
-    @OneToMany(mappedBy = "cage")
-    @JsonManagedReference
-    @JsonIgnore
-    private List<Pet> petList;
-
     @ManyToOne
     @JoinColumn(name = "farm_id", nullable = false)
-    @JsonBackReference
     private Farm farm;
 
     @Column(name = "description")

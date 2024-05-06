@@ -4,6 +4,7 @@ package com.example.jingangfarmmanagement.service.Impl;
 import com.example.jingangfarmmanagement.config.jwt.JwtTokenProvider;
 import com.example.jingangfarmmanagement.constants.Status;
 import com.example.jingangfarmmanagement.model.req.AssignUserRoleReq;
+import com.example.jingangfarmmanagement.model.req.ChangePasswordReq;
 import com.example.jingangfarmmanagement.repository.entity.*;
 import com.example.jingangfarmmanagement.model.BaseResponse;
 import com.example.jingangfarmmanagement.model.LoginResponse;
@@ -33,9 +34,6 @@ public class UserServiceImpl extends BaseServiceImpl<User> implements UserServic
     private RoleService roleService;
 
     @Autowired
-    private UserRoleService userRoleService;
-
-    @Autowired
     private HistoryService historyService;
 
     @Autowired
@@ -51,9 +49,11 @@ public class UserServiceImpl extends BaseServiceImpl<User> implements UserServic
 
     @Override
     public User create(User user) throws Exception {
+
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return super.create(user);
     }
+
 
     @Override
     public BaseResponse login(LoginRequest loginRequest) throws Exception {
@@ -80,23 +80,30 @@ public class UserServiceImpl extends BaseServiceImpl<User> implements UserServic
         return new BaseResponse(200, "OK", loginResponse);
     }
 
-    @Transactional
     @Override
-    public void assignRole(AssignUserRoleReq req) throws Exception {
-        User user = this.getById(req.getUserId());
-        userRoleService.deleteByUser(user.getId());
-        if (CollectionUtils.isEmpty(req.getRoleIds())) return;
+    public BaseResponse customCreate(User user) throws Exception {
+        if (user.getUserName() == null){
+            return new BaseResponse().fail("Tài khoản không được để trống");
+        }
+        if (user.getPassword() == null){
+            return new BaseResponse().fail("Mật khẩu không được để trống");
+        }
+        if (userRepository.findByUserName(user.getUserName()) != null){
+            return new BaseResponse().fail("Tài khoản đã tồn tại");
+        }
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        return new BaseResponse().success(super.create(user));
+    }
 
-        List<Role> roleList = roleService.getAllByInId(req.getRoleIds());
-        if (CollectionUtils.isEmpty(roleList)) return;
-
-        List<UserRole> userRoleList = roleList.stream()
-                .map(e -> UserRole.builder()
-                        .user(user)
-                        .role(e)
-                        .build())
-                .collect(Collectors.toList());
-        userRoleService.createAll(userRoleList);
+    @Override
+    public BaseResponse changePassword(ChangePasswordReq changePasswordReq) {
+        User user = userRepository.findAllById(changePasswordReq.getUserId());
+        if (user == null){
+            return new BaseResponse().fail("Tài khoản không tồn tại");
+        }
+        user.setPassword(passwordEncoder.encode(changePasswordReq.getNewPassword()));
+        userRepository.save(user);
+        return new BaseResponse().success("Thay đổi mật khẩu thành công");
     }
 
     private boolean isValidPassword(String userPass, String reqPass) {

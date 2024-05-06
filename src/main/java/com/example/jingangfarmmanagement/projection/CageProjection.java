@@ -14,14 +14,26 @@ public interface CageProjection {
     String getWarning();
     List<PetWithId> getPetList();
     CageTypeWithId getType();
+    FarmWithId getFarm();
 //
     interface PetWithId{
         Long getId();
         UilnessWithId getUilness();
+        int getStatus();
 
         interface UilnessWithId{
             Long getId();
+            UilnessTypeWithId getUilnessType();
+
+            interface UilnessTypeWithId{
+                Long getId();
+                int getScore();
+            }
         }
+    }
+
+    interface FarmWithId{
+        Long getId();
     }
 //
     interface CageTypeWithId{

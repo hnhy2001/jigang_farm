@@ -1,6 +1,7 @@
 package com.example.jingangfarmmanagement.repository.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -28,17 +29,7 @@ public class Pet extends BaseEntity{
 
     @ManyToOne
     @JoinColumn(name = "cage", nullable = false)
-    @JsonBackReference
     private Cage cage;
-
-    @ManyToOne
-    @JoinColumn(name = "farm", nullable = false)
-    @JsonBackReference
-    private Farm farm;
-
-    @ManyToOne
-    @JoinColumn(name = "health_condition", nullable = false)
-    private HealthCondition healthCondition;
 
     @Column(name = "weight")
     private double weight;
@@ -52,10 +43,12 @@ public class Pet extends BaseEntity{
     @Column(name = "sex", nullable = false)
     private int sex;
 
-    @ManyToOne
-    @JoinColumn(name = "uilness", nullable = true)
-    @JsonBackReference
-    private Uilness uilness;
+//    @ManyToOne
+//    @JoinColumn(name = "uilness", nullable = true)
+//    private Uilness uilness;
+
+    @Column(name = "uilness")
+    private String uilness;
 
     @Column(name = "parent")
     private String parent;

@@ -27,4 +27,12 @@ public class BaseResponse {
                 .result(result)
                 .build();
     }
+
+    public BaseResponse fail(Object result) {
+        return BaseResponse.builder()
+                .code(500)
+                .message("Thất bại!")
+                .result(result)
+                .build();
+    }
 }

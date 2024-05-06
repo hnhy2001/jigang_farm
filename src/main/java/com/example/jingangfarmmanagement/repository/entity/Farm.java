@@ -25,12 +25,6 @@ public class Farm extends BaseEntity{
     @JoinColumn(name = "type", nullable = false)
     private FarmType farmType;
 
-    @OneToMany(mappedBy = "farm")
-    @JsonManagedReference
-    @JsonIgnore
-    private List<Cage> cageList = new ArrayList<>();
-
-
     @Column(name = "description")
     private String description;
 }

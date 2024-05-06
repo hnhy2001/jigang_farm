@@ -2,6 +2,7 @@ package com.example.jingangfarmmanagement.service.Impl;
 
 import com.example.jingangfarmmanagement.model.req.SearchReq;
 import com.example.jingangfarmmanagement.projection.FarmProjection;
+import com.example.jingangfarmmanagement.projection.StatisticFarmProjection;
 import com.example.jingangfarmmanagement.query.CustomRsqlVisitor;
 import com.example.jingangfarmmanagement.repository.BaseRepository;
 import com.example.jingangfarmmanagement.repository.FarmRepository;
@@ -16,6 +17,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class FarmServiceImpl extends BaseServiceImpl<Farm> implements FarmService {
@@ -39,10 +41,8 @@ public class FarmServiceImpl extends BaseServiceImpl<Farm> implements FarmServic
     }
 
     @Override
-    public List<Farm> finByFinter(SearchReq req) {
-        req.setFilter(req.getFilter().concat(DELETED_FILTER));
-        Node rootNode = new RSQLParser().parse(req.getFilter());
-        Specification<Farm> spec = rootNode.accept(new CustomRsqlVisitor<>());
-        return List.of();
+    public List<Farm> findByFilter() {
+        List<Farm> result = farmReponsitory.findAll();
+        return result;
     }
 }

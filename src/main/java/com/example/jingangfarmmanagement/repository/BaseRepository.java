@@ -11,4 +11,5 @@ import java.util.List;
 public interface BaseRepository<T> extends JpaSpecificationExecutor<T>, PagingAndSortingRepository<T, Long>, JpaRepository<T, Long> {
     List<T> findAll();
     T findAllById(Long id);
+    List<T> findAllByStatus(int status);
 }

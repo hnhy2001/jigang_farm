@@ -14,7 +14,7 @@ import java.time.ZonedDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-@Table(name = "treatmentHistory")
+@Table(name = "treatment_history")
 public class TreatmentHistory extends BaseEntity{
     @ManyToOne
     @JoinColumn(name = "pet", nullable = false)
@@ -30,7 +30,20 @@ public class TreatmentHistory extends BaseEntity{
     @LastModifiedDate
     private ZonedDateTime endDate;
 
-    @ManyToOne
-    @JoinColumn(name = "curator", nullable = false)
-    private User curator;
+//    @ManyToOne
+//    @JoinColumn(name = "uilness", nullable = false)
+//    private Uilness uilness;
+
+    @Column(name = "uilness")
+    private String uilness;
+
+    @Column(name = "type")
+    private String type;
+
+    @Column(name = "infor")
+    private String infor;
+
+    @Column(name = "note")
+    private String note;
+
 }

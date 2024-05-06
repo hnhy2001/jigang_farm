@@ -1,9 +1,7 @@
 package com.example.jingangfarmmanagement.config.jwt;
 
 import com.example.jingangfarmmanagement.repository.entity.User;
-import com.example.jingangfarmmanagement.repository.entity.UserRole;
 import com.example.jingangfarmmanagement.service.RoleService;
-import com.example.jingangfarmmanagement.service.UserRoleService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
@@ -17,16 +15,12 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 public class CustomUserDetails implements UserDetails {
-    UserRoleService roleUserService;
-
-    RoleService roleService;
     private User user;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<GrantedAuthority> authorities = new ArrayList<>();
-        List<UserRole> userRoles = roleUserService.getAllByUserId(user.getId());
-        authorities.add(new SimpleGrantedAuthority(userRoles.get(0).getRole().getCode()));
+        authorities.add(new SimpleGrantedAuthority(user.getRole().getCode()));
         return authorities;
     }
 

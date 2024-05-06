@@ -15,6 +15,8 @@ public interface BaseService<T extends BaseEntity> {
 
     T getById(Long id) throws Exception;
 
+    List<T> getByActive();
+
     List<T> getAll();
 
     void delete(Long id);

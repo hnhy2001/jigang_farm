@@ -2,6 +2,7 @@ package com.example.jingangfarmmanagement.controller;
 
 import com.example.jingangfarmmanagement.model.BaseResponse;
 import com.example.jingangfarmmanagement.model.req.ChangeCageReq;
+import com.example.jingangfarmmanagement.model.req.SearchReq;
 import com.example.jingangfarmmanagement.repository.BaseRepository;
 import com.example.jingangfarmmanagement.repository.entity.Pet;
 import com.example.jingangfarmmanagement.service.BaseService;

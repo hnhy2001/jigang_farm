@@ -22,10 +22,4 @@ public class FarmController extends BaseController<Farm> {
     protected BaseService<Farm> getService() {
         return farmService;
     }
-
-    @Override
-    @GetMapping("/search")
-    public BaseResponse search(SearchReq req) {
-        return new BaseResponse(200, "Lấy dữ liệu thành công!", farmService.customSearch(req));
-    }
 }

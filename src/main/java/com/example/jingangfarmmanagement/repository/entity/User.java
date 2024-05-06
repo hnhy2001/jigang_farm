@@ -1,8 +1,10 @@
 package com.example.jingangfarmmanagement.repository.entity;
-
 import lombok.*;
+import org.apache.logging.log4j.message.Message;
+import org.hibernate.validator.constraints.UniqueElements;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "user")
@@ -14,7 +16,7 @@ public class User extends BaseEntity {
     @Column(name = "user_name", nullable = false, unique = true)
     private String userName;
 
-    @Column(name = "password", nullable = false)
+    @Column(name = "password")
     private String password;
 
     @Column(name = "email")
@@ -25,5 +27,10 @@ public class User extends BaseEntity {
 
     @Column(name = "full_name")
     private String fullName;
+
+    @ManyToOne()
+    @NotNull()
+    @JoinColumn(name = "role")
+    private Role role;
 
 }
