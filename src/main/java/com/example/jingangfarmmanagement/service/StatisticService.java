@@ -1,9 +1,8 @@
 package com.example.jingangfarmmanagement.service;
 
-import com.example.jingangfarmmanagement.model.response.StatisticTotalPetFollowFarmRes;
-
-import java.util.List;
+import com.example.jingangfarmmanagement.model.BaseResponse;
+import com.example.jingangfarmmanagement.model.req.StatisticPetWithAge;
 
 public interface StatisticService {
-    public List<StatisticTotalPetFollowFarmRes> statisticTotalPetFollowFarm();
+    public BaseResponse statisticPetWithAge(StatisticPetWithAge statisticPetWithAge);
 }

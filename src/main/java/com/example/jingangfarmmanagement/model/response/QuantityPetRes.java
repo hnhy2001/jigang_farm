@@ -1,5 +1,6 @@
 package com.example.jingangfarmmanagement.model.response;
 
+import com.example.jingangfarmmanagement.repository.entity.Cage;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -7,9 +8,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class StatisticPetUilness {
-    private Long uilness;
-    private String name;
-    private int quantity;
-    private int score;
+public class QuantityPetRes {
+    Cage cage;
+    Long quantity = 0L;
 }

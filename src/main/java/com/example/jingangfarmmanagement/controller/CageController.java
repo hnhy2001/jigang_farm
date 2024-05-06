@@ -22,4 +22,9 @@ public class CageController extends BaseController<Cage>{
     protected BaseService<Cage> getService() {
         return cageService;
     }
+
+    @GetMapping("get-quantity-pet")
+    public BaseResponse getQuantityPet(){
+        return cageService.quantityPet();
+    }
 }

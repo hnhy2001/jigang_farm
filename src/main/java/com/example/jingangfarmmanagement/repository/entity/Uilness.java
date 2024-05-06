@@ -30,5 +30,4 @@ public class Uilness extends BaseEntity{
 
     @Column(name = "recoment", length = 1000)
     private String recoment;
-
 }

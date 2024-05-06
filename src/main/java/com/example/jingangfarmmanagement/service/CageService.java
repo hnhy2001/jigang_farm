@@ -1,5 +1,6 @@
 package com.example.jingangfarmmanagement.service;
 
+import com.example.jingangfarmmanagement.model.BaseResponse;
 import com.example.jingangfarmmanagement.model.req.SearchReq;
 import com.example.jingangfarmmanagement.projection.CageProjection;
 import com.example.jingangfarmmanagement.projection.FarmProjection;
@@ -8,4 +9,5 @@ import org.springframework.data.domain.Page;
 
 public interface CageService extends BaseService<Cage>{
     Page<CageProjection> customSearch(SearchReq req);
+    BaseResponse quantityPet();
 }
