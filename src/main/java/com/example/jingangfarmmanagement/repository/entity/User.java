@@ -28,9 +28,9 @@ public class User extends BaseEntity {
     @Column(name = "full_name")
     private String fullName;
 
-    @ManyToOne()
-    @NotNull()
-    @JoinColumn(name = "role")
-    private Role role;
+//    @ManyToOne()
+//    @NotNull()
+//    @JoinColumn(name = "role")
+//    private Role role;
 
 }

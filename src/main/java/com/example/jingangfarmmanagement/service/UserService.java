@@ -12,4 +12,5 @@ public interface UserService extends BaseService<User> {
     BaseResponse login(LoginRequest loginRequest) throws Exception;
     BaseResponse customCreate(User user) throws Exception;
     BaseResponse changePassword(ChangePasswordReq changePasswordReq);
+    User getUserByUsername(String username);
 }

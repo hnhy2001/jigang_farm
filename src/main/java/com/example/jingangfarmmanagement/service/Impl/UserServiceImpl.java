@@ -109,6 +109,11 @@ public class UserServiceImpl extends BaseServiceImpl<User> implements UserServic
         return new BaseResponse().success("Thay đổi mật khẩu thành công");
     }
 
+    @Override
+    public User getUserByUsername(String username) {
+        return userRepository.findByUserName(username).get();
+    }
+
     private boolean isValidPassword(String userPass, String reqPass) {
         return !StringUtils.isEmpty(reqPass) && passwordEncoder.matches(reqPass, userPass);
     }

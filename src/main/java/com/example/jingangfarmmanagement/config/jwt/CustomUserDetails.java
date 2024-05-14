@@ -1,6 +1,7 @@
 package com.example.jingangfarmmanagement.config.jwt;
 
 import com.example.jingangfarmmanagement.repository.entity.User;
+import com.example.jingangfarmmanagement.repository.entity.UserRole;
 import com.example.jingangfarmmanagement.service.RoleService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -17,10 +18,14 @@ import java.util.List;
 public class CustomUserDetails implements UserDetails {
     private User user;
 
+    private List<UserRole> userRoles;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<GrantedAuthority> authorities = new ArrayList<>();
-        authorities.add(new SimpleGrantedAuthority(user.getRole().getCode()));
+        userRoles.stream().forEach(e -> {
+            authorities.add(new SimpleGrantedAuthority(e.getRole().getCode()));
+        });
         return authorities;
     }
 
