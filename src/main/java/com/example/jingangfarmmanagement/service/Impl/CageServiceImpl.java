@@ -59,7 +59,9 @@ public class CageServiceImpl extends BaseServiceImpl<Cage> implements CageServic
             return new BaseResponse().fail("Không có chuồng nào");
         if (petList.isEmpty())
             return new BaseResponse().fail("Không có con vật nào");
-        List<QuantityPetRes> result = cageList.stream().map(e -> mapper.map(e, QuantityPetRes.class)).collect(Collectors.toList());
+        List<QuantityPetRes> result = cageList.stream()
+                .filter(f -> f.getStatus() == 1)
+                .map(e -> mapper.map(e, QuantityPetRes.class)).collect(Collectors.toList());
         result.stream().forEach(res -> {
             petList.stream().forEach(pet -> {
                 if (pet.getCage().equals(res.getCage()))
