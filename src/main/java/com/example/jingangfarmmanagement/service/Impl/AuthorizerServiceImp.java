@@ -16,6 +16,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.web.bind.annotation.RequestMapping;
 import java.lang.annotation.Annotation;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service("appAuthorizer")
 public class AuthorizerServiceImp implements AuthorizerService {
@@ -39,18 +40,21 @@ public class AuthorizerServiceImp implements AuthorizerService {
                 return isAllow;
             }
             CustomUserDetails customUserDetails = (CustomUserDetails) user.getPrincipal();
-//            String userId = (String)user.getPrincipal();
-//            if (userId==null || "".equals(userId.trim())) {
-//                return isAllow;
-//            }
-//            User userCheck = userService.getUserByUsername("hnhy01");
-//            if (userCheck==null) {
-//                return isAllow;
-//            }
-//            List<UserRole> userRoles = userRoleService.getUserRoleByUserId(userCheck);
-            List<FunctionRole> functionRoles = functionRoleService.getByRole(customUserDetails.getUserRoles().get(0).getRole());
-            if (functionRoles.get(0).getFunction().getFunction().equals(securedPath)){
+            if(customUserDetails==null){
+                return isAllow;
+            }
+            if (!customUserDetails.getUserRoles().stream().filter(e -> e.getRole().getCode().equals("ADMIN")).collect(Collectors.toList()).isEmpty()){
                 isAllow = true;
+                return isAllow;
+            }
+            List<FunctionRole> functionRoles = functionRoleService.getByRole(customUserDetails.getUserRoles().get(0).getRole());
+//            if (functionRoles.get(0).getFunction().getFunction().equals(securedPath)){
+//                isAllow = true;
+//            }
+
+            if (!functionRoles.stream().filter(e -> e.getFunction().getFunction().equals(securedPath)).collect(Collectors.toList()).isEmpty()){
+                isAllow = true;
+                return isAllow;
             }
         } catch (Exception e) {
             throw e;

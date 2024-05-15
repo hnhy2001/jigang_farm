@@ -21,6 +21,7 @@ import org.springframework.util.StringUtils;
 
 import javax.transaction.Transactional;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -36,6 +37,9 @@ public class UserServiceImpl extends BaseServiceImpl<User> implements UserServic
 
     @Autowired
     private HistoryService historyService;
+
+    @Autowired
+    private UserRoleRepository userRoleRepository;
 
     @Autowired
     private ModelMapper modelMapper;
@@ -95,7 +99,16 @@ public class UserServiceImpl extends BaseServiceImpl<User> implements UserServic
         }
         user.setCreateDate(DateUtil.getCurrenDateTime());
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        return new BaseResponse().success(super.create(user));
+        List<UserRole> userRoles = new ArrayList<>();
+        User result = super.create(user);
+        result.getRole().stream().forEach(e -> {
+            UserRole userRole = new UserRole();
+            userRole.setUser(result);
+            userRole.setRole(e);
+            userRoles.add(userRole);
+        });
+        userRoleRepository.saveAll(userRoles);
+        return new BaseResponse().success(result);
     }
 
     @Override

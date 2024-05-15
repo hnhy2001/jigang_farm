@@ -5,6 +5,7 @@ import org.hibernate.validator.constraints.UniqueElements;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 @Entity
 @Table(name = "user")
@@ -27,6 +28,9 @@ public class User extends BaseEntity {
 
     @Column(name = "full_name")
     private String fullName;
+
+    @Transient
+    private List<Role> role;
 
 //    @ManyToOne()
 //    @NotNull()

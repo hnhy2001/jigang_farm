@@ -32,6 +32,16 @@ public class Materials extends BaseEntity{
     @Column(name = "unit")
     private String unit;
 
-    @Column(name = "quantity")
-    private Integer quantity;
+    @Column(name = "estimateQuantity")
+    private Long estimateQuantity;
+
+    @Column(name = "actualQuantity")
+    private Long actualQuantity;
+
+    @Column(name = "unitPridce")
+    private Long unitPridce;
+
+    @Column(name = "price")
+    private Long price;
 }
+
