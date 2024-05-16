@@ -21,4 +21,9 @@ public class GlobalException {
 //    public BaseResponse todoException(Exception ex, WebRequest request) {
 //        return new BaseResponse(500, "Internal Server Error","");
 //    }
+    @ExceptionHandler(Exception.class)
+    @ResponseStatus(value = HttpStatus.NOT_FOUND)
+    public static BaseResponse notFoundException(String ex) {
+       return new BaseResponse(404, "Not found",ex);
+    }
 }
