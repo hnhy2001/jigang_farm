@@ -1,6 +1,7 @@
 package com.example.jingangfarmmanagement.repository;
 
 import com.example.jingangfarmmanagement.repository.entity.Pet;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import th.co.geniustree.springdata.jpa.repository.JpaSpecificationExecutorWithProjection;
 

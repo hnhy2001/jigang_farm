@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.transaction.Transactional;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -28,31 +29,28 @@ public class IOFileServiceImpl implements IOFileService {
     @Autowired
     PetRepository petRepository;
     @Override
-    public void importPetsFromExcel(MultipartFile file) throws IOException {
+    @Transactional
+    public void importPetsFromExcel(MultipartFile file,String farmCode) throws IOException {
         List<Pet> pets = new ArrayList<>();
+        int totalPets=petRepository.findAll().size();
+        int noPet=totalPets+1;
         try (InputStream inputStream = file.getInputStream(); Workbook workbook = new XSSFWorkbook(inputStream)) {
             Sheet sheet = workbook.getSheetAt(0);
             for (Row row : sheet) {
-                if (row.getRowNum() == 0 || row.getRowNum()==1) {
+                if (row.getRowNum() == 0 ) {
                     continue;
                 }
                 Pet pet = new Pet();
-
-                pet.setCode(getCellValue(row.getCell(0))!=null? getCellValue(row.getCell(0)):null);
-                pet.setName(getCellValue(row.getCell(1))!=null? getCellValue(row.getCell(1)):null);
-                pet.setType(getCellValue(row.getCell(2))!=null? getCellValue(row.getCell(2)):null);
-                pet.setAge((int) Double.parseDouble(getCellValue(row.getCell(3))));
-                pet.setWeight(Double.parseDouble(getCellValue(row.getCell(4))));
-                pet.setSex(getCellValue(row.getCell(5)).equalsIgnoreCase("Cái") ?0 : 1);
-                if(cageRepository.findByCode(getCellValue(row.getCell(6)))!=null){
-                    Cage cage = cageRepository.findByCode(getCellValue(row.getCell(6)));
-                    pet.setCage(cage);
-                }
-                else{
-                    throw GlobalException.notFoundException(getCellValue(row.getCell(6)));
-                }
-                pet.setUilness(getCellValue(row.getCell(7)));
+                pet.setCode("VN_" + farmCode + "_" + getCellValue(row.getCell(5)) + "_" + noPet);
+                pet.setName(getCellValueOrDefault(row.getCell(0)));
+                pet.setType(getCellValueOrDefault(row.getCell(1)));
+                pet.setAge(getCellNumericValueOrDefault(row.getCell(2)));
+                pet.setWeight(getCellNumericValueOrDefault(row.getCell(3)));
+                pet.setSex(getCellSexValueOrDefault(row.getCell(4)));
+                pet.setCage(getCageFromCellOrDefault(row.getCell(5)));
+                pet.setUilness(getCellValueOrDefault(row.getCell(6)));
                 pets.add(pet);
+                noPet++;
             }
         } catch (BaseResponse e) {
             throw new RuntimeException(e);
@@ -76,6 +74,31 @@ public class IOFileServiceImpl implements IOFileService {
                 return cell.getCellFormula();
             default:
                 return "";
+        }
+    }
+    private String getCellValueOrDefault(Cell cell) {
+        return cell != null && cell.getCellType() != CellType.BLANK ? getCellValue(cell) : null;
+    }
+
+    private int getCellNumericValueOrDefault(Cell cell) {
+        return cell != null && cell.getCellType() != CellType.BLANK ? (int) Double.parseDouble(getCellValue(cell)) : 0;
+    }
+
+
+    private int getCellSexValueOrDefault(Cell cell) {
+        return cell != null && cell.getCellType() != CellType.BLANK && getCellValue(cell).equalsIgnoreCase("Cái") ? 0 : 1;
+    }
+
+    private Cage getCageFromCellOrDefault(Cell cell) throws BaseResponse {
+        if (cell != null && cell.getCellType() != CellType.BLANK) {
+            Cage cage = cageRepository.findByCode(getCellValue(cell));
+            if (cage != null) {
+                return cage;
+            } else {
+                throw GlobalException.notFoundException(getCellValue(cell));
+            }
+        } else {
+            throw GlobalException.notFoundException("Cage code is null or blank");
         }
     }
 }

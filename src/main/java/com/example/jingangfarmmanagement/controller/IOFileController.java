@@ -1,5 +1,6 @@
 package com.example.jingangfarmmanagement.controller;
 
+import com.example.jingangfarmmanagement.model.BaseResponse;
 import com.example.jingangfarmmanagement.service.IOFileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -15,12 +16,13 @@ public class IOFileController {
     @Autowired
     private IOFileService ioFileService;
     @PostMapping("pet/import")
-    public ResponseEntity<String> importPetFile(@RequestBody MultipartFile file) {
+    public BaseResponse importPetFile(@RequestBody MultipartFile file,
+                                      @RequestParam(required = true) String farmCode) {
         try {
-            ioFileService.importPetsFromExcel(file);
-            return ResponseEntity.ok("File uploaded and data imported successfully.");
+            ioFileService.importPetsFromExcel(file,farmCode);
+            return new BaseResponse(200,"OK",null);
         } catch (IOException e) {
-            return ResponseEntity.status(500).body("Failed to import data from file.");
+            return new BaseResponse(500,"Error",null);
         }
     }
 }

@@ -38,8 +38,8 @@ public class Materials extends BaseEntity{
     @Column(name = "actualQuantity")
     private Long actualQuantity;
 
-    @Column(name = "unitPridce")
-    private Long unitPridce;
+    @Column(name = "unitPrice")
+    private Long unitPrice;
 
     @Column(name = "price")
     private Long price;
