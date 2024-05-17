@@ -9,6 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
+
 @CrossOrigin
 @RestController
 @RequestMapping("file")
@@ -17,12 +18,17 @@ public class IOFileController {
     private IOFileService ioFileService;
     @PostMapping("pet/import")
     public BaseResponse importPetFile(@RequestBody MultipartFile file,
-                                      @RequestParam(required = true) String farmCode) {
-        try {
-            ioFileService.importPetsFromExcel(file,farmCode);
-            return new BaseResponse(200,"OK",null);
-        } catch (IOException e) {
-            return new BaseResponse(500,"Error",null);
-        }
+                                      @RequestParam(required = true) String farmCode) throws IOException {
+
+        return ioFileService.importPetsFromExcel(file,farmCode);
+
+    }
+    @PostMapping("material/import")
+    public BaseResponse importMaterialFile(@RequestBody MultipartFile file,
+                                           @RequestParam(required = true) String farmCode,
+                                           @RequestParam(required = true) String cageCode) throws IOException {
+
+            return ioFileService.importMaterialsFromExcel(file,farmCode,cageCode);
+
     }
 }

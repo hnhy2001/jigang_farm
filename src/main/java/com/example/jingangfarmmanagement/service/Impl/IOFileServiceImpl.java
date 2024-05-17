@@ -3,8 +3,10 @@ package com.example.jingangfarmmanagement.service.Impl;
 import com.example.jingangfarmmanagement.exception.GlobalException;
 import com.example.jingangfarmmanagement.model.BaseResponse;
 import com.example.jingangfarmmanagement.repository.CageRepository;
+import com.example.jingangfarmmanagement.repository.MaterialsRepository;
 import com.example.jingangfarmmanagement.repository.PetRepository;
 import com.example.jingangfarmmanagement.repository.entity.Cage;
+import com.example.jingangfarmmanagement.repository.entity.Materials;
 import com.example.jingangfarmmanagement.repository.entity.Pet;
 import com.example.jingangfarmmanagement.exception.GlobalException;
 import com.example.jingangfarmmanagement.service.IOFileService;
@@ -18,7 +20,9 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.transaction.Transactional;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,9 +32,11 @@ public class IOFileServiceImpl implements IOFileService {
     CageRepository cageRepository;
     @Autowired
     PetRepository petRepository;
+    @Autowired
+    MaterialsRepository materialsRepository;
     @Override
     @Transactional
-    public void importPetsFromExcel(MultipartFile file,String farmCode) throws IOException {
+    public BaseResponse importPetsFromExcel(MultipartFile file,String farmCode) throws IOException {
         List<Pet> pets = new ArrayList<>();
         int totalPets=petRepository.findAll().size();
         int noPet=totalPets+1;
@@ -56,6 +62,7 @@ public class IOFileServiceImpl implements IOFileService {
             throw new RuntimeException(e);
         }
         petRepository.saveAll(pets);
+        return new BaseResponse(200, "OK", "Nhập dữ liệu thành công");
     }
 
     private String getCellValue(Cell cell) {
@@ -79,9 +86,25 @@ public class IOFileServiceImpl implements IOFileService {
     private String getCellValueOrDefault(Cell cell) {
         return cell != null && cell.getCellType() != CellType.BLANK ? getCellValue(cell) : null;
     }
-
+    private Long getDateCellValueOrDefault(Cell cell) {
+        if (cell != null && cell.getCellType() != CellType.BLANK && cell.getCellType() == CellType.NUMERIC) {
+            Date date = cell.getDateCellValue();
+            if (date != null) {
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+                return Long.parseLong(dateFormat.format(date));
+            }
+        }
+        return null;
+    }
     private int getCellNumericValueOrDefault(Cell cell) {
         return cell != null && cell.getCellType() != CellType.BLANK ? (int) Double.parseDouble(getCellValue(cell)) : 0;
+    }
+    private Long getNumericCellValueOrDefault(Cell cell) {
+        if (cell != null && cell.getCellType() != CellType.BLANK && cell.getCellType() == CellType.NUMERIC) {
+            // Chuyển đổi giá trị số thực thành số long
+            return Double.valueOf(cell.getNumericCellValue()).longValue();
+        }
+        return null;
     }
 
 
@@ -100,5 +123,33 @@ public class IOFileServiceImpl implements IOFileService {
         } else {
             throw GlobalException.notFoundException("Cage code is null or blank");
         }
+    }
+    @Override
+    @Transactional
+    public BaseResponse importMaterialsFromExcel(MultipartFile file,String farmCode,String cageCode) throws IOException {
+        List<Materials> materials = new ArrayList<>();
+        int totalMaterials = materialsRepository.findAll().size();
+        int noMaterials = totalMaterials+1;
+        try (InputStream inputStream = file.getInputStream(); Workbook workbook = new XSSFWorkbook(inputStream)) {
+            Sheet sheet = workbook.getSheetAt(0);
+            for (Row row : sheet) {
+                if (row.getRowNum() == 0 ) {
+                    continue;
+                }
+                Materials material = new Materials();
+                material.setCode("VN_" + farmCode + "_" + cageCode + "_" + noMaterials);
+                material.setName(getCellValueOrDefault(row.getCell(0)));
+                material.setCargo(getCellValueOrDefault(row.getCell(1)));
+                material.setUnit(getCellValueOrDefault(row.getCell(2)));
+                material.setExpirationDate(getDateCellValueOrDefault(row.getCell(3)));
+                material.setPrice(Long.parseLong(String.valueOf(getCellNumericValueOrDefault(row.getCell(4)))));
+                material.setEstimateQuantity(getNumericCellValueOrDefault(row.getCell(5)));
+                material.setActualQuantity(getNumericCellValueOrDefault(row.getCell(6)));
+                materials.add(material);
+                noMaterials++;
+            }
+        }
+        materialsRepository.saveAll(materials);
+        return new BaseResponse(200, "OK", "Nhập dữ liệu thành công");
     }
 }
