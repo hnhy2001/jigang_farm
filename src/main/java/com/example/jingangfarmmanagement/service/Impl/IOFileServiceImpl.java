@@ -58,8 +58,8 @@ public class IOFileServiceImpl implements IOFileService {
                 pets.add(pet);
                 noPet++;
             }
-        } catch (BaseResponse e) {
-            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new IOException(e);
         }
         petRepository.saveAll(pets);
         return new BaseResponse(200, "OK", "Nhập dữ liệu thành công");
@@ -112,17 +112,14 @@ public class IOFileServiceImpl implements IOFileService {
         return cell != null && cell.getCellType() != CellType.BLANK && getCellValue(cell).equalsIgnoreCase("Cái") ? 0 : 1;
     }
 
-    private Cage getCageFromCellOrDefault(Cell cell) throws BaseResponse {
+    private Cage getCageFromCellOrDefault(Cell cell) {
         if (cell != null && cell.getCellType() != CellType.BLANK) {
             Cage cage = cageRepository.findByCode(getCellValue(cell));
             if (cage != null) {
                 return cage;
-            } else {
-                throw GlobalException.notFoundException(getCellValue(cell));
             }
-        } else {
-            throw GlobalException.notFoundException("Cage code is null or blank");
         }
+        return null;
     }
     @Override
     @Transactional
