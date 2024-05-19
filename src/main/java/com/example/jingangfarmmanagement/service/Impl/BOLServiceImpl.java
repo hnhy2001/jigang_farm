@@ -97,6 +97,7 @@ public class BOLServiceImpl implements BOLService {
     }
 
     @Override
+    @Transactional
     public BaseResponse update(Long id) throws Exception {
         BOL bol = bolRepository.findAllById(id);
         if (bol == null) {
@@ -110,12 +111,25 @@ public class BOLServiceImpl implements BOLService {
         List<MaterialsBOL> materialsBOLList = materialsBOLService.getByBOL(bol);
         List<MaterialsBOL> checkMaterialsBOLList = new ArrayList<>();
         List<MaterialsWarehouse> upDateMaterialsWarehouseList;
-        List<MaterialsWarehouse> checkMaterialsWarehouseList = new ArrayList<>();
 
         if (bol.getType() == 1) {
             upDateMaterialsWarehouseList = new ArrayList<>();
-            materialsBOLList.stream().forEach(mB -> {
-                materialsWarehouseList.stream().forEach(mW -> {
+
+            if (materialsWarehouseList.isEmpty()) {
+                materialsBOLList.stream().distinct().forEach(mB -> {
+                    MaterialsWarehouse materialsWarehouse = new MaterialsWarehouse();
+                    materialsWarehouse.setMaterials(mB.getMaterials());
+                    materialsWarehouse.setWarehouse(mB.getWarehouse());
+                    materialsWarehouse.setQuatity(mB.getActualQuantity());
+                    materialsWarehouse.setStatus(1);
+                    materialsWarehouse.setCreateDate(DateUtil.getCurrenDateTime());
+                    materialsWarehouse.setUpdateDate(DateUtil.getCurrenDateTime());
+                    upDateMaterialsWarehouseList.add(materialsWarehouse);
+                });
+            }
+
+            materialsWarehouseList.stream().forEach(mW -> {
+                materialsBOLList.stream().forEach(mB -> {
                     if (mB.getMaterials().getId().equals(mW.getMaterials().getId()) && mB.getWarehouse().getId().equals(mW.getWarehouse().getId())) {
                         if (mW.getQuatity() == null) {
                             mW.setQuatity(mB.getActualQuantity());
@@ -124,19 +138,24 @@ public class BOLServiceImpl implements BOLService {
                             mW.setUpdateDate(DateUtil.getCurrenDateTime());
                         }
                         upDateMaterialsWarehouseList.add(mW);
+                    } else {
+                        checkMaterialsBOLList.add(mB);
                     }
                 });
             });
 
             checkMaterialsBOLList.stream().distinct().forEach(mB -> {
-                MaterialsWarehouse materialsWarehouse = new MaterialsWarehouse();
-                materialsWarehouse.setMaterials(mB.getMaterials());
-                materialsWarehouse.setWarehouse(mB.getWarehouse());
-                materialsWarehouse.setQuatity(mB.getActualQuantity());
-                materialsWarehouse.setStatus(1);
-                materialsWarehouse.setCreateDate(DateUtil.getCurrenDateTime());
-                materialsWarehouse.setUpdateDate(DateUtil.getCurrenDateTime());
-                upDateMaterialsWarehouseList.add(materialsWarehouse);
+                if (upDateMaterialsWarehouseList.stream().filter(e -> e.getMaterials().getId().equals(mB.getMaterials().getId()) && e.getWarehouse().getId().equals(mB.getWarehouse().getId())).collect(Collectors.toList()).isEmpty()) {
+                    MaterialsWarehouse materialsWarehouse = new MaterialsWarehouse();
+                    materialsWarehouse.setMaterials(mB.getMaterials());
+                    materialsWarehouse.setWarehouse(mB.getWarehouse());
+                    materialsWarehouse.setQuatity(mB.getActualQuantity());
+                    materialsWarehouse.setStatus(1);
+                    materialsWarehouse.setCreateDate(DateUtil.getCurrenDateTime());
+                    materialsWarehouse.setUpdateDate(DateUtil.getCurrenDateTime());
+
+                    upDateMaterialsWarehouseList.add(materialsWarehouse);
+                }
             });
 
 
