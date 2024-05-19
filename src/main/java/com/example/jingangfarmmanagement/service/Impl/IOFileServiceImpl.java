@@ -36,7 +36,7 @@ public class IOFileServiceImpl implements IOFileService {
     MaterialsRepository materialsRepository;
     @Override
     @Transactional
-    public BaseResponse importPetsFromExcel(MultipartFile file,String farmCode) throws IOException {
+    public BaseResponse importPetsFromExcel(MultipartFile file,String farmCode,String cageCode) throws IOException {
         List<Pet> pets = new ArrayList<>();
         int totalPets=petRepository.findAll().size();
         int noPet=totalPets+1;
@@ -47,14 +47,15 @@ public class IOFileServiceImpl implements IOFileService {
                     continue;
                 }
                 Pet pet = new Pet();
-                pet.setCode("VN_" + farmCode + "_" + getCellValue(row.getCell(5)) + "_" + noPet);
+                pet.setCode("VN_" + farmCode + "_" + cageCode + "_" + noPet);
                 pet.setName(getCellValueOrDefault(row.getCell(0)));
                 pet.setType(getCellValueOrDefault(row.getCell(1)));
                 pet.setAge(getCellNumericValueOrDefault(row.getCell(2)));
                 pet.setWeight(getCellNumericValueOrDefault(row.getCell(3)));
                 pet.setSex(getCellSexValueOrDefault(row.getCell(4)));
-                pet.setCage(getCageFromCellOrDefault(row.getCell(5)));
+                pet.setCage(getCage(cageCode));
                 pet.setUilness(getCellValueOrDefault(row.getCell(6)));
+                pet.setStatus(1);
                 pets.add(pet);
                 noPet++;
             }
@@ -112,12 +113,9 @@ public class IOFileServiceImpl implements IOFileService {
         return cell != null && cell.getCellType() != CellType.BLANK && getCellValue(cell).equalsIgnoreCase("Cái") ? 0 : 1;
     }
 
-    private Cage getCageFromCellOrDefault(Cell cell) {
-        if (cell != null && cell.getCellType() != CellType.BLANK) {
-            Cage cage = cageRepository.findByCode(getCellValue(cell));
-            if (cage != null) {
-                return cage;
-            }
+    private Cage getCage(String cageCode) {
+        if (cageCode != null) {
+           return cageRepository.findByCode(cageCode);
         }
         return null;
     }

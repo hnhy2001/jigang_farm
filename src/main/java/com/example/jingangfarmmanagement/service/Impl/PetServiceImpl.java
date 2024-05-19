@@ -29,8 +29,7 @@ public class PetServiceImpl extends BaseServiceImpl<Pet> implements PetService {
     @Autowired
     private PetRepository petRepository;
     @Override
-    protected BaseRepository<Pet> getRepository() {
-        return petRepository;
+    protected BaseRepository<Pet> getRepository() {return petRepository;
     }
 
     @Override

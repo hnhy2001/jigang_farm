@@ -30,14 +30,14 @@ public class CageServiceImpl extends BaseServiceImpl<Cage> implements CageServic
     private static final String DELETED_FILTER = ";status>-1";
 
     @Autowired
-    private CageRepository cageReponsitory;
+    private CageRepository cageRepository;
 
     @Autowired
     private PetService petService;
 
     @Override
     protected BaseRepository<Cage> getRepository() {
-        return cageReponsitory;
+        return cageRepository;
     }
 
     @Override
@@ -46,8 +46,7 @@ public class CageServiceImpl extends BaseServiceImpl<Cage> implements CageServic
         Node rootNode = new RSQLParser().parse(req.getFilter());
         Specification<Cage> spec = rootNode.accept(new CustomRsqlVisitor<>());
         Pageable pageable = getPage(req);
-        Page<CageProjection> result = cageReponsitory.findAll(spec, CageProjection.class, pageable);
-        return result;
+        return cageRepository.findAll(spec, CageProjection.class, pageable);
     }
 
     @Override

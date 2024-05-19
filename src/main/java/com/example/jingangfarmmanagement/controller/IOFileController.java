@@ -18,9 +18,10 @@ public class IOFileController {
     private IOFileService ioFileService;
     @PostMapping("pet/import")
     public BaseResponse importPetFile(@RequestBody MultipartFile file,
-                                      @RequestParam(required = true) String farmCode) throws IOException {
+                                      @RequestParam(required = true) String farmCode,
+                                      @RequestParam(required = true) String cageCode) throws IOException {
 
-        return ioFileService.importPetsFromExcel(file,farmCode);
+        return ioFileService.importPetsFromExcel(file,farmCode,cageCode);
 
     }
     @PostMapping("material/import")
