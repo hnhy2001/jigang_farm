@@ -123,7 +123,7 @@ public class IOFileServiceImpl implements IOFileService {
     }
     @Override
     @Transactional
-    public BaseResponse importMaterialsFromExcel(MultipartFile file,String farmCode,String cageCode) throws IOException {
+    public BaseResponse importMaterialsFromExcel(MultipartFile file) throws IOException {
         List<Materials> materials = new ArrayList<>();
         int totalMaterials = materialsRepository.findAll().size();
         int noMaterials = totalMaterials+1;
@@ -134,7 +134,7 @@ public class IOFileServiceImpl implements IOFileService {
                     continue;
                 }
                 Materials material = new Materials();
-                material.setCode("VN_" + farmCode + "_" + cageCode + "_" + noMaterials);
+                material.setCode("VN_"+ noMaterials);
                 material.setName(getCellValueOrDefault(row.getCell(0)));
                 material.setCargo(getCellValueOrDefault(row.getCell(1)));
                 material.setUnit(getCellValueOrDefault(row.getCell(2)));
@@ -146,7 +146,11 @@ public class IOFileServiceImpl implements IOFileService {
                 noMaterials++;
             }
         }
-        materialsRepository.saveAll(materials);
+        catch (IOException e)
+        {
+            throw new IOException(e);
+        }
+        materialsRepository.saveAllAndFlush(materials);
         return new BaseResponse(200, "OK", "Nhập dữ liệu thành công");
     }
 }
