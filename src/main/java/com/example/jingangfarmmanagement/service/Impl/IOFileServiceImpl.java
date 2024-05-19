@@ -54,7 +54,7 @@ public class IOFileServiceImpl implements IOFileService {
                 pet.setWeight(getCellNumericValueOrDefault(row.getCell(3)));
                 pet.setSex(getCellSexValueOrDefault(row.getCell(4)));
                 pet.setCage(getCage(cageCode));
-                pet.setUilness(getCellValueOrDefault(row.getCell(6)));
+                pet.setUilness(getCellValueOrDefault(row.getCell(5)));
                 pet.setStatus(1);
                 pets.add(pet);
                 noPet++;
