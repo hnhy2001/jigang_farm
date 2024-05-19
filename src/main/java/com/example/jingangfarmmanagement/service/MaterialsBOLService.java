@@ -1,2 +1,9 @@
-package com.example.jingangfarmmanagement.service;public class MaterialsBOLService {
+package com.example.jingangfarmmanagement.service;
+
+import com.example.jingangfarmmanagement.repository.entity.MaterialsBOL;
+
+import java.util.List;
+
+public interface MaterialsBOLService extends BaseService<MaterialsBOL> {
+    List<MaterialsBOL> createMaterialsBOLList(List<MaterialsBOL> materialsBOLList);
 }

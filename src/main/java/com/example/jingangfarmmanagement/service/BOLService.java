@@ -5,4 +5,6 @@ import com.example.jingangfarmmanagement.repository.entity.BOL;
 
 public interface BOLService extends BaseService<BOL>{
     BaseResponse customCreate(BOL bol) throws Exception;
+    BaseResponse customUpdate(BOL bol) throws Exception;
+    BaseResponse cancel(Long id) throws Exception;
 }

@@ -7,6 +7,8 @@ import com.example.jingangfarmmanagement.service.MaterialsWarehouseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class MaterialsWarehouseServiceImpl extends BaseServiceImpl<MaterialsWarehouse> implements MaterialsWarehouseService {
     @Autowired
@@ -14,5 +16,10 @@ public class MaterialsWarehouseServiceImpl extends BaseServiceImpl<MaterialsWare
     @Override
     protected BaseRepository<MaterialsWarehouse> getRepository() {
         return materialsWarehouseRepository;
+    }
+
+    @Override
+    public List<MaterialsWarehouse> createMaterialsWarehouses(List<MaterialsWarehouse> materialsWarehouses) {
+        return materialsWarehouseRepository.saveAll(materialsWarehouses);
     }
 }

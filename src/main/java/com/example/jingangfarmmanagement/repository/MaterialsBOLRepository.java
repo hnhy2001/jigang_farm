@@ -1,2 +1,6 @@
-package com.example.jingangfarmmanagement.repository;public class MaterialsBOLRepository {
+package com.example.jingangfarmmanagement.repository;
+
+import com.example.jingangfarmmanagement.repository.entity.MaterialsBOL;
+
+public interface MaterialsBOLRepository extends BaseRepository<MaterialsBOL>{
 }

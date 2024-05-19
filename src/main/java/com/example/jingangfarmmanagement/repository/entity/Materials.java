@@ -6,9 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.LastModifiedDate;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.util.Date;
 
 @Entity
@@ -26,22 +24,25 @@ public class Materials extends BaseEntity{
     @Column(name = "cargo")
     private String cargo;
 
-    @Column(name = "expiration_date")
+    @Transient
     private Long expirationDate;
 
     @Column(name = "unit")
     private String unit;
 
-    @Column(name = "estimateQuantity")
-    private Long estimateQuantity;
+    @Transient
+    private Long estimateQuantity = 0L;
 
-    @Column(name = "actualQuantity")
-    private Long actualQuantity;
+    @Transient
+    private Long actualQuantity = 0L;
 
-    @Column(name = "unitPridce")
-    private Long unitPridce;
+    @Transient
+    private Long unitPridce = 0L;
 
-    @Column(name = "price")
-    private Long price;
+    @Transient
+    private Long price = 0L;
+
+    @Transient
+    private Warehouse warehouse;
 }
 

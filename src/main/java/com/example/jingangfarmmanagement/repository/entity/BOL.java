@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @AllArgsConstructor
@@ -15,9 +16,6 @@ public class BOL extends BaseEntity{
     @Column(name = "type")
     private int type;
 
-    @Column(name = "status")
-    private String status;
-
     @Column(name = "debt")
     private Long debt;
 
@@ -25,7 +23,6 @@ public class BOL extends BaseEntity{
     @JoinColumn(name = "consignee")
     private User consignee;
 
-    @ManyToOne
-    @JoinColumn(name = "warehouse")
-    private Warehouse warehouse;
+    @Transient
+    private List<Materials> materialsList;
 }
