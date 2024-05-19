@@ -2,6 +2,7 @@ package com.example.jingangfarmmanagement.service.Impl;
 
 import com.example.jingangfarmmanagement.repository.BaseRepository;
 import com.example.jingangfarmmanagement.repository.MaterialsBOLRepository;
+import com.example.jingangfarmmanagement.repository.entity.BOL;
 import com.example.jingangfarmmanagement.repository.entity.MaterialsBOL;
 import com.example.jingangfarmmanagement.service.MaterialsBOLService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,5 +22,10 @@ public class MaterialsBOLServiceImpl extends BaseServiceImpl<MaterialsBOL> imple
     @Override
     public List<MaterialsBOL> createMaterialsBOLList(List<MaterialsBOL> materialsBOLList) {
         return materialsBOLRepository.saveAll(materialsBOLList);
+    }
+
+    @Override
+    public List<MaterialsBOL> getByBOL(BOL bol) {
+        return materialsBOLRepository.findAllByBol(bol);
     }
 }

@@ -142,9 +142,9 @@ public class IOFileServiceImpl implements IOFileService {
                 material.setCargo(getCellValueOrDefault(row.getCell(1)));
                 material.setUnit(getCellValueOrDefault(row.getCell(2)));
                 material.setExpirationDate(getDateCellValueOrDefault(row.getCell(3)));
-                material.setPrice(Long.parseLong(String.valueOf(getCellNumericValueOrDefault(row.getCell(4)))));
-                material.setEstimateQuantity(getNumericCellValueOrDefault(row.getCell(5)));
-                material.setActualQuantity(getNumericCellValueOrDefault(row.getCell(6)));
+//                material.setPrice(Long.parseLong(String.valueOf(getCellNumericValueOrDefault(row.getCell(4)))));
+//                material.setEstimateQuantity(getNumericCellValueOrDefault(row.getCell(5)));
+//                material.setActualQuantity(getNumericCellValueOrDefault(row.getCell(6)));
                 materials.add(material);
                 noMaterials++;
             }
