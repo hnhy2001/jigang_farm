@@ -19,10 +19,10 @@ public class BOL extends BaseEntity{
     @Column(name = "debt")
     private Long debt;
 
+    @Column(name = "code")
+    private String code;
+
     @ManyToOne
     @JoinColumn(name = "consignee")
     private User consignee;
-
-    @Transient
-    private List<Materials> materialsList;
 }

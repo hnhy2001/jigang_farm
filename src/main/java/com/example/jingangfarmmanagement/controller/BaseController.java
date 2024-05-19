@@ -19,7 +19,7 @@ public abstract class BaseController<T extends BaseEntity> {
     }
 
     @GetMapping("/search")
-    @PreAuthorize("@appAuthorizer.authorize(authentication, 'VIEW', this)")
+//    @PreAuthorize("@appAuthorizer.authorize(authentication, 'VIEW', this)")
     public BaseResponse search(SearchReq req) {
         return new BaseResponse(200, "Lấy dữ liệu thành công!", this.getService().search(req));
     }

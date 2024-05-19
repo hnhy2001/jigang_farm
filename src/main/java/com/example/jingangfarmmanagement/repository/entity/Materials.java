@@ -30,18 +30,21 @@ public class Materials extends BaseEntity {
     @Column(name = "unit")
     private String unit;
 
-    @Transient
-    private Long estimateQuantity = 0L;
-
-    @Transient
-    private Long actualQuantity = 0L;
-
-    @Transient
-    private Long unitPridce = 0L;
-
-    @Transient
-    private Long price = 0L;
-
-    @Transient
-    private Warehouse warehouse;
+    @Column(name = "price")
+    private String price;
+//
+//    @Transient
+//    private Long estimateQuantity = 0L;
+//
+//    @Transient
+//    private Long actualQuantity = 0L;
+//
+//    @Transient
+//    private Long unitPridce = 0L;
+//
+//    @Transient
+//    private Long price = 0L;
+//
+//    @Transient
+//    private Warehouse warehouse;
 }
