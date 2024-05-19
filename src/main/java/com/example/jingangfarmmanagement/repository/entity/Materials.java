@@ -14,7 +14,7 @@ import java.util.Date;
 @NoArgsConstructor
 @Data
 @Table(name = "materials")
-public class Materials extends BaseEntity{
+public class Materials extends BaseEntity {
     @Column(name = "name")
     private String name;
 
@@ -45,4 +45,3 @@ public class Materials extends BaseEntity{
     @Transient
     private Warehouse warehouse;
 }
-
