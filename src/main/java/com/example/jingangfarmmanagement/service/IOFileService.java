@@ -8,5 +8,5 @@ import java.io.IOException;
 
 public interface IOFileService {
     public BaseResponse importPetsFromExcel(MultipartFile file,String farmCode) throws IOException;
-    public BaseResponse importMaterialsFromExcel(MultipartFile file, String farmCode, String cageCode) throws IOException;
+    public BaseResponse importMaterialsFromExcel(MultipartFile file) throws IOException;
 }

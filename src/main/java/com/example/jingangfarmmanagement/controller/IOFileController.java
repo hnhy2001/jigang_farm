@@ -24,11 +24,9 @@ public class IOFileController {
 
     }
     @PostMapping("material/import")
-    public BaseResponse importMaterialFile(@RequestBody MultipartFile file,
-                                           @RequestParam(required = true) String farmCode,
-                                           @RequestParam(required = true) String cageCode) throws IOException {
+    public BaseResponse importMaterialFile(@RequestBody MultipartFile file) throws IOException {
 
-            return ioFileService.importMaterialsFromExcel(file,farmCode,cageCode);
+            return ioFileService.importMaterialsFromExcel(file);
 
     }
 }

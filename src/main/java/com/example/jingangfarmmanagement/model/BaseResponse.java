@@ -6,7 +6,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class BaseResponse extends Throwable {
+public class BaseResponse  {
     private int code;
     private String message;
     private Object result;
