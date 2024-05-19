@@ -143,6 +143,7 @@ public class IOFileServiceImpl implements IOFileService {
                 material.setCargo(getCellValueOrDefault(row.getCell(1)));
                 material.setUnit(getCellValueOrDefault(row.getCell(2)));
                 material.setExpirationDate(getDateCellValueOrDefault(row.getCell(3)));
+                material.setStatus(1);
                 materials.add(material);
                 noMaterials++;
             }
