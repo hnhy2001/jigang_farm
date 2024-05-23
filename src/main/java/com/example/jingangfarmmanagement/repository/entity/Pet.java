@@ -1,18 +1,22 @@
 package com.example.jingangfarmmanagement.repository.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 @Table(name = "pet")
+@JsonIgnoreProperties({"treatmentCards"})
 public class Pet extends BaseEntity{
     @Column(name = "code")
     private String code;
@@ -51,4 +55,7 @@ public class Pet extends BaseEntity{
 
     @Column(name = "parent")
     private String parent;
+    @ManyToMany(mappedBy = "pets")
+    @JsonBackReference
+    private List<TreatmentCard> treatmentCards;
 }

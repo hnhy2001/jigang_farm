@@ -1,19 +1,22 @@
 package com.example.jingangfarmmanagement.repository.entity;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 @Table(name = "materials")
+
 public class Materials extends BaseEntity {
     @Column(name = "name")
     private String name;
@@ -32,6 +35,9 @@ public class Materials extends BaseEntity {
 
     @Column(name = "price")
     private String price;
+    @OneToMany(mappedBy = "material",cascade = CascadeType.ALL)
+    @JsonBackReference
+    List<TreatmentCardMaterial> treatmentCardMaterials;
 //
 //    @Transient
 //    private Long estimateQuantity = 0L;
