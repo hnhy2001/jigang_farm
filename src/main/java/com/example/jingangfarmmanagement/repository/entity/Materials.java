@@ -35,9 +35,6 @@ public class Materials extends BaseEntity {
 
     @Column(name = "price")
     private String price;
-    @OneToMany(mappedBy = "material",cascade = CascadeType.ALL)
-    @JsonBackReference
-    List<TreatmentCardMaterial> treatmentCardMaterials;
 //
 //    @Transient
 //    private Long estimateQuantity = 0L;

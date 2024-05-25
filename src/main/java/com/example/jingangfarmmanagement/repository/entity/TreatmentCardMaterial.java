@@ -19,13 +19,13 @@ import javax.persistence.ManyToOne;
 @Setter
 public class TreatmentCardMaterial extends BaseEntity{
 
-    @ManyToOne()
-    @JoinColumn(name="treatment_card_id")
-    @JsonBackReference
-    private TreatmentCard treatmentCard;
-    @ManyToOne()
-    @JoinColumn(name="material_id")
-    @JsonManagedReference
-    private Materials material;
+//    @ManyToOne()
+//    @JoinColumn(name="treatment_card_id")
+//    private TreatmentCard treatmentCard;
+//    @ManyToOne()
+//    @JoinColumn(name="material_id")
+//    private Materials material;
+    private Long treatmentCardId;
+    private Long materialId;
     private Long quantity;
 }

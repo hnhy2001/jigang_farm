@@ -8,6 +8,6 @@ import java.util.List;
 
 @Repository
 public interface TreatmentCardMaterialRepository extends BaseRepository<TreatmentCardMaterial> {
-    List<TreatmentCardMaterial> findByTreatmentCard(TreatmentCard treatmentCard);
+    List<TreatmentCardMaterial> findByTreatmentCardId(Long treatmentCardId);
 
 }

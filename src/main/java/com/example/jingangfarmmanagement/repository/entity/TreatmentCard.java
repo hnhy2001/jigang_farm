@@ -1,6 +1,7 @@
 package com.example.jingangfarmmanagement.repository.entity;
 
 import com.example.jingangfarmmanagement.repository.entity.Enum.ETreatmentCardStatus;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 
@@ -31,8 +32,4 @@ public class TreatmentCard extends BaseEntity{
     )
     @JsonManagedReference
     private List<Pet> pets = new ArrayList<>();
-    @OneToMany(mappedBy = "treatmentCard",cascade = CascadeType.ALL)
-    @JsonManagedReference
-    List<TreatmentCardMaterial> treatmentCardMaterials;
-
 }

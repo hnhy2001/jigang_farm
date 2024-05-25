@@ -1,6 +1,7 @@
 package com.example.jingangfarmmanagement.controller;
 
 import com.example.jingangfarmmanagement.model.BaseResponse;
+import com.example.jingangfarmmanagement.model.req.SearchReq;
 import com.example.jingangfarmmanagement.model.req.TreatmentCardReq;
 import com.example.jingangfarmmanagement.repository.entity.TreatmentCard;
 import com.example.jingangfarmmanagement.service.BaseService;
@@ -26,5 +27,13 @@ public class TreatmentCardController extends BaseController<TreatmentCard>{
     @PutMapping("/treatment/update")
     public BaseResponse updateTreatment(@RequestParam Long id,@RequestBody TreatmentCardReq req) {
         return treatmentCardService.updateTreatment(id,req);
+    }
+    @GetMapping("/treatment/get-by-id")
+    public BaseResponse getTreatmentCardById(@RequestParam Long id){
+        return treatmentCardService.getTreatmentCardById(id);
+    }
+    @GetMapping("/treatment/search")
+    public BaseResponse search(SearchReq req) {
+        return new BaseResponse(200, "Lấy dữ liệu thành công!", treatmentCardService.searchTreatmentCard(req));
     }
 }
