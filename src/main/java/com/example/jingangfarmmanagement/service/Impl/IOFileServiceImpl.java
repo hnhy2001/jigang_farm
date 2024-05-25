@@ -140,9 +140,9 @@ public class IOFileServiceImpl implements IOFileService {
                 Materials material = new Materials();
                 material.setCode("VN_" + noMaterials);
                 material.setName(getCellValueOrDefault(row.getCell(0)));
-                material.setCargo(getCellValueOrDefault(row.getCell(1)));
+                material.setNote(getCellValueOrDefault(row.getCell(1)));
                 material.setUnit(getCellValueOrDefault(row.getCell(2)));
-                material.setExpirationDate(getDateCellValueOrDefault(row.getCell(3)));
+//                material.setExpirationDate(getDateCellValueOrDefault(row.getCell(3)));
                 material.setStatus(1);
                 materials.add(material);
                 noMaterials++;

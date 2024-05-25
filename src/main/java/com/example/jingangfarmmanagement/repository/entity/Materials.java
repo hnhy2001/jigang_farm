@@ -35,6 +35,8 @@ public class Materials extends BaseEntity {
 
     @Column(name = "price")
     private String price;
+    @Column(name="note")
+    private String note;
 //
 //    @Transient
 //    private Long estimateQuantity = 0L;
