@@ -1,8 +1,10 @@
 package com.example.jingangfarmmanagement.service.Impl;
 
+import com.example.jingangfarmmanagement.mapper.TreatmentCardMapper;
 import com.example.jingangfarmmanagement.model.BaseResponse;
 import com.example.jingangfarmmanagement.model.req.SearchReq;
 import com.example.jingangfarmmanagement.model.req.TreatmentCardReq;
+import com.example.jingangfarmmanagement.model.response.MaterialRes;
 import com.example.jingangfarmmanagement.model.response.TreatmentCardRes;
 import com.example.jingangfarmmanagement.query.CustomRsqlVisitor;
 import com.example.jingangfarmmanagement.repository.*;
@@ -33,6 +35,8 @@ public class TreatmentCardServiceImpl extends BaseServiceImpl<TreatmentCard> imp
     PetRepository petRepository;
     @Autowired
     MaterialsRepository materialsRepository;
+    @Autowired
+    TreatmentCardMapper treatmentCardMapper;
     @Autowired
     TreatmentCardMaterialRepository treatmentCardMaterialRepository;
     private static final String DELETED_FILTER = ";status>-1";
@@ -130,15 +134,17 @@ public class TreatmentCardServiceImpl extends BaseServiceImpl<TreatmentCard> imp
 
         List<TreatmentCardMaterial> treatmentCardMaterials = treatmentCardMaterialRepository.findByTreatmentCardId(id);
 
-        List<Materials> materialList = treatmentCardMaterials.stream()
-                .map(treatmentCardMaterial -> materialsRepository.findById(treatmentCardMaterial.getMaterialId())
-                        .orElseThrow(EntityNotFoundException::new))
+        List<MaterialRes> materialList = treatmentCardMaterials.stream()
+                .map(treatmentCardMaterial ->{
+                    Materials material = materialsRepository.findById(treatmentCardMaterial.getMaterialId())
+                        .orElseThrow(EntityNotFoundException::new);
+                  return treatmentCardMapper.toMaterialRes(material, treatmentCardMaterial.getQuantity());
+                })
                 .collect(Collectors.toList());
 
         TreatmentCardRes treatmentCardRes = new TreatmentCardRes();
         treatmentCardRes.setTreatmentCard(treatmentCard);
-        treatmentCardRes.setMaterialsList(materialList);
-
+        treatmentCardRes.setMaterial(materialList);
         return new BaseResponse(200, "OK", treatmentCardRes);
     }
     @Override
@@ -152,13 +158,17 @@ public class TreatmentCardServiceImpl extends BaseServiceImpl<TreatmentCard> imp
         List<TreatmentCardRes> cardResList = treatmentCards.getContent().stream()
                 .map(treatmentCard -> {
                     List<TreatmentCardMaterial> treatmentCardMaterials = treatmentCardMaterialRepository.findByTreatmentCardId(treatmentCard.getId());
-                    List<Materials> materialList = treatmentCardMaterials.stream()
-                            .map(treatmentCardMaterial -> materialsRepository.findById(treatmentCardMaterial.getMaterialId())
-                                    .orElseThrow(EntityNotFoundException::new))
+                    List<MaterialRes> materialList = treatmentCardMaterials.stream()
+                            .map(treatmentCardMaterial ->{
+                                Materials material = materialsRepository.findById(treatmentCardMaterial.getMaterialId())
+                                        .orElseThrow(EntityNotFoundException::new);
+                                return treatmentCardMapper.toMaterialRes(material, treatmentCardMaterial.getQuantity());
+                            })
                             .collect(Collectors.toList());
+
                     TreatmentCardRes treatmentCardRes = new TreatmentCardRes();
                     treatmentCardRes.setTreatmentCard(treatmentCard);
-                    treatmentCardRes.setMaterialsList(materialList);
+                    treatmentCardRes.setMaterial(materialList);
                     return treatmentCardRes;
                 })
                 .collect(Collectors.toList());

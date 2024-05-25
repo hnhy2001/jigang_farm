@@ -13,5 +13,5 @@ import java.util.List;
 @Getter
 public class TreatmentCardRes {
     private TreatmentCard treatmentCard;
-    private List<Materials> materialsList;
+    private List<MaterialRes> material;
 }
