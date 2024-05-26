@@ -49,7 +49,7 @@ public class TreatmentCardServiceImpl extends BaseServiceImpl<TreatmentCard> imp
         try {
             TreatmentCard treatmentCard = new TreatmentCard();
             treatmentCard.setCode(req.getCode());
-            treatmentCard.setNote(req.getCode());
+            treatmentCard.setNote(req.getNote());
             treatmentCard.setStatus(1);
             treatmentCard.setCreateDate(req.getCreateDate());
             List<Uilness> uilnesses = new ArrayList<>();
