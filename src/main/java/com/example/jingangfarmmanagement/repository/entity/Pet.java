@@ -53,8 +53,10 @@ public class Pet extends BaseEntity{
     @Column(name = "uilness")
     private String uilness;
 
-    @Column(name = "parent")
-    private String parent;
+    @Column(name = "parent_dad")
+    private String parentDad;
+    @Column(name = "parent_mom")
+    private String parentMon;
     @ManyToMany(mappedBy = "pets")
     @JsonBackReference
     private List<TreatmentCard> treatmentCards;

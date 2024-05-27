@@ -12,8 +12,13 @@ import java.util.List;
 
 public interface PetService extends BaseService<Pet> {
     public BaseResponse changeCage(ChangeCageReq changCageReq);
+
     Page<PetProjection> customSearch(SearchReq req);
+
     PetProjection customDetails(Long id);
+
     List<Pet> getByStatus(int status);
+
+    public BaseResponse createPet(Pet pet) throws Exception;
 
 }

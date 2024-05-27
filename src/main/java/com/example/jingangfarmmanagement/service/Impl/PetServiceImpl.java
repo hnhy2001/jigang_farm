@@ -1,5 +1,6 @@
 package com.example.jingangfarmmanagement.service.Impl;
 
+import com.example.jingangfarmmanagement.constants.Status;
 import com.example.jingangfarmmanagement.model.BaseResponse;
 import com.example.jingangfarmmanagement.model.req.ChangeCageReq;
 import com.example.jingangfarmmanagement.model.req.SearchReq;
@@ -11,6 +12,7 @@ import com.example.jingangfarmmanagement.repository.PetRepository;
 import com.example.jingangfarmmanagement.repository.entity.Farm;
 import com.example.jingangfarmmanagement.repository.entity.Pet;
 import com.example.jingangfarmmanagement.service.PetService;
+import com.example.jingangfarmmanagement.uitl.DateUtil;
 import cz.jirutka.rsql.parser.RSQLParser;
 import cz.jirutka.rsql.parser.ast.Node;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,5 +62,14 @@ public class PetServiceImpl extends BaseServiceImpl<Pet> implements PetService {
         }).collect(Collectors.toList());
         petRepository.saveAll(pets);
         return new BaseResponse(200, "OK", "Chuyển chuồng thành công");
+    }
+    @Override
+    public BaseResponse createPet(Pet pet) throws Exception {
+        pet.setStatus(Status.ACTIVE);
+        pet.setCreateDate(DateUtil.getCurrenDateTime());
+        if (petRepository.existsByName(pet.getName())) {
+            return new BaseResponse(500, "Tên vật nuôi đã tồn tại", null);
+        }
+        return new BaseResponse(200, "Thêm mới vật nuôi thành công", petRepository.save(pet));
     }
 }
