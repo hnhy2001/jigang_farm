@@ -53,7 +53,7 @@ public class CageServiceImpl extends BaseServiceImpl<Cage> implements CageServic
     public BaseResponse quantityPet() {
         ModelMapper mapper = new ModelMapper();
         List<Cage> cageList = super.getAll();
-        List<Pet> petList = petService.getAll();
+        List<Pet> petList = petService.getByStatus(1);
         if (cageList.isEmpty())
             return new BaseResponse().fail("Không có chuồng nào");
         if (petList.isEmpty())

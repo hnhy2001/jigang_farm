@@ -47,6 +47,11 @@ public class PetServiceImpl extends BaseServiceImpl<Pet> implements PetService {
     }
 
     @Override
+    public List<Pet> getByStatus(int status) {
+        return petRepository.findAllByStatus(1);
+    }
+
+    @Override
     public BaseResponse changeCage(ChangeCageReq changCageReq) {
         List<Pet> pets = petRepository.findByIdIn(changCageReq.getPetList());
         pets.stream().map(e -> {

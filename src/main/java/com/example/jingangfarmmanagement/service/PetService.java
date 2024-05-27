@@ -8,9 +8,12 @@ import com.example.jingangfarmmanagement.projection.PetProjection;
 import com.example.jingangfarmmanagement.repository.entity.Pet;
 import org.springframework.data.domain.Page;
 
+import java.util.List;
+
 public interface PetService extends BaseService<Pet> {
     public BaseResponse changeCage(ChangeCageReq changCageReq);
     Page<PetProjection> customSearch(SearchReq req);
     PetProjection customDetails(Long id);
+    List<Pet> getByStatus(int status);
 
 }
