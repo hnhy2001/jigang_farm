@@ -10,4 +10,5 @@ import java.util.List;
 @Repository
 public interface PetRepository extends BaseRepository<Pet>, JpaSpecificationExecutorWithProjection<Pet> {
     List<Pet> findByIdIn(List<Long> ids);
+    boolean existsByName(String name);
 }

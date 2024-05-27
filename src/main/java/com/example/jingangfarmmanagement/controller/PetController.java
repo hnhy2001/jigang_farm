@@ -27,4 +27,8 @@ public class PetController extends BaseController<Pet> {
     public BaseResponse changeCage(@RequestBody ChangeCageReq changeCageReq) {
         return petService.changeCage(changeCageReq);
     }
+    @PostMapping("/create-pet")
+    public BaseResponse create(@RequestBody Pet pet) throws Exception {
+        return petService.createPet(pet);
+    }
 }

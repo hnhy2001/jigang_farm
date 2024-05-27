@@ -16,7 +16,8 @@ public interface PetProjection {
     double getWeight();
     String getWarning();
     int getSex();
-    String getParent();
+    String getParentDad();
+    String getParentMom();
     PetTypeWithId getType();
     UilnessWithId getUilness();
     CageWithId getCage();

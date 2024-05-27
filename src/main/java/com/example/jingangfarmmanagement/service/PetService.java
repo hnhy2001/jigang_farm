@@ -12,5 +12,6 @@ public interface PetService extends BaseService<Pet> {
     public BaseResponse changeCage(ChangeCageReq changCageReq);
     Page<PetProjection> customSearch(SearchReq req);
     PetProjection customDetails(Long id);
+    public BaseResponse createPet(Pet pet) throws Exception;
 
 }
