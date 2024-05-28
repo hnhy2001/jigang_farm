@@ -20,6 +20,7 @@ import java.util.List;
 @NoArgsConstructor
 @Data
 @Table(name = "uilness")
+@JsonIgnoreProperties({"treatmentCards"})
 public class Uilness extends BaseEntity{
     @Column(name = "code")
     private String code;
