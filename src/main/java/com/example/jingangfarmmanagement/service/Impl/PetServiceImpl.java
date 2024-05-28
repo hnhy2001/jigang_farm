@@ -82,6 +82,6 @@ public class PetServiceImpl extends BaseServiceImpl<Pet> implements PetService {
         }
         ObjectMapperUtils.map(pet, entityMy);
         pet.setUpdateDate(DateUtil.getCurrenDateTime());
-        return new BaseResponse(200, "Thêm mới vật nuôi thành công", petRepository.save(entityMy));
+        return new BaseResponse(200, "Cập nhật vật nuôi thành công", petRepository.save(entityMy));
     }
 }
