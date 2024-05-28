@@ -14,4 +14,5 @@ public interface PetRepository extends BaseRepository<Pet>, JpaSpecificationExec
     List<Pet> findAllByStatus(int status);
 
     boolean existsByName(String name);
+    Pet findByName(String name);
 }

@@ -13,6 +13,7 @@ import com.example.jingangfarmmanagement.repository.entity.Farm;
 import com.example.jingangfarmmanagement.repository.entity.Pet;
 import com.example.jingangfarmmanagement.service.PetService;
 import com.example.jingangfarmmanagement.uitl.DateUtil;
+import com.example.jingangfarmmanagement.uitl.ObjectMapperUtils;
 import cz.jirutka.rsql.parser.RSQLParser;
 import cz.jirutka.rsql.parser.ast.Node;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,5 +72,16 @@ public class PetServiceImpl extends BaseServiceImpl<Pet> implements PetService {
             return new BaseResponse(500, "Tên vật nuôi đã tồn tại", null);
         }
         return new BaseResponse(200, "Thêm mới vật nuôi thành công", petRepository.save(pet));
+    }
+    @Override
+    public BaseResponse updatePet (Pet pet) throws Exception {
+        Pet entityMy = petRepository.getById(pet.getId());
+        Pet existingPet = petRepository.findByName(pet.getName());
+        if (existingPet != null && !existingPet.getId().equals(pet.getId())) {
+            return new BaseResponse(500, "Tên vật nuôi đã tồn tại", null);
+        }
+        ObjectMapperUtils.map(pet, entityMy);
+        pet.setUpdateDate(DateUtil.getCurrenDateTime());
+        return new BaseResponse(200, "Thêm mới vật nuôi thành công", petRepository.save(entityMy));
     }
 }

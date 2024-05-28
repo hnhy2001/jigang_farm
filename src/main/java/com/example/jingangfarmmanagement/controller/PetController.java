@@ -31,4 +31,8 @@ public class PetController extends BaseController<Pet> {
     public BaseResponse create(@RequestBody Pet pet) throws Exception {
         return petService.createPet(pet);
     }
+    @PutMapping("/update-pet")
+    public BaseResponse update(@RequestBody Pet pet) throws Exception {
+        return petService.updatePet(pet);
+    }
 }

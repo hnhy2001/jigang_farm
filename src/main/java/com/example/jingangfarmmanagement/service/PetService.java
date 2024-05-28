@@ -20,5 +20,5 @@ public interface PetService extends BaseService<Pet> {
     List<Pet> getByStatus(int status);
 
     public BaseResponse createPet(Pet pet) throws Exception;
-
+    public BaseResponse updatePet(Pet pet) throws Exception;
 }
