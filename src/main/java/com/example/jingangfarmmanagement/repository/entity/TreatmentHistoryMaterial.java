@@ -17,15 +17,8 @@ import javax.persistence.ManyToOne;
 @Builder
 @Getter
 @Setter
-public class TreatmentCardMaterial extends BaseEntity{
-
-//    @ManyToOne()
-//    @JoinColumn(name="treatment_card_id")
-//    private TreatmentCard treatmentCard;
-//    @ManyToOne()
-//    @JoinColumn(name="material_id")
-//    private Materials material;
-    private Long treatmentCardId;
+public class TreatmentHistoryMaterial extends BaseEntity{
+    private Long treatmentHistoryId;
     private Long materialId;
     private Long quantity;
 }

@@ -28,12 +28,4 @@ public class TreatmentCardController extends BaseController<TreatmentCard>{
     public BaseResponse updateTreatment(@RequestParam Long id,@RequestBody TreatmentCardReq req) {
         return treatmentCardService.updateTreatment(id,req);
     }
-    @GetMapping("/treatment/get-by-id")
-    public BaseResponse getTreatmentCardById(@RequestParam Long id){
-        return treatmentCardService.getTreatmentCardById(id);
-    }
-    @GetMapping("/treatment/search")
-    public BaseResponse search(SearchReq req) {
-        return new BaseResponse(200, "Lấy dữ liệu thành công!", treatmentCardService.searchTreatmentCard(req));
-    }
 }

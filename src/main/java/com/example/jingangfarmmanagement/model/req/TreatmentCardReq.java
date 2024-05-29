@@ -1,5 +1,6 @@
 package com.example.jingangfarmmanagement.model.req;
 
+import com.example.jingangfarmmanagement.repository.entity.TreatmentHistory;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,5 +16,4 @@ public class TreatmentCardReq {
     Long createDate;
     List<Long> petIds;
     List<Long> ulinessIds;
-    List<TreatmentCardMaterialReq> materials;
 }
