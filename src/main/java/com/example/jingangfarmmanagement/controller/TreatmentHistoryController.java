@@ -10,6 +10,8 @@ import com.example.jingangfarmmanagement.service.TreatmentHistoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @CrossOrigin
 @RestController
 @RequestMapping("treatment_history")
@@ -22,12 +24,12 @@ public class TreatmentHistoryController extends BaseController<TreatmentHistory>
         return treatmentHistoryService;
     }
     @PostMapping("/treatment/create")
-    public BaseResponse createTreatmentHistory(@RequestBody TreatmentHistoryReq req)  {
+    public BaseResponse createTreatmentHistory(@RequestBody List<TreatmentHistoryReq> req)  {
         return treatmentHistoryService.createTreatmentHistory(req);
     }
 
     @PutMapping("/treatment/update")
-    public BaseResponse updateTreatmentHistory(@RequestParam Long id,@RequestBody TreatmentHistoryReq req) {
+    public BaseResponse updateTreatmentHistory(@RequestParam Long id,@RequestBody List<TreatmentHistoryReq> req) {
         return treatmentHistoryService.updateTreatmentHistory(id,req);
     }
     @GetMapping("/treatment/get-by-id")

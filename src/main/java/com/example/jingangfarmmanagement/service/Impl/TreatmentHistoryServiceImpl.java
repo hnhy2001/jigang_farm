@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -42,9 +43,40 @@ public class TreatmentHistoryServiceImpl extends BaseServiceImpl<TreatmentHistor
         return treatmentHistoryRepository;
     }
     @Override
-    public BaseResponse createTreatmentHistory(TreatmentHistoryReq req) {
+    public BaseResponse createTreatmentHistory(List<TreatmentHistoryReq> reqList) {
         try {
-            TreatmentHistory treatmentHistory = new TreatmentHistory();
+            for(var req:reqList) {
+                TreatmentHistory treatmentHistory = new TreatmentHistory();
+                treatmentHistory.setUpdateDate(req.getUpdateDate());
+                treatmentHistory.setUnit(req.getUnit());
+                treatmentHistory.setStatus(1);
+                treatmentHistory.setType(req.getType());
+                treatmentHistory.setResult(req.getResult());
+                treatmentHistory.setTreatmentCardId(req.getTreatmentCardId());
+                treatmentHistoryRepository.save(treatmentHistory);
+
+                for (var materialReq : req.getMaterials()) {
+                    Materials material = materialsRepository.findById(materialReq.getMaterialId())
+                            .orElseThrow();
+                    TreatmentHistoryMaterial treatmentCardMaterial = new TreatmentHistoryMaterial();
+                    treatmentCardMaterial.setTreatmentHistoryId(treatmentHistory.getId());
+                    treatmentCardMaterial.setMaterialId(material.getId());
+                    treatmentCardMaterial.setQuantity(materialReq.getQuantity());
+                    treatmentHistoryMaterialRepository.save(treatmentCardMaterial);
+                }
+              }
+            return new BaseResponse(200, "OK", null);
+        } catch (Exception e) {
+            return new BaseResponse(500, "Internal Server Error", null);
+        }
+    }
+    @Override
+    @Transactional
+    public BaseResponse updateTreatmentHistory(Long treatmentCardHistoryId, List<TreatmentHistoryReq> reqList) {
+        TreatmentHistory treatmentHistory = treatmentHistoryRepository.findById(treatmentCardHistoryId)
+                .orElseThrow(() -> new EntityNotFoundException("Treatment card not found"));
+        // Update the properties
+        for(var req:reqList) {
             treatmentHistory.setUpdateDate(req.getUpdateDate());
             treatmentHistory.setUnit(req.getUnit());
             treatmentHistory.setStatus(1);
@@ -52,48 +84,19 @@ public class TreatmentHistoryServiceImpl extends BaseServiceImpl<TreatmentHistor
             treatmentHistory.setResult(req.getResult());
             treatmentHistory.setTreatmentCardId(req.getTreatmentCardId());
             treatmentHistoryRepository.save(treatmentHistory);
-
+            // Update materials
+            List<TreatmentHistoryMaterial> existingMaterials = treatmentHistoryMaterialRepository.findByTreatmentHistoryId(treatmentHistory.getId());
+            treatmentHistoryMaterialRepository.deleteAll(existingMaterials);
+            existingMaterials.clear();
             for (var materialReq : req.getMaterials()) {
                 Materials material = materialsRepository.findById(materialReq.getMaterialId())
-                        .orElseThrow();
+                        .orElseThrow(() -> new EntityNotFoundException(Constant.MATERIAL_NOT_FOUND));
                 TreatmentHistoryMaterial treatmentCardMaterial = new TreatmentHistoryMaterial();
                 treatmentCardMaterial.setTreatmentHistoryId(treatmentHistory.getId());
                 treatmentCardMaterial.setMaterialId(material.getId());
                 treatmentCardMaterial.setQuantity(materialReq.getQuantity());
                 treatmentHistoryMaterialRepository.save(treatmentCardMaterial);
             }
-
-            return new BaseResponse(200, "OK", treatmentHistory);
-        } catch (Exception e) {
-            return new BaseResponse(500, "Internal Server Error", null);
-        }
-    }
-    @Override
-    @Transactional
-    public BaseResponse updateTreatmentHistory(Long treatmentCardHistoryId, TreatmentHistoryReq req) {
-        TreatmentHistory treatmentHistory = treatmentHistoryRepository.findById(treatmentCardHistoryId)
-                .orElseThrow(() -> new EntityNotFoundException("Treatment card not found"));
-
-        // Update the properties
-        treatmentHistory.setUpdateDate(req.getUpdateDate());
-        treatmentHistory.setUnit(req.getUnit());
-        treatmentHistory.setStatus(1);
-        treatmentHistory.setType(req.getType());
-        treatmentHistory.setResult(req.getResult());
-        treatmentHistory.setTreatmentCardId(req.getTreatmentCardId());
-        treatmentHistoryRepository.save(treatmentHistory);
-        // Update materials
-        List<TreatmentHistoryMaterial> existingMaterials = treatmentHistoryMaterialRepository.findByTreatmentHistoryId(treatmentHistory.getId());
-        treatmentHistoryMaterialRepository.deleteAll(existingMaterials);
-        existingMaterials.clear();
-        for (var materialReq : req.getMaterials()) {
-            Materials material = materialsRepository.findById(materialReq.getMaterialId())
-                    .orElseThrow(() -> new EntityNotFoundException(Constant.MATERIAL_NOT_FOUND));
-            TreatmentHistoryMaterial treatmentCardMaterial = new TreatmentHistoryMaterial();
-            treatmentCardMaterial.setTreatmentHistoryId(treatmentHistory.getId());
-            treatmentCardMaterial.setMaterialId(material.getId());
-            treatmentCardMaterial.setQuantity(materialReq.getQuantity());
-            treatmentHistoryMaterialRepository.save(treatmentCardMaterial);
         }
         return new BaseResponse(200, "OK", treatmentHistory);
     }
