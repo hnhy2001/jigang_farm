@@ -78,43 +78,39 @@ public class TreatmentHistoryServiceImpl extends BaseServiceImpl<TreatmentHistor
     }
     @Override
     @Transactional
-    public BaseResponse updateTreatmentHistory(Long treatmentCardHistoryId, List<TreatmentHistoryReq> reqList) {
-        TreatmentHistory treatmentHistory = treatmentHistoryRepository.findById(treatmentCardHistoryId)
-                .orElseThrow(() -> new EntityNotFoundException("Treatment card not found"));
+    public BaseResponse updateTreatmentHistory(Long treatmentCardId, List<TreatmentHistoryReq> reqList) {
+        List<TreatmentHistory> treatmentHistoryList = treatmentHistoryRepository.findByTreatmentCardId(treatmentCardId);
+        treatmentHistoryRepository.deleteAll(treatmentHistoryList);
+        treatmentHistoryList.clear();
         // Update the properties
         for(var req:reqList) {
+            TreatmentHistory treatmentHistory = new TreatmentHistory();
+            treatmentHistory.setStatus(1);
             treatmentHistory.setTreatmentCardId(req.getTreatmentCardId());
             treatmentHistory.setCheckingDate(req.getCheckingDate());
             treatmentHistoryRepository.save(treatmentHistory);
-            List<HistoryHealth> exHistoryHealths= historyHealthRepository.findByTreatmentHistory(treatmentHistory);
-            historyHealthRepository.deleteAll(exHistoryHealths);
-            exHistoryHealths.clear();
             List<HistoryHealth> historyHealths = req.getHistoryHealths().stream().map(historyHealthReq -> {
                 HistoryHealth historyHealth = new HistoryHealth();
                 historyHealth.setUnit(historyHealthReq.getUnit());
                 historyHealth.setType(historyHealthReq.getType());
                 historyHealth.setStatus(1);
                 historyHealth.setResult(historyHealthReq.getResult());
+
                 historyHealth.setTreatmentHistory(treatmentHistory);
                 return historyHealth;
             }).collect(Collectors.toList());
             historyHealthRepository.saveAll(historyHealths);
-            // Update materials
-            List<TreatmentHistoryMaterial> existingMaterials = treatmentHistoryMaterialRepository.findByTreatmentHistoryId(treatmentHistory.getId());
-            treatmentHistoryMaterialRepository.deleteAll(existingMaterials);
-            existingMaterials.clear();
             for (var materialReq : req.getMaterials()) {
                 Materials material = materialsRepository.findById(materialReq.getMaterialId())
-                        .orElseThrow(() -> new EntityNotFoundException(Constant.MATERIAL_NOT_FOUND));
+                        .orElseThrow();
                 TreatmentHistoryMaterial treatmentCardMaterial = new TreatmentHistoryMaterial();
                 treatmentCardMaterial.setTreatmentHistoryId(treatmentHistory.getId());
                 treatmentCardMaterial.setMaterialId(material.getId());
                 treatmentCardMaterial.setQuantity(materialReq.getQuantity());
-                treatmentCardMaterial.setStatus(1);
                 treatmentHistoryMaterialRepository.save(treatmentCardMaterial);
             }
         }
-        return new BaseResponse(200, "OK", treatmentHistory);
+        return new BaseResponse(200, "OK", treatmentHistoryList);
     }
     @Override
     public BaseResponse getTreatmentHistoryById(Long id){

@@ -17,6 +17,7 @@ public interface TreatmentCardMapper {
 
         MaterialRes materialRes = new MaterialRes();
         materialRes.setName(materials.getName());
+        materialRes.setId(materials.getId());
         materialRes.setCode(materials.getCode());
         materialRes.setCargo(materials.getCargo());
         materialRes.setUnit(materials.getUnit());
