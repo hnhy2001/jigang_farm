@@ -22,7 +22,6 @@ public class HistoryHealth extends BaseEntity{
     private String type;
     private String unit;
     private String result;
-    private Long checkingDate;
     @ManyToOne()
     @JoinColumn(name = "treatment_history_id")
     @JsonBackReference

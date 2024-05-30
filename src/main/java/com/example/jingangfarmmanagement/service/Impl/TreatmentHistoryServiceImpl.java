@@ -48,6 +48,7 @@ public class TreatmentHistoryServiceImpl extends BaseServiceImpl<TreatmentHistor
                 TreatmentHistory treatmentHistory = new TreatmentHistory();
                 treatmentHistory.setStatus(1);
                 treatmentHistory.setTreatmentCardId(req.getTreatmentCardId());
+                treatmentHistory.setCheckingDate(req.getCheckingDate());
                 treatmentHistoryRepository.save(treatmentHistory);
                 List<HistoryHealth> historyHealths = req.getHistoryHealths().stream().map(historyHealthReq -> {
                     HistoryHealth historyHealth = new HistoryHealth();
@@ -55,7 +56,7 @@ public class TreatmentHistoryServiceImpl extends BaseServiceImpl<TreatmentHistor
                     historyHealth.setType(historyHealthReq.getType());
                     historyHealth.setStatus(1);
                     historyHealth.setResult(historyHealthReq.getResult());
-                    historyHealth.setCheckingDate(historyHealthReq.getCheckingDate());
+
                     historyHealth.setTreatmentHistory(treatmentHistory);
                     return historyHealth;
                 }).collect(Collectors.toList());
@@ -83,6 +84,7 @@ public class TreatmentHistoryServiceImpl extends BaseServiceImpl<TreatmentHistor
         // Update the properties
         for(var req:reqList) {
             treatmentHistory.setTreatmentCardId(req.getTreatmentCardId());
+            treatmentHistory.setCheckingDate(req.getCheckingDate());
             treatmentHistoryRepository.save(treatmentHistory);
             List<HistoryHealth> exHistoryHealths= historyHealthRepository.findByTreatmentHistory(treatmentHistory);
             historyHealthRepository.deleteAll(exHistoryHealths);
@@ -93,7 +95,6 @@ public class TreatmentHistoryServiceImpl extends BaseServiceImpl<TreatmentHistor
                 historyHealth.setType(historyHealthReq.getType());
                 historyHealth.setStatus(1);
                 historyHealth.setResult(historyHealthReq.getResult());
-                historyHealth.setCheckingDate(historyHealthReq.getCheckingDate());
                 historyHealth.setTreatmentHistory(treatmentHistory);
                 return historyHealth;
             }).collect(Collectors.toList());

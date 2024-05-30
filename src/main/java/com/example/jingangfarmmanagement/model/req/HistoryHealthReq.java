@@ -11,5 +11,4 @@ public class HistoryHealthReq {
     private String type;
     private String unit;
     private String result;
-    private Long checkingDate;
 }

@@ -45,6 +45,7 @@ public class TreatmentHistory extends BaseEntity{
 //    private String note;
 
     private Long treatmentCardId;
+    private Long checkingDate;
     @OneToMany(mappedBy="treatmentHistory",cascade = CascadeType.ALL)
     @JsonManagedReference
     private List<HistoryHealth> historyHealths;

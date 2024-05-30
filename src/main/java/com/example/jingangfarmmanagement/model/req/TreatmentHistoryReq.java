@@ -13,5 +13,6 @@ import java.util.List;
 public class TreatmentHistoryReq {
     private List<HistoryHealthReq> historyHealths;
     private Long treatmentCardId;
+    private Long checkingDate;
     List<TreatmentCardMaterialReq> materials;
 }
