@@ -14,4 +14,5 @@ public interface TreatmentHistoryService extends BaseService<TreatmentHistory>{
     public BaseResponse updateTreatmentHistory(Long treatmentCardHistoryId,List<TreatmentHistoryReq> req);
     public BaseResponse getTreatmentHistoryById(Long id);
     public Page<TreatmentHistoryRes> searchTreatmentHistory(SearchReq req);
+    public Page<TreatmentHistory> findTreatmentHistoriesByPet(List<Long> petIds, int page, int size);
 }

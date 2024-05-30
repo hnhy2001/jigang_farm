@@ -174,4 +174,9 @@ public class TreatmentHistoryServiceImpl extends BaseServiceImpl<TreatmentHistor
                 PageRequest.of(req.getPage(), req.getSize(), direction, sortBy) :
                 Pageable.unpaged();
     }
+    @Override
+    public Page<TreatmentHistory> findTreatmentHistoriesByPet(List<Long> petIds, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return treatmentHistoryRepository.findTreatmentHistoriesByPet(petIds, pageable);
+    }
 }

@@ -8,6 +8,7 @@ import com.example.jingangfarmmanagement.repository.entity.TreatmentHistory;
 import com.example.jingangfarmmanagement.service.BaseService;
 import com.example.jingangfarmmanagement.service.TreatmentHistoryService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -39,5 +40,11 @@ public class TreatmentHistoryController extends BaseController<TreatmentHistory>
     @GetMapping("/treatment/search")
     public BaseResponse search(SearchReq req) {
         return new BaseResponse(200, "Lấy dữ liệu thành công!", treatmentHistoryService.searchTreatmentHistory(req));
+    }
+    @GetMapping("pet/treatment-history")
+    public BaseResponse findTreatmentHistoriesByPet(@RequestParam  List<Long> petIds,
+                                                              @RequestParam int page,
+                                                              @RequestParam int size){
+        return new BaseResponse(200, "Lấy dữ liệu thành công!", treatmentHistoryService.findTreatmentHistoriesByPet(petIds,page,size));
     }
 }
