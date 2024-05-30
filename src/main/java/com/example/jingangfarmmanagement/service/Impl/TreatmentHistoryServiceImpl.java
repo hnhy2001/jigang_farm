@@ -7,10 +7,7 @@ import com.example.jingangfarmmanagement.model.req.TreatmentHistoryReq;
 import com.example.jingangfarmmanagement.model.response.MaterialRes;
 import com.example.jingangfarmmanagement.model.response.TreatmentHistoryRes;
 import com.example.jingangfarmmanagement.query.CustomRsqlVisitor;
-import com.example.jingangfarmmanagement.repository.BaseRepository;
-import com.example.jingangfarmmanagement.repository.MaterialsRepository;
-import com.example.jingangfarmmanagement.repository.TreatmentHistoryMaterialRepository;
-import com.example.jingangfarmmanagement.repository.TreatmentHistoryRepository;
+import com.example.jingangfarmmanagement.repository.*;
 import com.example.jingangfarmmanagement.repository.entity.*;
 import com.example.jingangfarmmanagement.service.TreatmentHistoryService;
 import com.example.jingangfarmmanagement.uitl.Constant;
@@ -37,6 +34,8 @@ public class TreatmentHistoryServiceImpl extends BaseServiceImpl<TreatmentHistor
     @Autowired
     TreatmentHistoryMaterialRepository treatmentHistoryMaterialRepository;
     @Autowired
+    HistoryHealthRepository historyHealthRepository;
+    @Autowired
     TreatmentCardMapper treatmentCardMapper;
     @Override
     protected BaseRepository<TreatmentHistory> getRepository() {
@@ -47,14 +46,20 @@ public class TreatmentHistoryServiceImpl extends BaseServiceImpl<TreatmentHistor
         try {
             for(var req:reqList) {
                 TreatmentHistory treatmentHistory = new TreatmentHistory();
-                treatmentHistory.setUpdateDate(req.getUpdateDate());
-                treatmentHistory.setUnit(req.getUnit());
                 treatmentHistory.setStatus(1);
-                treatmentHistory.setType(req.getType());
-                treatmentHistory.setResult(req.getResult());
                 treatmentHistory.setTreatmentCardId(req.getTreatmentCardId());
                 treatmentHistoryRepository.save(treatmentHistory);
-
+                List<HistoryHealth> historyHealths = req.getHistoryHealths().stream().map(historyHealthReq -> {
+                    HistoryHealth historyHealth = new HistoryHealth();
+                    historyHealth.setUnit(historyHealthReq.getUnit());
+                    historyHealth.setType(historyHealthReq.getType());
+                    historyHealth.setStatus(1);
+                    historyHealth.setResult(historyHealthReq.getResult());
+                    historyHealth.setCheckingDate(historyHealthReq.getCheckingDate());
+                    historyHealth.setTreatmentHistory(treatmentHistory);
+                    return historyHealth;
+                }).collect(Collectors.toList());
+                historyHealthRepository.saveAll(historyHealths);
                 for (var materialReq : req.getMaterials()) {
                     Materials material = materialsRepository.findById(materialReq.getMaterialId())
                             .orElseThrow();
@@ -77,13 +82,22 @@ public class TreatmentHistoryServiceImpl extends BaseServiceImpl<TreatmentHistor
                 .orElseThrow(() -> new EntityNotFoundException("Treatment card not found"));
         // Update the properties
         for(var req:reqList) {
-            treatmentHistory.setUpdateDate(req.getUpdateDate());
-            treatmentHistory.setUnit(req.getUnit());
-            treatmentHistory.setStatus(1);
-            treatmentHistory.setType(req.getType());
-            treatmentHistory.setResult(req.getResult());
             treatmentHistory.setTreatmentCardId(req.getTreatmentCardId());
             treatmentHistoryRepository.save(treatmentHistory);
+            List<HistoryHealth> exHistoryHealths= historyHealthRepository.findByTreatmentHistory(treatmentHistory);
+            historyHealthRepository.deleteAll(exHistoryHealths);
+            exHistoryHealths.clear();
+            List<HistoryHealth> historyHealths = req.getHistoryHealths().stream().map(historyHealthReq -> {
+                HistoryHealth historyHealth = new HistoryHealth();
+                historyHealth.setUnit(historyHealthReq.getUnit());
+                historyHealth.setType(historyHealthReq.getType());
+                historyHealth.setStatus(1);
+                historyHealth.setResult(historyHealthReq.getResult());
+                historyHealth.setCheckingDate(historyHealthReq.getCheckingDate());
+                historyHealth.setTreatmentHistory(treatmentHistory);
+                return historyHealth;
+            }).collect(Collectors.toList());
+            historyHealthRepository.saveAll(historyHealths);
             // Update materials
             List<TreatmentHistoryMaterial> existingMaterials = treatmentHistoryMaterialRepository.findByTreatmentHistoryId(treatmentHistory.getId());
             treatmentHistoryMaterialRepository.deleteAll(existingMaterials);
@@ -95,6 +109,7 @@ public class TreatmentHistoryServiceImpl extends BaseServiceImpl<TreatmentHistor
                 treatmentCardMaterial.setTreatmentHistoryId(treatmentHistory.getId());
                 treatmentCardMaterial.setMaterialId(material.getId());
                 treatmentCardMaterial.setQuantity(materialReq.getQuantity());
+                treatmentCardMaterial.setStatus(1);
                 treatmentHistoryMaterialRepository.save(treatmentCardMaterial);
             }
         }
@@ -105,9 +120,9 @@ public class TreatmentHistoryServiceImpl extends BaseServiceImpl<TreatmentHistor
         TreatmentHistory treatmentHistory = treatmentHistoryRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Treatment History not found"));
 
-        List<TreatmentHistoryMaterial> treatmentCardMaterials = treatmentHistoryMaterialRepository.findByTreatmentHistoryId(id);
+        List<TreatmentHistoryMaterial> treatmentHistoryMaterials = treatmentHistoryMaterialRepository.findByTreatmentHistoryId(id);
 
-        List<MaterialRes> materialList = treatmentCardMaterials.stream()
+        List<MaterialRes> materialList = treatmentHistoryMaterials.stream()
                 .map(treatmentCardMaterial ->{
                     Materials material = materialsRepository.findById(treatmentCardMaterial.getMaterialId())
                             .orElseThrow(EntityNotFoundException::new);
@@ -124,7 +139,7 @@ public class TreatmentHistoryServiceImpl extends BaseServiceImpl<TreatmentHistor
     public Page<TreatmentHistoryRes> searchTreatmentHistory(SearchReq req) {
         req.setFilter(req.getFilter().concat(DELETED_FILTER));
         Node rootNode = new RSQLParser().parse(req.getFilter());
-        Specification<TreatmentHistory> spec = rootNode.accept(new CustomRsqlVisitor<TreatmentHistory>());
+        Specification<TreatmentHistory> spec = rootNode.accept(new CustomRsqlVisitor<>());
         Pageable pageable = getPage(req);
         Page<TreatmentHistory> treatmentHistories = treatmentHistoryRepository.findAll(spec, pageable);
 

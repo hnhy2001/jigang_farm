@@ -1,6 +1,8 @@
 package com.example.jingangfarmmanagement.repository.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,6 +12,8 @@ import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
 import java.time.ZonedDateTime;
+import java.util.List;
+import java.util.Set;
 
 @Entity
 @AllArgsConstructor
@@ -39,9 +43,9 @@ public class TreatmentHistory extends BaseEntity{
 //
 //    @Column(name = "note")
 //    private String note;
-    private String type;
-    private String unit;
-    private String result;
-    private String treatmentCardId;
 
+    private Long treatmentCardId;
+    @OneToMany(mappedBy="treatmentHistory",cascade = CascadeType.ALL)
+    @JsonManagedReference
+    private List<HistoryHealth> historyHealths;
 }
