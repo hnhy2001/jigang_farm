@@ -9,6 +9,8 @@ import com.example.jingangfarmmanagement.service.TreatmentCardService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @CrossOrigin
 @RestController
 @RequestMapping("treatment_card")
@@ -27,5 +29,11 @@ public class TreatmentCardController extends BaseController<TreatmentCard>{
     @PutMapping("/treatment/update")
     public BaseResponse updateTreatment(@RequestParam Long id,@RequestBody TreatmentCardReq req) {
         return treatmentCardService.updateTreatment(id,req);
+    }
+    @GetMapping("pet")
+    public BaseResponse findTreatmentHistoriesByPet(@RequestParam List<Long> petIds,
+                                                    @RequestParam int page,
+                                                    @RequestParam int size){
+        return new BaseResponse(200, "Lấy dữ liệu thành công!", treatmentCardService.findTreatmentHistoriesByPet(petIds,page,size));
     }
 }

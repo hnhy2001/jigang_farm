@@ -41,10 +41,5 @@ public class TreatmentHistoryController extends BaseController<TreatmentHistory>
     public BaseResponse search(SearchReq req) {
         return new BaseResponse(200, "Lấy dữ liệu thành công!", treatmentHistoryService.searchTreatmentHistory(req));
     }
-    @GetMapping("pet")
-    public BaseResponse findTreatmentHistoriesByPet(@RequestParam  List<Long> petIds,
-                                                              @RequestParam int page,
-                                                              @RequestParam int size){
-        return new BaseResponse(200, "Lấy dữ liệu thành công!", treatmentHistoryService.findTreatmentHistoriesByPet(petIds,page,size));
-    }
+
 }

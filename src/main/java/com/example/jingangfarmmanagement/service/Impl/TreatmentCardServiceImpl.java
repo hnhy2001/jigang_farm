@@ -7,6 +7,9 @@ import com.example.jingangfarmmanagement.repository.entity.*;
 import com.example.jingangfarmmanagement.service.TreatmentCardService;
 import com.example.jingangfarmmanagement.uitl.Constant;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
@@ -82,5 +85,10 @@ public class TreatmentCardServiceImpl extends BaseServiceImpl<TreatmentCard> imp
         treatmentCard.setPets(existingPets);
         treatmentCardRepository.save(treatmentCard);
         return new BaseResponse(200, "OK", treatmentCard);
+    }
+    @Override
+    public Page<TreatmentCard> findTreatmentHistoriesByPet(List<Long> petIds, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return treatmentCardRepository.findTreatmentCardsByPet(petIds, pageable);
     }
 }
