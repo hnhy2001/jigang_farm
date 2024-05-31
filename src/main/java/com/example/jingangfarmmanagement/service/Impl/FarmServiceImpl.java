@@ -24,11 +24,11 @@ public class FarmServiceImpl extends BaseServiceImpl<Farm> implements FarmServic
     private static final String DELETED_FILTER = ";status>-1";
 
     @Autowired
-    private FarmRepository farmReponsitory;
+    private FarmRepository farmRepository;
 
     @Override
     protected BaseRepository<Farm> getRepository() {
-        return farmReponsitory;
+        return farmRepository;
     }
 
     @Override
@@ -37,12 +37,12 @@ public class FarmServiceImpl extends BaseServiceImpl<Farm> implements FarmServic
         Node rootNode = new RSQLParser().parse(req.getFilter());
         Specification<Farm> spec = rootNode.accept(new CustomRsqlVisitor<>());
         Pageable pageable = getPage(req);
-        return farmReponsitory.findAll(spec, FarmProjection.class, pageable);
+        return farmRepository.findAll(spec, FarmProjection.class, pageable);
     }
 
     @Override
     public List<Farm> findByFilter() {
-        List<Farm> result = farmReponsitory.findAll();
+        List<Farm> result = farmRepository.findAll();
         return result;
     }
 }
