@@ -4,14 +4,11 @@ import com.example.jingangfarmmanagement.model.BaseResponse;
 import com.example.jingangfarmmanagement.model.req.ExportPetReq;
 import com.example.jingangfarmmanagement.model.req.SearchReq;
 import com.example.jingangfarmmanagement.model.response.ExportPetRes;
-import com.example.jingangfarmmanagement.model.response.MaterialRes;
-import com.example.jingangfarmmanagement.model.response.TreatmentHistoryRes;
 import com.example.jingangfarmmanagement.query.CustomRsqlVisitor;
 import com.example.jingangfarmmanagement.repository.BaseRepository;
 import com.example.jingangfarmmanagement.repository.ExportPetRepository;
 import com.example.jingangfarmmanagement.repository.PetRepository;
 import com.example.jingangfarmmanagement.repository.entity.*;
-import com.example.jingangfarmmanagement.service.BaseService;
 import com.example.jingangfarmmanagement.service.ExportPetService;
 import cz.jirutka.rsql.parser.RSQLParser;
 import cz.jirutka.rsql.parser.ast.Node;
@@ -108,5 +105,9 @@ public class ExportPetServiceImpl extends BaseServiceImpl<ExportPet> implements 
         return req.getSize() != null ?
                 PageRequest.of(req.getPage(), req.getSize(), direction, sortBy) :
                 Pageable.unpaged();
+    }
+    public BaseResponse getDeathPetByFarmAndCage(Long cageId){
+        List<ExportPetStatistic> exportPetStatistics=exportPetRepository.statisticExportPetWithCage(cageId);
+        return new BaseResponse(200,"OK",exportPetStatistics);
     }
 }

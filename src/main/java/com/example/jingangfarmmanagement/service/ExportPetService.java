@@ -8,7 +8,7 @@ import com.example.jingangfarmmanagement.repository.entity.ExportPet;
 import org.springframework.data.domain.Page;
 
 public interface ExportPetService extends BaseService<ExportPet> {
-    public BaseResponse createExportPet(ExportPetReq req);
-    public Page<ExportPetRes> searchExportPet(SearchReq req);
-    public BaseResponse getExportPetById(Long id);
+     BaseResponse createExportPet(ExportPetReq req);
+     Page<ExportPetRes> searchExportPet(SearchReq req);
+     BaseResponse getExportPetById(Long id);
 }
