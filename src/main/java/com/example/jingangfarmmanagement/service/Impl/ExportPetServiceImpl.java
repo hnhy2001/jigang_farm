@@ -106,8 +106,25 @@ public class ExportPetServiceImpl extends BaseServiceImpl<ExportPet> implements 
                 PageRequest.of(req.getPage(), req.getSize(), direction, sortBy) :
                 Pageable.unpaged();
     }
+    @Override
     public BaseResponse getDeathPetByFarmAndCage(Long cageId){
         List<ExportPetStatistic> exportPetStatistics=exportPetRepository.statisticExportPetWithCage(cageId);
         return new BaseResponse(200,"OK",exportPetStatistics);
+    }
+    @Override
+    public Page<ExportPetRes> searchExportPet(Long cageId, String name, String code, Integer sex, Integer age, Long startExportDate,Long endExportDate, String note, Pageable pageable) {
+        Page<ExportPet> exportPets = exportPetRepository.searchExportPet(cageId, name, code, sex, age, startExportDate,endExportDate, note, pageable);
+        List<ExportPetRes> exportPetResList = exportPets.getContent().stream().map(exportPet -> {
+            Optional<Pet> pet = petRepository.findById(exportPet.getPetId());
+            ExportPetRes exportPetRes = new ExportPetRes();
+            exportPetRes.setExportDate(exportPet.getExportDate());
+            exportPetRes.setReasonExport(exportPet.getReasonExport());
+            exportPetRes.setExportDate(exportPet.getExportDate());
+            exportPetRes.setNote(exportPet.getNote());
+            exportPetRes.setType(exportPet.getType());
+            exportPetRes.setPet(pet.orElse(null));
+            return exportPetRes;
+        }).collect(Collectors.toList());
+        return new PageImpl<>(exportPetResList, pageable, exportPets.getTotalElements());
     }
 }

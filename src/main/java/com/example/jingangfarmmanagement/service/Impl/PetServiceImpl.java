@@ -37,7 +37,6 @@ public class PetServiceImpl extends BaseServiceImpl<Pet> implements PetService {
 
     @Override
     public Page<PetProjection> customSearch(SearchReq req) {
-        req.setFilter(req.getFilter().concat(DELETED_FILTER));
         Node rootNode = new RSQLParser().parse(req.getFilter());
         Specification<Pet> spec = rootNode.accept(new CustomRsqlVisitor<>());
         Pageable pageable = getPage(req);

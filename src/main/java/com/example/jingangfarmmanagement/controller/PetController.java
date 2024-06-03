@@ -35,4 +35,10 @@ public class PetController extends BaseController<Pet> {
     public BaseResponse update(@RequestBody Pet pet) throws Exception {
         return petService.updatePet(pet);
     }
+//    @GetMapping("/search")
+//    public BaseResponse search(SearchReq req) {
+//        return new BaseResponse(200, "Lấy dữ liệu thành công!", petService.customSearch(req));
+//    }
+
+
 }
