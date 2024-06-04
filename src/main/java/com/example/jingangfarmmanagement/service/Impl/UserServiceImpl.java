@@ -82,6 +82,7 @@ public class UserServiceImpl extends BaseServiceImpl<User> implements UserServic
         loginResponse.setToken(jwtTokenProvider.generateToken(user.getUserName()));
         loginResponse.setUserName(user.getUserName());
         loginResponse.setFullName(user.getFullName());
+        loginResponse.setUserId(user.getId());
         return new BaseResponse(200, "OK", loginResponse);
     }
 

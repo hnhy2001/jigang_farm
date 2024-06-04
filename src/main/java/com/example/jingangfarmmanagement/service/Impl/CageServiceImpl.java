@@ -69,4 +69,9 @@ public class CageServiceImpl extends BaseServiceImpl<Cage> implements CageServic
         });
         return new BaseResponse().success(result);
     }
+
+    @Override
+    public List<Cage> getByFarm(Farm farm) {
+        return cageRepository.findAllByFarmAndStatus(farm, 1);
+    }
 }

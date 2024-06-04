@@ -12,13 +12,18 @@ import javax.validation.Valid;
 
 @CrossOrigin
 @RestController
-@RequestMapping("statisic")
+@RequestMapping("statistic")
 public class StatisticController {
     @Autowired
     StatisticService statisticService;
 
-    @PostMapping("pet-with-age")
-    public BaseResponse statisticPetWithAge(@RequestBody StatisticPetWithAge statisticPetWithAge){
-        return statisticService.statisticPetWithAge(statisticPetWithAge);
+    @GetMapping("farm")
+    public BaseResponse statisticWithFarm(SearchReq req) throws Exception {
+        return statisticService.statisticFarm(req);
+    }
+
+    @GetMapping("cage")
+    public BaseResponse statisticWithCage(SearchReq req) throws Exception {
+        return statisticService.statisticCage(req);
     }
 }
