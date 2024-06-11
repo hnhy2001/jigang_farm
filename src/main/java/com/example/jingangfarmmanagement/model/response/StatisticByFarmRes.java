@@ -18,8 +18,9 @@ public class StatisticByFarmRes {
     private int totalFemale;
     private int petDie;
     private int petLive;
-    private int petUilness;
-    private int petNomal;
+//    private int petUilness;
+//    private int petNomal;
     private List<StatisticPetByAge> statisticPetByAgeList;
     private List<StatisticPetByWeight> statisticPetByWeightList;
+    private List<StatisticStatusUilnessPet> statisticStatusUilnessPetList;
 }

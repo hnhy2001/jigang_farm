@@ -3,13 +3,11 @@ package com.example.jingangfarmmanagement.service.Impl;
 import com.example.jingangfarmmanagement.model.BaseResponse;
 import com.example.jingangfarmmanagement.model.req.SearchReq;
 import com.example.jingangfarmmanagement.model.req.StatisticPetWithAge;
-import com.example.jingangfarmmanagement.model.response.ResultStatisticByCageRes;
-import com.example.jingangfarmmanagement.model.response.StatisticByFarmRes;
-import com.example.jingangfarmmanagement.model.response.StatisticPetByAge;
-import com.example.jingangfarmmanagement.model.response.StatisticPetByWeight;
+import com.example.jingangfarmmanagement.model.response.*;
 import com.example.jingangfarmmanagement.repository.entity.Cage;
 import com.example.jingangfarmmanagement.repository.entity.Farm;
 import com.example.jingangfarmmanagement.repository.entity.Pet;
+import com.example.jingangfarmmanagement.repository.entity.Uilness;
 import com.example.jingangfarmmanagement.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -17,7 +15,9 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 
@@ -31,6 +31,9 @@ public class StatisticServiceImpl implements StatisticService {
 
     @Autowired
     PetService petService;
+
+    @Autowired
+    UilnessService uilnessService;
 
     @Override
     public BaseResponse statisticPetWithAge(StatisticPetWithAge statisticPetWithAge) {
@@ -69,6 +72,15 @@ public class StatisticServiceImpl implements StatisticService {
             list.add(new StatisticPetByWeight().builder().from(i).to(i+1).unit("Kg").quantity(0).build());
         }
         list.add(new StatisticPetByWeight().builder().from(10).to(99999).unit("Kg").quantity(0).build());
+        return list;
+    }
+
+    public List<StatisticStatusUilnessPet> createStatisticStatusUilnessPet(){
+        List<StatisticStatusUilnessPet> list = new ArrayList<>();
+        list.add(new StatisticStatusUilnessPet().builder().point(0).name("Bình thường").totalPet(0).totalMale(0).totalFemale(0).build());
+        for (int i = 1; i<=5; i++){
+            list.add(new StatisticStatusUilnessPet().builder().point(i).name("Tình trạng bệnh " + i).totalPet(0).totalMale(0).totalFemale(0).build());
+        }
         return list;
     }
 
@@ -126,6 +138,7 @@ public class StatisticServiceImpl implements StatisticService {
         if (cageList.isEmpty()){
             return new BaseResponse().success("Không có chuồng nào thuộc trại này");
         }
+        List<Uilness> uilnessList = uilnessService.getAll();
         List<Pet> petList = petService.getAll();
         List<StatisticByFarmRes> results = new ArrayList<>();
         farmList.forEach(e -> {
@@ -136,10 +149,11 @@ public class StatisticServiceImpl implements StatisticService {
             result.setTotalPet(0);
             result.setPetLive(0);
             result.setPetDie(0);
-            result.setPetUilness(0);
-            result.setPetNomal(0);
+//            result.setPetUilness(0);
+//            result.setPetNomal(0);
             result.setStatisticPetByAgeList(createStatisticByAge());
             result.setStatisticPetByWeightList(createStatisticByWeight());
+            result.setStatisticStatusUilnessPetList(createStatisticStatusUilnessPet());
             getCageList(e, cageList).forEach(cage -> {
                 getPetList(cage, petList).forEach(pet -> {
                     result.setTotalPet(result.getTotalPet() + 1);
@@ -153,11 +167,11 @@ public class StatisticServiceImpl implements StatisticService {
                     }else {
                         result.setPetLive(result.getPetLive()+1);
                     }
-                    if (pet.getUilness() != null || !pet.getUilness().equals("")){
-                        result.setPetUilness(result.getPetUilness()+1);
-                    }else {
-                        result.setPetNomal(result.getPetNomal()+1);
-                    }
+//                    if (pet.getUilness() != null || !pet.getUilness().equals("")){
+//                        result.setPetUilness(result.getPetUilness()+1);
+//                    }else {
+//                        result.setPetNomal(result.getPetNomal()+1);
+//                    }
                     result.getStatisticPetByAgeList().forEach(age -> {
                         if (pet.getAge() >= age.getFrom() && pet.getAge() < age.getTo()){
                             age.setQuantity(age.getQuantity() + 1);
@@ -168,6 +182,34 @@ public class StatisticServiceImpl implements StatisticService {
                             weight.setQuantity(weight.getQuantity() + 1);
                         }
                     });
+                    if (!uilnessList.isEmpty() && pet.getStatus() != -1){
+                        if (pet.getUilness() == null || pet.getUilness().equals("")){
+                            result.getStatisticStatusUilnessPetList().get(0).setTotalPet(result.getStatisticStatusUilnessPetList().get(0).getTotalPet() + 1);
+                            if (pet.getSex() == 1){
+                                result.getStatisticStatusUilnessPetList().get(0).setTotalMale(result.getStatisticStatusUilnessPetList().get(0).getTotalMale() + 1);
+                            }else {
+                                result.getStatisticStatusUilnessPetList().get(0).setTotalFemale(result.getStatisticStatusUilnessPetList().get(0).getTotalFemale() + 1);
+                            }
+                        }else {
+                            String[] uilnessArray = pet.getUilness().split(",");
+                            AtomicInteger uilnessCheckPoint = new AtomicInteger(0);
+                            Arrays.stream(uilnessArray).forEach(uilnessCode -> {
+                                uilnessList.forEach(uilness -> {
+                                    if (uilnessCode.contains(uilness.getCode())){
+                                        if (uilness.getScore() >= uilnessCheckPoint.get()){
+                                            uilnessCheckPoint.set(uilness.getScore());
+                                        }
+                                    }
+                                });
+                            });
+                            result.getStatisticStatusUilnessPetList().get(uilnessCheckPoint.get()).setTotalPet(result.getStatisticStatusUilnessPetList().get(uilnessCheckPoint.get()).getTotalPet() + 1);
+                            if (pet.getSex() == 1){
+                                result.getStatisticStatusUilnessPetList().get(uilnessCheckPoint.get()).setTotalMale(result.getStatisticStatusUilnessPetList().get(uilnessCheckPoint.get()).getTotalMale() + 1);
+                            }else {
+                                result.getStatisticStatusUilnessPetList().get(uilnessCheckPoint.get()).setTotalFemale(result.getStatisticStatusUilnessPetList().get(uilnessCheckPoint.get()).getTotalFemale() + 1);
+                            }
+                        }
+                    }
                 });
             });
             results.add(result);
@@ -183,6 +225,7 @@ public class StatisticServiceImpl implements StatisticService {
         if (cageList.isEmpty()){
             return new BaseResponse().success("Không có chuồng nào thuộc trại này");
         }
+        List<Uilness> uilnessList = uilnessService.getAll();
         List<Pet> petList = petService.getAll();
         List<ResultStatisticByCageRes> results = new ArrayList<>();
             cageList.forEach(cage -> {
@@ -193,10 +236,12 @@ public class StatisticServiceImpl implements StatisticService {
                 result.setTotalPet(0);
                 result.setPetLive(0);
                 result.setPetDie(0);
-                result.setPetUilness(0);
-                result.setPetNomal(0);
+//                result.setPetUilness(0);
+//                result.setPetNomal(0);
                 result.setStatisticPetByAgeList(createStatisticByAge());
                 result.setStatisticPetByWeightList(createStatisticByWeight());
+                result.setStatisticStatusUilnessPetList(createStatisticStatusUilnessPet());
+
                 getPetList(cage, petList).forEach(pet -> {
                     result.setTotalPet(result.getTotalPet() + 1);
                     if (pet.getSex() == 1){
@@ -209,11 +254,11 @@ public class StatisticServiceImpl implements StatisticService {
                     }else {
                         result.setPetLive(result.getPetLive()+1);
                     }
-                    if (pet.getUilness() != null || !pet.getUilness().equals("")){
-                        result.setPetUilness(result.getPetUilness()+1);
-                    }else {
-                        result.setPetNomal(result.getPetNomal()+1);
-                    }
+//                    if (pet.getUilness() != null || !pet.getUilness().equals("")){
+//                        result.setPetUilness(result.getPetUilness()+1);
+//                    }else {
+//                        result.setPetNomal(result.getPetNomal()+1);
+//                    }
                     result.getStatisticPetByAgeList().forEach(age -> {
                         if (pet.getAge() >= age.getFrom() && pet.getAge() < age.getTo()){
                             age.setQuantity(age.getQuantity() + 1);
@@ -224,6 +269,34 @@ public class StatisticServiceImpl implements StatisticService {
                             weight.setQuantity(weight.getQuantity() + 1);
                         }
                     });
+                    if (!uilnessList.isEmpty() && pet.getStatus() != -1){
+                        if (pet.getUilness() == null || pet.getUilness().equals("")){
+                            result.getStatisticStatusUilnessPetList().get(0).setTotalPet(result.getStatisticStatusUilnessPetList().get(0).getTotalPet() + 1);
+                            if (pet.getSex() == 1){
+                                result.getStatisticStatusUilnessPetList().get(0).setTotalMale(result.getStatisticStatusUilnessPetList().get(0).getTotalMale() + 1);
+                            }else {
+                                result.getStatisticStatusUilnessPetList().get(0).setTotalFemale(result.getStatisticStatusUilnessPetList().get(0).getTotalFemale() + 1);
+                            }
+                        }else {
+                            String[] uilnessArray = pet.getUilness().split(",");
+                            AtomicInteger uilnessCheckPoint = new AtomicInteger(0);
+                            Arrays.stream(uilnessArray).forEach(uilnessCode -> {
+                                uilnessList.forEach(uilness -> {
+                                    if (uilnessCode.contains(uilness.getCode())){
+                                        if (uilness.getScore() >= uilnessCheckPoint.get()){
+                                            uilnessCheckPoint.set(uilness.getScore());
+                                        }
+                                    }
+                                });
+                            });
+                            result.getStatisticStatusUilnessPetList().get(uilnessCheckPoint.get()).setTotalPet(result.getStatisticStatusUilnessPetList().get(uilnessCheckPoint.get()).getTotalPet() + 1);
+                            if (pet.getSex() == 1){
+                                result.getStatisticStatusUilnessPetList().get(uilnessCheckPoint.get()).setTotalMale(result.getStatisticStatusUilnessPetList().get(uilnessCheckPoint.get()).getTotalMale() + 1);
+                            }else {
+                                result.getStatisticStatusUilnessPetList().get(uilnessCheckPoint.get()).setTotalFemale(result.getStatisticStatusUilnessPetList().get(uilnessCheckPoint.get()).getTotalFemale() + 1);
+                            }
+                        }
+                    }
                 });
                 results.add(result);
             });
