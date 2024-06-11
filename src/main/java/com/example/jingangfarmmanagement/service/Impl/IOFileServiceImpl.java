@@ -47,6 +47,12 @@ public class IOFileServiceImpl implements IOFileService {
                 if (row.getRowNum() == 0) {
                     continue;
                 }
+                if(petRepository.findByName(getCellValueOrDefault(row.getCell(0)))!=null){
+                    continue;
+                }
+                if(getCellValueOrDefault(row.getCell(0))==null){
+                    break;
+                }
                 Pet pet = new Pet();
                 pet.setCode("VN_" + farmCode + "_" + cageCode + "_" + noPet);
                 pet.setName(getCellValueOrDefault(row.getCell(0)));
@@ -56,6 +62,8 @@ public class IOFileServiceImpl implements IOFileService {
                 pet.setSex(getCellSexValueOrDefault(row.getCell(4)));
                 pet.setCage(getCage(cageCode));
                 pet.setUilness(getCellValueOrDefault(row.getCell(5)));
+                pet.setParentDad(getCellValueOrDefault(row.getCell(6)));
+                pet.setParentMon(getCellValueOrDefault(row.getCell(7)));
                 pet.setStatus(1);
                 pets.add(pet);
                 noPet++;
@@ -136,6 +144,12 @@ public class IOFileServiceImpl implements IOFileService {
             for (Row row : sheet) {
                 if (row.getRowNum() == 0) {
                     continue;
+                }
+                if(materialsRepository.findByName(getCellValueOrDefault(row.getCell(0)))!=null){
+                    continue;
+                }
+                if(getCellValueOrDefault(row.getCell(0))==null){
+                    break;
                 }
                 Materials material = new Materials();
                 material.setCode("VN_" + noMaterials);

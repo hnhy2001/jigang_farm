@@ -5,4 +5,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface MaterialsRepository extends BaseRepository<Materials>{
+    Materials findByName(String name);
 }

@@ -4,6 +4,7 @@ import com.example.jingangfarmmanagement.constants.Status;
 import com.example.jingangfarmmanagement.model.BaseResponse;
 import com.example.jingangfarmmanagement.model.req.ChangeCageReq;
 import com.example.jingangfarmmanagement.model.req.SearchReq;
+import com.example.jingangfarmmanagement.model.req.UpdateWeightPetReq;
 import com.example.jingangfarmmanagement.projection.FarmProjection;
 import com.example.jingangfarmmanagement.projection.PetProjection;
 import com.example.jingangfarmmanagement.query.CustomRsqlVisitor;
@@ -82,5 +83,14 @@ public class PetServiceImpl extends BaseServiceImpl<Pet> implements PetService {
         ObjectMapperUtils.map(pet, entityMy);
         pet.setUpdateDate(DateUtil.getCurrenDateTime());
         return new BaseResponse(200, "Cập nhật vật nuôi thành công", petRepository.save(entityMy));
+    }
+
+    @Override
+    public BaseResponse updatePetWeight(UpdateWeightPetReq updateWeightPet)  {
+        List<Pet> pets = petRepository.findByIdIn(updateWeightPet.getPetIds());
+        for(Pet pet: pets) {
+            pet.setWeight(updateWeightPet.getWeight());
+        }
+        return new BaseResponse(200, "Cập nhật cân nặng vật nuôi thành công",   petRepository.saveAll((pets)));
     }
 }

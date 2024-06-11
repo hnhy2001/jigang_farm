@@ -15,4 +15,5 @@ public interface PetRepository extends BaseRepository<Pet>, JpaSpecificationExec
 
     boolean existsByName(String name);
     Pet findByName(String name);
+
 }
