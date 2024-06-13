@@ -7,6 +7,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 
 public interface IOFileService {
-    public BaseResponse importPetsFromExcel(MultipartFile file,String farmCode,String cageCode) throws IOException;
+    public BaseResponse importPetsFromExcel(MultipartFile file) throws IOException;
     public BaseResponse importMaterialsFromExcel(MultipartFile file) throws IOException;
 }

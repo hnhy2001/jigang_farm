@@ -12,5 +12,5 @@ import java.util.List;
 @Repository
 public interface FarmRepository extends BaseRepository<Farm>, JpaSpecificationExecutorWithProjection<Farm> {
     <R> List<R> findBy(Class<R> var2);
-
+    Farm findByName(String name);
 }

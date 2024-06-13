@@ -12,4 +12,5 @@ import java.util.Optional;
 public interface CageRepository extends BaseRepository<Cage>, JpaSpecificationExecutorWithProjection<Cage> {
    Cage findByCode(String code);
    List<Cage> findAllByFarmAndStatus(Farm farm, int status);
+   Cage findByName(String name);
 }
