@@ -60,4 +60,7 @@ public class Pet extends BaseEntity{
     @ManyToMany(mappedBy = "pets")
     @JsonBackReference
     private List<TreatmentCard> treatmentCards;
+    @ManyToMany(mappedBy = "pets")
+    @JsonBackReference
+    private List<MealVoucher> mealVouchers;
 }
