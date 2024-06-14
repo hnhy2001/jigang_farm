@@ -37,7 +37,7 @@ public class IOFileServiceImpl implements IOFileService {
 
     @Override
     @Transactional
-    public BaseResponse importPetsFromExcel(MultipartFile file,String farmCode,String cageCode) throws IOException {
+    public BaseResponse importPetsFromExcel(MultipartFile file) throws IOException {
         List<Pet> pets = new ArrayList<>();
         int totalPets = petRepository.findAll().size();
         int noPet = totalPets + 1;
@@ -47,23 +47,23 @@ public class IOFileServiceImpl implements IOFileService {
                 if (row.getRowNum() == 0) {
                     continue;
                 }
-                if(petRepository.findByName(getCellValueOrDefault(row.getCell(0)))!=null){
+                if(petRepository.findByName(getCellValueOrDefault(row.getCell(2)))!=null){
                     continue;
                 }
-                if(getCellValueOrDefault(row.getCell(0))==null){
+                if(getCellValueOrDefault(row.getCell(0))==null && getCellValueOrDefault(row.getCell(1))!=null && getCellValueOrDefault(row.getCell(2))!=null ){
                     break;
                 }
                 Pet pet = new Pet();
-                pet.setCode("VN_" + farmCode + "_" + cageCode + "_" + noPet);
-                pet.setName(getCellValueOrDefault(row.getCell(0)));
-                pet.setType(getCellValueOrDefault(row.getCell(1)));
-                pet.setAge(getCellNumericValueOrDefault(row.getCell(2)));
-                pet.setWeight(getCellNumericValueOrDefault(row.getCell(3)));
-                pet.setSex(getCellSexValueOrDefault(row.getCell(4)));
-                pet.setCage(getCage(cageCode));
-                pet.setUilness(getCellValueOrDefault(row.getCell(5)));
-                pet.setParentDad(getCellValueOrDefault(row.getCell(6)));
-                pet.setParentMon(getCellValueOrDefault(row.getCell(7)));
+                pet.setCode("VN_" + getCellValueOrDefault(row.getCell(0)) + "_" + getCellValueOrDefault(row.getCell(1)) + "_" + noPet);
+                pet.setName(getCellValueOrDefault(row.getCell(2)));
+                pet.setType(getCellValueOrDefault(row.getCell(3)));
+                pet.setAge(getCellNumericValueOrDefault(row.getCell(4)));
+                pet.setWeight(getCellNumericValueOrDefault(row.getCell(5)));
+                pet.setSex(getCellSexValueOrDefault(row.getCell(6)));
+                pet.setCage(getCage(getCellValueOrDefault(row.getCell(1))));
+                pet.setUilness(getCellValueOrDefault(row.getCell(7)));
+                pet.setParentDad(getCellValueOrDefault(row.getCell(8)));
+                pet.setParentMon(getCellValueOrDefault(row.getCell(9)));
                 pet.setStatus(1);
                 pets.add(pet);
                 noPet++;
@@ -93,6 +93,7 @@ public class IOFileServiceImpl implements IOFileService {
                 return "";
         }
     }
+
 
     private String getCellValueOrDefault(Cell cell) {
         return cell != null && cell.getCellType() != CellType.BLANK ? getCellValue(cell) : null;
@@ -128,7 +129,7 @@ public class IOFileServiceImpl implements IOFileService {
 
     private Cage getCage(String cageCode) {
         if (cageCode != null) {
-           return cageRepository.findByCode(cageCode);
+           return cageRepository.findByName(cageCode);
         }
         return null;
     }
