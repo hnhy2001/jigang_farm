@@ -47,9 +47,9 @@ public class IOFileServiceImpl implements IOFileService {
                 if (row.getRowNum() == 0) {
                     continue;
                 }
-                if(petRepository.findByName(getCellValueOrDefault(row.getCell(2)))!=null){
-                    continue;
-                }
+//                if(petRepository.findByName(getCellValueOrDefault(row.getCell(2)))!=null){
+//                    continue;
+//                }
                 if(getCellValueOrDefault(row.getCell(0))==null && getCellValueOrDefault(row.getCell(1))!=null && getCellValueOrDefault(row.getCell(2))!=null ){
                     break;
                 }
@@ -60,7 +60,7 @@ public class IOFileServiceImpl implements IOFileService {
                 pet.setAge(getCellNumericValueOrDefault(row.getCell(4)));
                 pet.setWeight(getCellNumericValueOrDefault(row.getCell(5)));
                 pet.setSex(getCellSexValueOrDefault(row.getCell(6)));
-                pet.setCage(getCage(getCellValueOrDefault(row.getCell(1))));
+                pet.setCage(getCage(getCellValueOrDefault(row.getCell(1)),getCellValueOrDefault(row.getCell(0))));
                 pet.setUilness(getCellValueOrDefault(row.getCell(7)));
                 pet.setParentDad(getCellValueOrDefault(row.getCell(8)));
                 pet.setParentMon(getCellValueOrDefault(row.getCell(9)));
@@ -127,9 +127,9 @@ public class IOFileServiceImpl implements IOFileService {
                 : 1;
     }
 
-    private Cage getCage(String cageCode) {
-        if (cageCode != null) {
-           return cageRepository.findByName(cageCode);
+    private Cage getCage(String cageName,String farmName) {
+        if (cageName != null && farmName != null) {
+           return cageRepository.findByNameAndFarmName(cageName,farmName);
         }
         return null;
     }
