@@ -60,7 +60,11 @@ public class IOFileServiceImpl implements IOFileService {
                 pet.setAge(getCellNumericValueOrDefault(row.getCell(4)));
                 pet.setWeight(getCellNumericValueOrDefault(row.getCell(5)));
                 pet.setSex(getCellSexValueOrDefault(row.getCell(6)));
-                pet.setCage(getCage(getCellValueOrDefault(row.getCell(1)),getCellValueOrDefault(row.getCell(0))));
+                if(getCage(getCellValueOrDefault(row.getCell(1)),getCellValueOrDefault(row.getCell(0)))!=null){
+                    pet.setCage(getCage(getCellValueOrDefault(row.getCell(1)),getCellValueOrDefault(row.getCell(0))));
+                }else{
+                    return new BaseResponse(500,"Tên chuồng trại không hợp lệ","chuồng "+ getCellValueOrDefault(row.getCell(1))+" trại " + getCellValueOrDefault(row.getCell(0)));
+                }
                 pet.setUilness(getCellValueOrDefault(row.getCell(7)));
                 pet.setParentDad(getCellValueOrDefault(row.getCell(8)));
                 pet.setParentMon(getCellValueOrDefault(row.getCell(9)));
@@ -131,7 +135,10 @@ public class IOFileServiceImpl implements IOFileService {
         if (cageName != null && farmName != null) {
             double cageNameBefore = Double.parseDouble(cageName);
             int cage = (int) cageNameBefore;
-           return cageRepository.findByNameAndFarmName(String.valueOf(cage),farmName);
+           if(cageRepository.findByNameAndFarmName(String.valueOf(cage),farmName)!=null){
+               return cageRepository.findByNameAndFarmName(String.valueOf(cage),farmName);
+           }
+           else return null;
         }
         return null;
     }
