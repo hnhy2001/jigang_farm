@@ -129,7 +129,9 @@ public class IOFileServiceImpl implements IOFileService {
 
     private Cage getCage(String cageName,String farmName) {
         if (cageName != null && farmName != null) {
-           return cageRepository.findByNameAndFarmName(cageName,farmName);
+            double cageNameBefore = Double.parseDouble(cageName);
+            int cage = (int) cageNameBefore;
+           return cageRepository.findByNameAndFarmName(String.valueOf(cage),farmName);
         }
         return null;
     }
