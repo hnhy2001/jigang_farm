@@ -63,7 +63,7 @@ public class IOFileServiceImpl implements IOFileService {
                 if(getCage(getCellValueOrDefault(row.getCell(1)),getCellValueOrDefault(row.getCell(0)))!=null){
                     pet.setCage(getCage(getCellValueOrDefault(row.getCell(1)),getCellValueOrDefault(row.getCell(0))));
                 }else{
-                    return new BaseResponse(500,"Tên chuồng trại không hợp lệ","chuồng "+ getCellValueOrDefault(row.getCell(1))+" trại " + getCellValueOrDefault(row.getCell(0)));
+                    return new BaseResponse(500,"Tên chuồng trại không hợp lệ","chuồng "+ "-" +getCellValueOrDefault(row.getCell(1))+" trại "+"-"+ getCellValueOrDefault(row.getCell(0)) + "không hợp lệ");
                 }
                 pet.setUilness(getCellValueOrDefault(row.getCell(7)));
                 pet.setParentDad(getCellValueOrDefault(row.getCell(8)));
