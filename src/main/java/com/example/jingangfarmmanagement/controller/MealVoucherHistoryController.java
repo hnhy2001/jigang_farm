@@ -40,7 +40,7 @@ public class MealVoucherHistoryController extends BaseController<MealVoucherHist
     }
     @GetMapping("/voucher/search")
     public BaseResponse search(SearchReq req) {
-        return new BaseResponse(200, "Lấy dữ liệu thành công!", mealVoucherHistoryService.searchMealVoucherHistoryHistory(req));
+        return new BaseResponse(200, "Lấy dữ liệu thành công!", mealVoucherHistoryService.searchMealVoucherHistory(req));
     }
 
 }
