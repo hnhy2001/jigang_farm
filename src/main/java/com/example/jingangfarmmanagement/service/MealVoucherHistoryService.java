@@ -16,6 +16,6 @@ public interface MealVoucherHistoryService extends BaseService<MealVoucherHistor
     public BaseResponse createMealVoucherHistory(List<MealVoucherHistoryReq> req);
     public BaseResponse updateMealVoucherHistory(Long mealVoucherHistoryId, List<MealVoucherHistoryReq> reqList);
     public BaseResponse getMealVoucherHistoryById(Long id);
-    public Page<MealVoucherHistoryRes> searchMealVoucherHistoryHistory(SearchReq req);
+    public Page<MealVoucherHistoryRes> searchMealVoucherHistory(SearchReq req);
 
 }

@@ -110,7 +110,7 @@ public class MealVoucherHistoryServiceImpl extends BaseServiceImpl<MealVoucherHi
         return new BaseResponse(200, "OK", mealVoucherHistoryRes);
     }
     @Override
-    public Page<MealVoucherHistoryRes> searchMealVoucherHistoryHistory(SearchReq req) {
+    public Page<MealVoucherHistoryRes> searchMealVoucherHistory(SearchReq req) {
         req.setFilter(req.getFilter().concat(DELETED_FILTER));
         Node rootNode = new RSQLParser().parse(req.getFilter());
         Specification<MealVoucherHistory> spec = rootNode.accept(new CustomRsqlVisitor<>());
