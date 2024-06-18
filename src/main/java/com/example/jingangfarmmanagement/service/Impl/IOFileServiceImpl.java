@@ -131,18 +131,18 @@ public class IOFileServiceImpl implements IOFileService {
                 : 1;
     }
 
-    private Cage getCage(String cageName,String farmName) {
-        if (cageName != null && farmName != null) {
-            double cageNameBefore = Double.parseDouble(cageName);
-            double  farmNameBefore = Double.parseDouble(farmName);
-            int cage = (int) cageNameBefore;
-            int farm = (int) farmNameBefore;
-           if(cageRepository.findByNameAndFarmName(String.valueOf(cage), String.valueOf(farm))!=null){
-               return cageRepository.findByNameAndFarmName(String.valueOf(cage),farmName);
-           }
-           else return null;
+    private Cage getCage(String cageName, String farmName) {
+        if (cageName == null || farmName == null) {
+            return null;
         }
-        return null;
+        try {
+            int cage = (int) Double.parseDouble(cageName);
+            int farm = (int) Double.parseDouble(farmName);
+
+            return cageRepository.findByNameAndFarmName(String.valueOf(cage), String.valueOf(farm));
+        } catch (NumberFormatException e) {
+            return null;
+        }
     }
 
     @Override
