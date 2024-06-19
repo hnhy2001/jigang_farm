@@ -58,7 +58,7 @@ public class IOFileServiceImpl implements IOFileService {
                 pet.setName(getCellValueOrDefault(row.getCell(2)));
                 pet.setType(getCellValueOrDefault(row.getCell(3)));
                 pet.setAge(getCellNumericValueOrDefault(row.getCell(4)));
-                pet.setWeight(getCellNumericValueOrDefault(row.getCell(5)));
+                pet.setWeight(getCellDoubleValueOrDefault(row.getCell(5)));
                 pet.setSex(getCellSexValueOrDefault(row.getCell(6)));
                 if(getCage(getCellValueOrDefault(row.getCell(1)),getCellValueOrDefault(row.getCell(0)))!=null){
                     pet.setCage(getCage(getCellValueOrDefault(row.getCell(1)),getCellValueOrDefault(row.getCell(0))));
@@ -117,6 +117,10 @@ public class IOFileServiceImpl implements IOFileService {
     private int getCellNumericValueOrDefault(Cell cell) {
         return cell != null && cell.getCellType() != CellType.BLANK ? (int) Double.parseDouble(getCellValue(cell)) : 0;
     }
+    private double getCellDoubleValueOrDefault(Cell cell) {
+        return cell != null && cell.getCellType() != CellType.BLANK ?  Double.parseDouble(getCellValue(cell)) : 0;
+    }
+
 
     private Long getNumericCellValueOrDefault(Cell cell) {
         if (cell != null && cell.getCellType() != CellType.BLANK && cell.getCellType() == CellType.NUMERIC) {
