@@ -43,51 +43,6 @@ public class IOFileServiceImpl implements IOFileService {
     MaterialsRepository materialsRepository;
 
 
-
-
-//    @Transactional
-//    public BaseResponse importPetsFromExcel(MultipartFile file) throws IOException {
-//        List<Pet> pets = new ArrayList<>();
-//        int totalPets = petRepository.findAll().size();
-//        int noPet = totalPets + 1;
-//        try (InputStream inputStream = file.getInputStream(); Workbook workbook = new XSSFWorkbook(inputStream)) {
-//            Sheet sheet = workbook.getSheetAt(0);
-//            for (Row row : sheet) {
-//                if (row.getRowNum() == 0) {
-//                    continue;
-//                }
-////                if(petRepository.findByName(getCellValueOrDefault(row.getCell(2)))!=null){
-////                    continue;
-////                }
-//                if(getCellValueOrDefault(row.getCell(0))==null && getCellValueOrDefault(row.getCell(1))!=null && getCellValueOrDefault(row.getCell(2))!=null ){
-//                    break;
-//                }
-//                Pet pet = new Pet();
-//                pet.setCode("VN_" + getCellValueOrDefault(row.getCell(0)) + "_" + getCellValueOrDefault(row.getCell(1)) + "_" + noPet);
-//                pet.setName(getCellValueOrDefault(row.getCell(2)));
-//                pet.setType(getCellValueOrDefault(row.getCell(3)));
-//                pet.setAge(getCellNumericValueOrDefault(row.getCell(4)));
-//                pet.setWeight(getCellDoubleValueOrDefault(row.getCell(5)));
-//                pet.setSex(getCellSexValueOrDefault(row.getCell(6)));
-//                if(getCage(getCellValueOrDefault(row.getCell(1)),getCellValueOrDefault(row.getCell(0)))!=null){
-//                    pet.setCage(getCage(getCellValueOrDefault(row.getCell(1)),getCellValueOrDefault(row.getCell(0))));
-//                }else{
-//                    return new BaseResponse(500,"Tên chuồng trại không hợp lệ","chuồng "+ "-" +getCellValueOrDefault(row.getCell(1))+" trại "+"-"+ getCellValueOrDefault(row.getCell(0)) + "không hợp lệ");
-//                }
-//                pet.setUilness(getCellValueOrDefault(row.getCell(7)));
-//                pet.setParentDad(getCellValueOrDefault(row.getCell(8)));
-//                pet.setParentMon(getCellValueOrDefault(row.getCell(9)));
-//                pet.setStatus(1);
-//                pets.add(pet);
-//                noPet++;
-//            }
-//        } catch (IOException e) {
-//            throw new IOException(e);
-//        }
-//        petRepository.saveAll(pets);
-//        return new BaseResponse(200, "OK", "Nhập dữ liệu thành công");
-//    }
-
     @Override
     @Transactional
     public BaseResponse importPetsFromExcel(MultipartFile file) throws IOException {
@@ -194,51 +149,6 @@ public class IOFileServiceImpl implements IOFileService {
         return cell != null && cell.getCellType() != CellType.BLANK ? getCellValue(cell) : null;
     }
 
-    private Long getDateCellValueOrDefault(Cell cell) {
-        if (cell != null && cell.getCellType() != CellType.BLANK && cell.getCellType() == CellType.NUMERIC) {
-            Date date = cell.getDateCellValue();
-            if (date != null) {
-                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
-                return Long.parseLong(dateFormat.format(date));
-            }
-        }
-        return null;
-    }
-
-    private int getCellNumericValueOrDefault(Cell cell) {
-        return cell != null && cell.getCellType() != CellType.BLANK ? (int) Double.parseDouble(getCellValue(cell)) : 0;
-    }
-    private double getCellDoubleValueOrDefault(Cell cell) {
-        return cell != null && cell.getCellType() != CellType.BLANK ?  Double.parseDouble(getCellValue(cell)) : 0;
-    }
-
-
-    private Long getNumericCellValueOrDefault(Cell cell) {
-        if (cell != null && cell.getCellType() != CellType.BLANK && cell.getCellType() == CellType.NUMERIC) {
-            // Chuyển đổi giá trị số thực thành số long
-            return Double.valueOf(cell.getNumericCellValue()).longValue();
-        }
-        return null;
-    }
-
-    private int getCellSexValueOrDefault(Cell cell) {
-        return cell != null && cell.getCellType() != CellType.BLANK && getCellValue(cell).equalsIgnoreCase("Cái") ? 0
-                : 1;
-    }
-
-//    private Cage getCage(String cageName, String farmName) {
-//        if (cageName == null || farmName == null) {
-//            return null;
-//        }
-//        try {
-//            int cage = (int) Double.parseDouble(cageName);
-//            int farm = (int) Double.parseDouble(farmName);
-//
-//            return cageRepository.findByNameAndFarmName(String.valueOf(cage), String.valueOf(farm));
-//        } catch (NumberFormatException e) {
-//            return null;
-//        }
-//    }
 
     @Override
     @Transactional
