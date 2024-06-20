@@ -15,6 +15,10 @@ public interface PetRepository extends BaseRepository<Pet>, JpaSpecificationExec
 
     boolean existsByName(String name);
     Pet findByName(String name);
-
-
+    @Query("select p from Pet p join Cage c on p.cage.id=c.id " +
+            "join Farm f on c.farm.id = f.id " +
+            "where p.name=:name " +
+            "AND c.name=:cageName " +
+            "AND f.name=:farmName ")
+    Pet findByCageAndFarmAndName( String name,String cageName, String farmName);
 }
