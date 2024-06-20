@@ -112,6 +112,8 @@ public class IOFileServiceImpl implements IOFileService {
                     cage = new Cage();
                     cage.setName(dto.getCageName());
                     cage.setFarm(farmRepository.findByName(dto.getFarmName()));
+                    cage.setStatus(1);
+                    cage.setCreateDate(com.example.jingangfarmmanagement.uitl.DateUtil.getCurrenDateTime());
                     // Save the new cage
                     cage = cageRepository.save(cage);
                 }
