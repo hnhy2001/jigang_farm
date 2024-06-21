@@ -9,6 +9,7 @@ import com.example.jingangfarmmanagement.repository.MaterialsRepository;
 import com.example.jingangfarmmanagement.repository.PetRepository;
 import com.example.jingangfarmmanagement.repository.dto.PetFileImportDto;
 import com.example.jingangfarmmanagement.repository.entity.Cage;
+import com.example.jingangfarmmanagement.repository.entity.Farm;
 import com.example.jingangfarmmanagement.repository.entity.Materials;
 import com.example.jingangfarmmanagement.repository.entity.Pet;
 import com.example.jingangfarmmanagement.exception.GlobalException;
@@ -17,6 +18,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.multipart.MultipartFile;
@@ -60,63 +62,84 @@ public class IOFileServiceImpl implements IOFileService {
                 if (dto.getFarmName() == null && dto.getCageName() != null && dto.getName() != null) {
                     break;
                 }
-                // Check if the cage exists
+                Farm farm = getFarm(dto.getFarmName());
+                if (farm == null) {
+                    farm = createNewFarm(dto.getFarmName());
+                }
+
                 Cage cage = getCage(dto.getCageName(), dto.getFarmName());
                 if (cage == null) {
-                    // Create new cage if it doesn't exist
-                    cage = new Cage();
-                    cage.setName(dto.getCageName());
-                    cage.setFarm(farmRepository.findByName(dto.getFarmName()));
-                    cage.setStatus(1);
-                    cage.setCreateDate(com.example.jingangfarmmanagement.uitl.DateUtil.getCurrenDateTime());
-                    // Save the new cage
-                    cage = cageRepository.save(cage);
+                    cage = createNewCage(dto.getCageName(), dto.getFarmName());
                 }
 
-                // Check if the pet already exists
-                Pet existingPet = petRepository.findByCageAndFarmAndName(dto.getName(),dto.getCageName(), dto.getFarmName());
-
-                if (existingPet != null) {
-                    // Update existing pet details
-                    existingPet.setType(dto.getType());
-                    existingPet.setAge(dto.getAge()!=null ? Integer.parseInt(dto.getAge()): 0);
-                    existingPet.setWeight(dto.getWeight()!=null ?Double.parseDouble(dto.getWeight()):0);
-                    existingPet.setSex(dto.getSex() != null && dto.getSex().equalsIgnoreCase("Cái") ? 0 : 1);
-                    existingPet.setUilness(dto.getUilness());
-                    existingPet.setParentDad(dto.getParentDad());
-                    existingPet.setParentMon(dto.getParentMom());
-                    existingPet.setStatus(1);
-                    pets.add(existingPet);
+                Pet pet = petRepository.findByCageAndFarmAndName(dto.getName(), dto.getCageName(), dto.getFarmName());
+                if (pet != null) {
+                    updatePet(pet, dto);
                 } else {
-                    // Create a new pet
-                    Pet pet = new Pet();
-                    pet.setCode("VN_" + dto.getFarmName() + "_" + dto.getCageName() + "_" + noPet);
-                    pet.setName(dto.getName());
-                    pet.setType(dto.getType());
-                    pet.setAge(dto.getAge()!=null ? Integer.parseInt(dto.getAge()): 0);
-                    pet.setWeight(dto.getWeight()!=null ? Double.parseDouble(dto.getWeight()):0);
-                    pet.setSex(dto.getSex() != null && dto.getSex().equalsIgnoreCase("Cái") ? 0 : 1);
-                    if (getCage(dto.getCageName(), dto.getFarmName()) != null) {
-                        pet.setCage(getCage(dto.getCageName(), dto.getFarmName()));
-                    } else {
-                        return new BaseResponse(500, "Tên chuồng trại không hợp lệ", "chuồng " + "-" + dto.getCageName() + " trại " + "-" + dto.getFarmName() + " không hợp lệ");
-                    }
-                    pet.setUilness(dto.getUilness());
-                    pet.setParentDad(dto.getParentDad());
-                    pet.setParentMon(dto.getParentMom());
-                    pet.setStatus(1);
-                    pets.add(pet);
+                    pet = createNewPet(dto, cage, noPet);
                     noPet++;
                 }
+                pets.add(pet);
             }
+
             petRepository.saveAll(pets);
             return new BaseResponse(200, "OK", "Nhập dữ liệu thành công");
 
         } catch (IOException e) {
-            throw new IOException(e);
+            throw new IOException("Error processing file", e);
         }
     }
 
+    private Cage createNewCage(String cageName, String farmName) {
+        Cage cage = new Cage();
+        cage.setName(cageName);
+        cage.setFarm(farmRepository.findByName(farmName));
+        cage.setStatus(1);
+        cage.setCreateDate(com.example.jingangfarmmanagement.uitl.DateUtil.getCurrenDateTime());
+        return cageRepository.save(cage);
+    }
+    private Farm createNewFarm(String farmName) {
+        Farm farm = new Farm();
+        farm.setName(farmName);
+        farm.setStatus(1);
+        farm.setCreateDate(com.example.jingangfarmmanagement.uitl.DateUtil.getCurrenDateTime());
+        return farmRepository.save(farm);
+    }
+
+    private void updatePet(Pet pet, PetFileImportDto dto) {
+        pet.setType(dto.getType());
+        pet.setAge(dto.getAge() != null ? Integer.parseInt(dto.getAge()) : 0);
+        pet.setWeight(dto.getWeight() != null ? Double.parseDouble(dto.getWeight()) : 0);
+        pet.setSex("Cái".equalsIgnoreCase(dto.getSex()) ? 0 : 1);
+        pet.setUilness(dto.getUilness());
+        pet.setParentDad(dto.getParentDad());
+        pet.setParentMon(dto.getParentMom());
+        pet.setStatus(1);
+    }
+
+    private Pet createNewPet(PetFileImportDto dto, Cage cage, int noPet) {
+        Pet pet = new Pet();
+        pet.setCode("VN_" + dto.getFarmName() + "_" + dto.getCageName() + "_" + noPet);
+        pet.setName(dto.getName());
+        pet.setType(dto.getType());
+        pet.setAge(dto.getAge() != null ? Integer.parseInt(dto.getAge()) : 0);
+        pet.setWeight(dto.getWeight() != null ? Double.parseDouble(dto.getWeight()) : 0);
+        pet.setSex("Cái".equalsIgnoreCase(dto.getSex()) ? 0 : 1);
+        pet.setCage(cage);
+        pet.setUilness(dto.getUilness());
+        pet.setParentDad(dto.getParentDad());
+        pet.setParentMon(dto.getParentMom());
+        pet.setStatus(1);
+        return pet;
+    }
+
+    private Farm getFarm(String farmName){
+        try{
+            return farmRepository.findByName(farmName);
+        }catch(Exception e){
+            return null;
+        }
+    }
 
     private Cage getCage(String cageName, String farmName) {
             try {
