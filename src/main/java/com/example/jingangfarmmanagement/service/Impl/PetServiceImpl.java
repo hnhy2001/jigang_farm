@@ -9,7 +9,9 @@ import com.example.jingangfarmmanagement.projection.FarmProjection;
 import com.example.jingangfarmmanagement.projection.PetProjection;
 import com.example.jingangfarmmanagement.query.CustomRsqlVisitor;
 import com.example.jingangfarmmanagement.repository.BaseRepository;
+import com.example.jingangfarmmanagement.repository.ChangeCageHistoryRepository;
 import com.example.jingangfarmmanagement.repository.PetRepository;
+import com.example.jingangfarmmanagement.repository.entity.ChangeCageHistory;
 import com.example.jingangfarmmanagement.repository.entity.Farm;
 import com.example.jingangfarmmanagement.repository.entity.Pet;
 import com.example.jingangfarmmanagement.service.PetService;
@@ -23,6 +25,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -32,6 +35,8 @@ public class PetServiceImpl extends BaseServiceImpl<Pet> implements PetService {
 
     @Autowired
     private PetRepository petRepository;
+    @Autowired
+    private ChangeCageHistoryRepository changeCageHistoryRepository;
     @Override
     protected BaseRepository<Pet> getRepository() {return petRepository;
     }
@@ -54,16 +59,29 @@ public class PetServiceImpl extends BaseServiceImpl<Pet> implements PetService {
         return petRepository.findAllByStatus(1);
     }
 
+
     @Override
-    public BaseResponse changeCage(ChangeCageReq changCageReq) {
-        List<Pet> pets = petRepository.findByIdIn(changCageReq.getPetList());
-        pets.stream().map(e -> {
-            e.setCage(changCageReq.getCage());
-            return e;
+    @Transactional
+    public BaseResponse changeCage(ChangeCageReq changeCageReq) {
+        List<Pet> pets = petRepository.findByIdIn(changeCageReq.getPetList());
+        List<ChangeCageHistory> changeHistories = pets.stream().map(pet -> {
+            ChangeCageHistory changeCageHistory = new ChangeCageHistory();
+            changeCageHistory.setPet(pet);
+            changeCageHistory.setStatus(1);
+            changeCageHistory.setFarmNameFrom(pet.getCage().getFarm().getName());
+            changeCageHistory.setFarmNameTo(changeCageReq.getCage().getFarm().getName());
+            changeCageHistory.setCageNameFrom(pet.getCage().getName());
+            changeCageHistory.setCageNameTo(changeCageReq.getCage().getName());
+            changeCageHistory.setCreateDate(DateUtil.getCurrenDateTime());
+            pet.setCage(changeCageReq.getCage());
+            return changeCageHistory;
         }).collect(Collectors.toList());
+
+        changeCageHistoryRepository.saveAll(changeHistories);
         petRepository.saveAll(pets);
         return new BaseResponse(200, "OK", "Chuyển chuồng thành công");
     }
+
     @Override
     public BaseResponse createPet(Pet pet) throws Exception {
         pet.setStatus(Status.ACTIVE);
