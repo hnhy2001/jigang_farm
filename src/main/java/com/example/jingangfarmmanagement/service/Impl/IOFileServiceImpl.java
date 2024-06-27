@@ -45,7 +45,6 @@ public class IOFileServiceImpl implements IOFileService {
         List<Pet> pets = new ArrayList<>();
         List<Farm> farms = new ArrayList<>();
         List<Cage> cages = new ArrayList<>();
-        List<Uilness> uilnesses = new ArrayList<>();
         List<String> errorMessages = new ArrayList<>();
         int totalPets = petRepository.findAll().size();
         int noPet = totalPets + 1;
@@ -67,22 +66,10 @@ public class IOFileServiceImpl implements IOFileService {
                         throw new IllegalArgumentException("Missing required fields: FarmName, CageName, or Name");
                     }
 
-                    Farm farm = getFarm(dto.getFarmName());
-                    if (farm == null) {
-                        farm = createNewFarm(dto.getFarmName());
-                        farms.add(farm);
-                        farm = farmRepository.save(farm);
-                    }
+                    // Clear uilnesses list for each pet import
+                    List<Uilness> uilnesses = new ArrayList<>();
 
-                    Cage cage = getCage(dto.getCageName(), dto.getFarmName());
-                    if (cage == null) {
-                        cage = createNewCage(dto.getCageName(), dto.getFarmName());
-                        cages.add(cage);
-                        cage = cageRepository.save(cage);
-                    }
-
-
-                    uilnesses.clear();
+                    // Process uilnesses from DTO
                     String uilnessData = dto.getUilness();
                     if (uilnessData != null && !uilnessData.isEmpty()) {
                         String[] uilnessNames = uilnessData.split(",");
@@ -96,6 +83,20 @@ public class IOFileServiceImpl implements IOFileService {
                                 uilnesses.add(expertUilness);
                             }
                         }
+                    }
+
+                    Farm farm = getFarm(dto.getFarmName());
+                    if (farm == null) {
+                        farm = createNewFarm(dto.getFarmName());
+                        farms.add(farm);
+                        farm = farmRepository.save(farm);
+                    }
+
+                    Cage cage = getCage(dto.getCageName(), dto.getFarmName());
+                    if (cage == null) {
+                        cage = createNewCage(dto.getCageName(), dto.getFarmName());
+                        cages.add(cage);
+                        cage = cageRepository.save(cage);
                     }
 
                     // Check if the pet already exists in the pets list
@@ -122,7 +123,8 @@ public class IOFileServiceImpl implements IOFileService {
                         pets.add(pet);
                     }
 
-                    if ((i + 1) % batchSize == 0) {
+                    // Batch processing: save every batchSize pets
+                    if ((i + 1) % batchSize == 0 || i == petFileImportDtos.size() - 1) {
                         petRepository.saveAll(pets);
 
                         farms.clear();
@@ -157,15 +159,17 @@ public class IOFileServiceImpl implements IOFileService {
                 petRepository.saveAll(pets);
             }
 
+            // Check if there were any errors during processing
             if (errorMessages.isEmpty()) {
                 return new BaseResponse(200, "OK", "Nhập dữ liệu thành công");
             } else {
-                return new BaseResponse(500, "Lỗi", String.join("; ", errorMessages));
+                return new BaseResponse(500, "Error", String.join("; ", errorMessages));
             }
         } catch (IOException e) {
             throw new IOException("Error processing file", e);
         }
     }
+
 
     private Cage createNewCage(String cageName, String farmName) {
         Cage cage = new Cage();

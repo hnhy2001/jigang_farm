@@ -1,6 +1,7 @@
 package com.example.jingangfarmmanagement.repository.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.AllArgsConstructor;
@@ -49,13 +50,9 @@ public class Pet extends BaseEntity{
 //    @ManyToOne
 //    @JoinColumn(name = "uilness", nullable = true)
 //    private Uilness uilness;
-    @ManyToMany(cascade = CascadeType.ALL)
-    @JoinTable(name = "pet_uiless",
-            joinColumns = @JoinColumn(name = "pet_id"),
-            inverseJoinColumns = @JoinColumn(name = "uilness_id")
-    )
-    @JsonManagedReference
-    private List<Uilness> uilnesses = new ArrayList<>();
+    @ManyToMany(mappedBy = "pets")
+    @JsonIgnore
+    private List<Uilness> uilnesses;
     @Column(name = "parent_dad")
     private String parentDad;
     @Column(name = "parent_mom")
