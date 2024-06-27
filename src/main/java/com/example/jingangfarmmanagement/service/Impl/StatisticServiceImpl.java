@@ -183,7 +183,7 @@ public class StatisticServiceImpl implements StatisticService {
                         }
                     });
                     if (!uilnessList.isEmpty() && pet.getStatus() != -1){
-                        if (pet.getUilnesses() == null){
+                        if (pet.getUilness() == null){
                             result.getStatisticStatusUilnessPetList().get(0).setTotalPet(result.getStatisticStatusUilnessPetList().get(0).getTotalPet() + 1);
                             if (pet.getSex() == 1){
                                 result.getStatisticStatusUilnessPetList().get(0).setTotalMale(result.getStatisticStatusUilnessPetList().get(0).getTotalMale() + 1);
@@ -191,9 +191,9 @@ public class StatisticServiceImpl implements StatisticService {
                                 result.getStatisticStatusUilnessPetList().get(0).setTotalFemale(result.getStatisticStatusUilnessPetList().get(0).getTotalFemale() + 1);
                             }
                         }else {
-                            List<String> uilnesses = pet.getUilnesses().stream().map(Uilness::getName).collect(Collectors.toList());
+                            String[] uilnesses = pet.getUilness().split(",");
                             AtomicInteger uilnessCheckPoint = new AtomicInteger(0);
-                            uilnesses.forEach(uilnessCode -> {
+                            Arrays.stream(uilnesses).forEach(uilnessCode -> {
                                 uilnessList.forEach(uilness -> {
                                     if (uilnessCode.contains(uilness.getCode())){
                                         if (uilness.getScore() >= uilnessCheckPoint.get()){
@@ -270,7 +270,7 @@ public class StatisticServiceImpl implements StatisticService {
                         }
                     });
                     if (!uilnessList.isEmpty() && pet.getStatus() != -1){
-                        if (pet.getUilnesses() == null ){
+                        if (pet.getUilness() == null ){
                             result.getStatisticStatusUilnessPetList().get(0).setTotalPet(result.getStatisticStatusUilnessPetList().get(0).getTotalPet() + 1);
                             if (pet.getSex() == 1){
                                 result.getStatisticStatusUilnessPetList().get(0).setTotalMale(result.getStatisticStatusUilnessPetList().get(0).getTotalMale() + 1);
@@ -278,9 +278,9 @@ public class StatisticServiceImpl implements StatisticService {
                                 result.getStatisticStatusUilnessPetList().get(0).setTotalFemale(result.getStatisticStatusUilnessPetList().get(0).getTotalFemale() + 1);
                             }
                         }else {
-                            List<String>  uilnesses = pet.getUilnesses().stream().map(Uilness::getName).collect(Collectors.toList());
+                            String[]  uilnesses = pet.getUilness().split(",");
                             AtomicInteger uilnessCheckPoint = new AtomicInteger(0);
-                            uilnesses.forEach(uilnessCode -> {
+                            Arrays.stream(uilnesses).forEach(uilnessCode -> {
                                 uilnessList.forEach(uilness -> {
                                     if (uilnessCode.contains(uilness.getCode())){
                                         if (uilness.getScore() >= uilnessCheckPoint.get()){

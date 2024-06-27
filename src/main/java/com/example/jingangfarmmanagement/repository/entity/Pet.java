@@ -50,9 +50,14 @@ public class Pet extends BaseEntity{
 //    @ManyToOne
 //    @JoinColumn(name = "uilness", nullable = true)
 //    private Uilness uilness;
-    @ManyToMany(mappedBy = "pets")
-    @JsonIgnore
-    private List<Uilness> uilnesses;
+//    @ManyToMany(cascade = CascadeType.ALL)
+//    @JoinTable(name = "pet_uiless",
+//            joinColumns = @JoinColumn(name = "pet_id"),
+//            inverseJoinColumns = @JoinColumn(name = "uilness_id")
+//    )
+//    private List<Uilness> uilnesses = new ArrayList<>();
+    private String uilness;
+
     @Column(name = "parent_dad")
     private String parentDad;
     @Column(name = "parent_mom")

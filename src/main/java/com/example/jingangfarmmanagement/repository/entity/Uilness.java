@@ -37,12 +37,7 @@ public class Uilness extends BaseEntity{
     @JsonBackReference
     private List<TreatmentCard> treatmentCards;
 
-    @ManyToMany(cascade = CascadeType.ALL)
-    @JoinTable(name = "pet_uiless",
-            joinColumns = @JoinColumn(name = "pet_id"),
-            inverseJoinColumns = @JoinColumn(name = "uilness_id")
-    )
-    @JsonIgnore
-    private List<Pet> pets = new ArrayList<>();
+//    @ManyToMany(mappedBy = "uilnesses")
+//    private List<Pet> pets;
 
 }

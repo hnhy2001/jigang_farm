@@ -8,6 +8,7 @@ import com.example.jingangfarmmanagement.repository.dto.PetFileImportDto;
 import com.example.jingangfarmmanagement.repository.entity.*;
 import com.example.jingangfarmmanagement.exception.GlobalException;
 import com.example.jingangfarmmanagement.service.IOFileService;
+import com.google.gson.Gson;
 import org.apache.commons.io.FileUtils;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -63,7 +64,7 @@ public class IOFileServiceImpl implements IOFileService {
                 try {
                     // Validate fields
                     if (dto.getFarmName() == null || dto.getCageName() == null || dto.getName() == null) {
-                        throw new IllegalArgumentException("Missing required fields: FarmName, CageName, or Name");
+                        throw new IllegalArgumentException("Thiếu một trong các trường bắt buộc: tên trại, tên chuồng, or tên vật nuôi");
                     }
 
                     // Clear uilnesses list for each pet import
@@ -105,10 +106,9 @@ public class IOFileServiceImpl implements IOFileService {
                         if (existingPet.getName().equals(dto.getName()) &&
                                 existingPet.getCage().getName().equals(dto.getCageName()) &&
                                 existingPet.getCage().getFarm().getName().equals(dto.getFarmName())) {
-                            updatePet(existingPet, dto, uilnesses);
-                            petFound = true;
-                            break;
+                            throw new IllegalArgumentException("Trùng vật nuôi cùng trại cùng chuồng");
                         }
+
                     }
 
                     // If not found in the current batch, check database for existing pet
@@ -126,7 +126,6 @@ public class IOFileServiceImpl implements IOFileService {
                     // Batch processing: save every batchSize pets
                     if ((i + 1) % batchSize == 0 || i == petFileImportDtos.size() - 1) {
                         petRepository.saveAll(pets);
-
                         farms.clear();
                         cages.clear();
                         pets.clear();
@@ -201,7 +200,7 @@ public class IOFileServiceImpl implements IOFileService {
         pet.setAge(dto.getAge() != null ? Integer.parseInt(dto.getAge()) : 0);
         pet.setWeight(dto.getWeight() != null ? Double.parseDouble(dto.getWeight()) : 0);
         pet.setSex("Cái".equalsIgnoreCase(dto.getSex()) ? 0 : 1);
-        pet.setUilnesses(uilnesses);
+        pet.setUilness(uilnesses.toString());
         pet.setParentDad(dto.getParentDad());
         pet.setParentMon(dto.getParentMom());
         pet.setStatus(1);
@@ -216,7 +215,7 @@ public class IOFileServiceImpl implements IOFileService {
         pet.setWeight(dto.getWeight() != null ? Double.parseDouble(dto.getWeight()) : 0);
         pet.setSex("Cái".equalsIgnoreCase(dto.getSex()) ? 0 : 1);
         pet.setCage(cage);
-        pet.setUilnesses(uilnesses);
+        pet.setUilness(uilnesses.toString());
         pet.setParentDad(dto.getParentDad());
         pet.setParentMon(dto.getParentMom());
         pet.setStatus(1);
