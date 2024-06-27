@@ -39,5 +39,9 @@ public class Uilness extends BaseEntity{
     @ManyToMany(mappedBy = "uilnesses")
     @JsonBackReference
     private List<TreatmentCard> treatmentCards;
+    @ManyToMany(mappedBy = "uilnesses")
+    @JsonBackReference
+    private List<Pet> pets;
+
 
 }

@@ -49,10 +49,13 @@ public class Pet extends BaseEntity{
 //    @ManyToOne
 //    @JoinColumn(name = "uilness", nullable = true)
 //    private Uilness uilness;
-
-    @Column(name = "uilness")
-    private String uilness;
-
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(name = "pet_uiless",
+            joinColumns = @JoinColumn(name = "pet_id"),
+            inverseJoinColumns = @JoinColumn(name = "uilness_id")
+    )
+    @JsonManagedReference
+    private List<Uilness> uilnesses = new ArrayList<>();
     @Column(name = "parent_dad")
     private String parentDad;
     @Column(name = "parent_mom")
