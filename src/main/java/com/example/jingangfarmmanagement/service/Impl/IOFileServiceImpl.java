@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class IOFileServiceImpl implements IOFileService {
@@ -200,7 +201,11 @@ public class IOFileServiceImpl implements IOFileService {
         pet.setAge(dto.getAge() != null ? Integer.parseInt(dto.getAge()) : 0);
         pet.setWeight(dto.getWeight() != null ? Double.parseDouble(dto.getWeight()) : 0);
         pet.setSex("Cái".equalsIgnoreCase(dto.getSex()) ? 0 : 1);
-        pet.setUilness(uilnesses.toString());
+        List<String> uilnessNames= uilnesses.stream().map(Uilness::getName).collect(Collectors.toList());
+        String result = uilnessNames.stream()
+                .map(name -> name)
+                .collect(Collectors.joining(","));
+        pet.setUilness(result);
         pet.setParentDad(dto.getParentDad());
         pet.setParentMon(dto.getParentMom());
         pet.setStatus(1);
@@ -215,7 +220,11 @@ public class IOFileServiceImpl implements IOFileService {
         pet.setWeight(dto.getWeight() != null ? Double.parseDouble(dto.getWeight()) : 0);
         pet.setSex("Cái".equalsIgnoreCase(dto.getSex()) ? 0 : 1);
         pet.setCage(cage);
-        pet.setUilness(uilnesses.toString());
+        List<String> uilnessNames= uilnesses.stream().map(Uilness::getName).collect(Collectors.toList());
+        String result = uilnessNames.stream()
+                .map(name -> name)
+                .collect(Collectors.joining(","));
+        pet.setUilness(result);
         pet.setParentDad(dto.getParentDad());
         pet.setParentMon(dto.getParentMom());
         pet.setStatus(1);

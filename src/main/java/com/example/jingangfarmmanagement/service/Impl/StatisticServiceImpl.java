@@ -195,7 +195,7 @@ public class StatisticServiceImpl implements StatisticService {
                             AtomicInteger uilnessCheckPoint = new AtomicInteger(0);
                             Arrays.stream(uilnesses).forEach(uilnessCode -> {
                                 uilnessList.forEach(uilness -> {
-                                    if (uilnessCode.contains(uilness.getCode())){
+                                    if (uilnessCode.contains(uilness.getName())){
                                         if (uilness.getScore() >= uilnessCheckPoint.get()){
                                             uilnessCheckPoint.set(uilness.getScore());
                                         }
@@ -282,7 +282,7 @@ public class StatisticServiceImpl implements StatisticService {
                             AtomicInteger uilnessCheckPoint = new AtomicInteger(0);
                             Arrays.stream(uilnesses).forEach(uilnessCode -> {
                                 uilnessList.forEach(uilness -> {
-                                    if (uilnessCode.contains(uilness.getCode())){
+                                    if (uilnessCode.contains(uilness.getName())){
                                         if (uilness.getScore() >= uilnessCheckPoint.get()){
                                             uilnessCheckPoint.set(uilness.getScore());
                                         }
