@@ -112,7 +112,7 @@ public class PetServiceImpl extends BaseServiceImpl<Pet> implements PetService {
         return new BaseResponse(200, "Cập nhật cân nặng vật nuôi thành công",   petRepository.saveAll((pets)));
     }
     @Override
-    public BaseResponse findPetWithCageAndFarm(Long cageId, Long farmId, Long startDate, Long endDate){
+    public BaseResponse findPetWithCageAndFarm(List<Long> cageId, List<Long> farmId, Long startDate, Long endDate){
         List<Pet> pets =petRepository.findByCageIdFarmId(cageId,farmId,startDate,endDate);
         return new BaseResponse(200, "Lấy vật nuôi thành công",pets);
     }

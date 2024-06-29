@@ -24,5 +24,5 @@ public interface PetService extends BaseService<Pet> {
     public BaseResponse updatePet(Pet pet) throws Exception;
 
     public BaseResponse updatePetWeight(UpdateWeightPetReq updateWeightPet) ;
-    public BaseResponse findPetWithCageAndFarm(Long cageId, Long farmId, Long startDate, Long endDate);
+    public BaseResponse findPetWithCageAndFarm(List<Long> cageId,List<Long> farmId, Long startDate, Long endDate);
 }

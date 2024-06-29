@@ -9,6 +9,8 @@ import com.example.jingangfarmmanagement.service.PetService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @CrossOrigin
 @RestController
 @RequestMapping("pet")
@@ -43,8 +45,8 @@ public class PetController extends BaseController<Pet> {
     }
     @GetMapping("/export-pet")
     public BaseResponse findPetWithCageAndFarm(
-                @RequestParam(required = false) Long cageId,
-                @RequestParam(required = true) Long farmId,
+                @RequestParam(required = false) List<Long> cageId,
+                @RequestParam(required = true) List<Long> farmId,
                 @RequestParam(required = false) Long startDate,
                 @RequestParam(required = false) Long endDate) {
      return new BaseResponse(200, "Lấy dữ liệu thành công!", petService.findPetWithCageAndFarm(cageId,farmId,startDate,endDate));
