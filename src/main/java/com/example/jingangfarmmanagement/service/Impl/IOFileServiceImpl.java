@@ -8,8 +8,6 @@ import com.example.jingangfarmmanagement.repository.dto.PetFileImportDto;
 import com.example.jingangfarmmanagement.repository.entity.*;
 import com.example.jingangfarmmanagement.exception.GlobalException;
 import com.example.jingangfarmmanagement.service.IOFileService;
-import com.google.gson.Gson;
-import org.apache.commons.io.FileUtils;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,7 +63,7 @@ public class IOFileServiceImpl implements IOFileService {
                 try {
                     // Validate fields
                     if (dto.getFarmName() == null || dto.getCageName() == null || dto.getName() == null) {
-                        throw new IllegalArgumentException("Thiếu một trong các trường bắt buộc: tên trại, tên chuồng, or tên vật nuôi");
+                        throw new IllegalArgumentException("Thiếu một trong các trường bắt buộc: tên trại, tên chuồng, hoặc tên vật nuôi");
                     }
 
                     // Clear uilnesses list for each pet import
@@ -137,12 +135,12 @@ public class IOFileServiceImpl implements IOFileService {
                     }
                 } catch (IllegalArgumentException e) {
                     // Return BaseResponse with the error message immediately
-                    String errorMessage = "Error processing row " + (i + 1) + ": " + e.getMessage();
+                    String errorMessage = "File nhập liệu lỗi ở dòng " + (i + 1) + ": " + e.getMessage();
                     System.err.println(errorMessage);
                     errorMessages.add(errorMessage);
                 } catch (Exception e) {
                     // Log the error with the row information
-                    String errorMessage = "Error processing row " + (i + 1) + ": " + e.getMessage();
+                    String errorMessage = "File nhập liệu lỗi ở dòng" + (i + 1) + ": " + e.getMessage();
                     System.err.println(errorMessage);
                     errorMessages.add(errorMessage);
                 }
@@ -166,7 +164,7 @@ public class IOFileServiceImpl implements IOFileService {
                 return new BaseResponse(500, "Error", String.join("; ", errorMessages));
             }
         } catch (IOException e) {
-            throw new IOException("Error processing file", e);
+            throw new IOException("Đã có lỗi xảy ra ", e);
         }
     }
 

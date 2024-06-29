@@ -41,4 +41,13 @@ public class PetController extends BaseController<Pet> {
     public BaseResponse updatePetWeight(@RequestBody UpdateWeightPetReq updateWeightPet) {
        return petService.updatePetWeight(updateWeightPet);
     }
+    @GetMapping("/export-pet")
+    public BaseResponse findPetWithCageAndFarm(
+                @RequestParam(required = false) Long cageId,
+                @RequestParam(required = true) Long farmId,
+                @RequestParam(required = false) Long startDate,
+                @RequestParam(required = false) Long endDate) {
+     return new BaseResponse(200, "Lấy dữ liệu thành công!", petService.findPetWithCageAndFarm(cageId,farmId,startDate,endDate));
+   }
+
 }
