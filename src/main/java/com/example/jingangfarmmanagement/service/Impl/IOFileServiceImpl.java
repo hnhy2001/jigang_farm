@@ -91,6 +91,8 @@ public class IOFileServiceImpl implements IOFileService {
                         farm = createNewFarm(dto.getFarmName());
                         farms.add(farm);
                         farm = farmRepository.save(farm);
+                    } else if (farm.getStatus()!=1) {
+                        throw new IllegalArgumentException("Trại " + farm.getName() + " không hoạt động");
                     }
 
                     Cage cage = getCage(dto.getCageName(), dto.getFarmName());
@@ -98,7 +100,10 @@ public class IOFileServiceImpl implements IOFileService {
                         cage = createNewCage(dto.getCageName(), dto.getFarmName());
                         cages.add(cage);
                         cage = cageRepository.save(cage);
+                    } else if (cage.getStatus()!=1) {
+                        throw new IllegalArgumentException("Chuồng " + cage.getName() + " không hoạt động");
                     }
+
 
                     // Check if the pet already exists in the pets list
                     boolean petFound = false;
