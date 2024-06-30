@@ -46,7 +46,7 @@ public class PetController extends BaseController<Pet> {
     @GetMapping("/export-pet")
     public BaseResponse findPetWithCageAndFarm(
                 @RequestParam(required = false) List<Long> cageId,
-                @RequestParam(required = true) List<Long> farmId,
+                @RequestParam(required = false) List<Long> farmId,
                 @RequestParam(required = false) Long startDate,
                 @RequestParam(required = false) Long endDate) {
      return new BaseResponse(200, "Lấy dữ liệu thành công!", petService.findPetWithCageAndFarm(cageId,farmId,startDate,endDate));

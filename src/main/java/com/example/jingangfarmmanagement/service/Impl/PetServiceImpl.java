@@ -26,6 +26,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -112,8 +113,22 @@ public class PetServiceImpl extends BaseServiceImpl<Pet> implements PetService {
         return new BaseResponse(200, "Cập nhật cân nặng vật nuôi thành công",   petRepository.saveAll((pets)));
     }
     @Override
-    public BaseResponse findPetWithCageAndFarm(List<Long> cageId, List<Long> farmId, Long startDate, Long endDate){
-        List<Pet> pets =petRepository.findByCageIdFarmId(cageId,farmId,startDate,endDate);
-        return new BaseResponse(200, "Lấy vật nuôi thành công",pets);
+    public BaseResponse findPetWithCageAndFarm(List<Long> cageIds, List<Long> farmIds, Long startDate, Long endDate){
+        List<Pet> pets = new ArrayList<>();
+        List<Pet> resultPets = new ArrayList<>();
+        if(!cageIds.isEmpty())
+        {
+            for(var cageId:cageIds){
+                pets =petRepository.findByCageId(cageId,startDate,endDate);
+                resultPets.addAll(pets);
+            }
+        }else {
+            for(var farmId:farmIds){
+                pets =petRepository.findByFarmId(farmId,startDate,endDate);
+                resultPets.addAll(pets);
+            }
+        }
+
+        return new BaseResponse(200, "Lấy vật nuôi thành công",resultPets);
     }
 }
