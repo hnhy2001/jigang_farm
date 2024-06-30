@@ -4,6 +4,7 @@ import com.alibaba.excel.EasyExcel;
 import com.example.jingangfarmmanagement.exception.GlobalException;
 import com.example.jingangfarmmanagement.model.BaseResponse;
 import com.example.jingangfarmmanagement.repository.*;
+import com.example.jingangfarmmanagement.repository.dto.MeterialFileImportDto;
 import com.example.jingangfarmmanagement.repository.dto.PetFileImportDto;
 import com.example.jingangfarmmanagement.repository.entity.*;
 import com.example.jingangfarmmanagement.exception.GlobalException;
@@ -272,44 +273,105 @@ public class IOFileServiceImpl implements IOFileService {
         }
     }
 
-
-    private String getCellValueOrDefault(Cell cell) {
-        return cell != null && cell.getCellType() != CellType.BLANK ? getCellValue(cell) : null;
-    }
-
-
-    @Override
     @Transactional
     public BaseResponse importMaterialsFromExcel(MultipartFile file) throws IOException {
         List<Materials> materials = new ArrayList<>();
+        List<String> errorMessages = new ArrayList<>();
         int totalMaterials = materialsRepository.findAll().size();
-        int noMaterials = totalMaterials + 1;
-        try (InputStream inputStream = file.getInputStream(); Workbook workbook = new XSSFWorkbook(inputStream)) {
-            Sheet sheet = workbook.getSheetAt(0);
-            for (Row row : sheet) {
-                if (row.getRowNum() == 0) {
-                    continue;
+        int noMaterial = totalMaterials + 1;
+
+        // Batch size configuration
+        int batchSize = 50;  // You can adjust this value based on your requirements
+
+        try {
+            List<MeterialFileImportDto> meterialFileImportDtos = EasyExcel.read(file.getInputStream())
+                    .head(MeterialFileImportDto.class)
+                    .sheet()
+                    .doReadSync();
+
+            for (int i = 0; i < meterialFileImportDtos.size(); i++) {
+                MeterialFileImportDto dto = meterialFileImportDtos.get(i);
+                try {
+                    // Validate fields
+                    if (dto.getName() == null ) {
+                        throw new IllegalArgumentException("Thiếu một trong các trường bắt buộc: tên vật tư");
+                    }
+                    // Check if the pet already exists in the pets list
+                    boolean materialFound = false;
+                    for (Materials existingMaterials : materials) {
+                        if (existingMaterials.getName().equals(dto.getName())) {
+                            throw new IllegalArgumentException("Trùng vật tư");
+                        }
+
+                    }
+
+                    // If not found in the current batch, check database for existing pet
+                    if (!materialFound) {
+                        Materials material = materialsRepository.findByName(dto.getName());
+                        if (material != null) {
+                            updateMaterial(material, dto);
+                        } else {
+                            material = createNewMaterial(dto);
+                            noMaterial++;
+                        }
+                        materials.add(material);
+                    }
+                    // Batch processing: save every batchSize pets
+                    if ((i + 1) % batchSize == 0 || i == materials.size() - 1) {
+                        materialsRepository.saveAll(materials);
+                        materials.clear();
+
+                        // Flush and clear to manage memory
+                        entityManager.flush();
+                        entityManager.clear();
+                    }
+                } catch (IllegalArgumentException e) {
+                    // Return BaseResponse with the error message immediately
+                    String errorMessage = "File nhập liệu lỗi ở dòng " + (i + 1) + ": " + e.getMessage();
+                    System.err.println(errorMessage);
+                    errorMessages.add(errorMessage);
+                } catch (Exception e) {
+                    // Log the error with the row information
+                    String errorMessage = "File nhập liệu lỗi ở dòng" + (i + 1) + ": " + e.getMessage();
+                    System.err.println(errorMessage);
+                    errorMessages.add(errorMessage);
                 }
-                if(materialsRepository.findByName(getCellValueOrDefault(row.getCell(0)))!=null){
-                    continue;
-                }
-                if(getCellValueOrDefault(row.getCell(0))==null){
-                    break;
-                }
-                Materials material = new Materials();
-                material.setCode("VN_" + noMaterials);
-                material.setName(getCellValueOrDefault(row.getCell(0)));
-                material.setNote(getCellValueOrDefault(row.getCell(1)));
-                material.setUnit(getCellValueOrDefault(row.getCell(2)));
-//                material.setExpirationDate(getDateCellValueOrDefault(row.getCell(3)));
-                material.setStatus(1);
-                materials.add(material);
-                noMaterials++;
+            }
+
+            // Save any remaining entities
+            if (!materials.isEmpty()) {
+                materialsRepository.saveAll(materials);
+            }
+
+            // Check if there were any errors during processing
+            if (errorMessages.isEmpty()) {
+                return new BaseResponse(200, "OK", "Nhập dữ liệu thành công");
+            } else {
+                return new BaseResponse(500, "Error", String.join("; ", errorMessages));
             }
         } catch (IOException e) {
-            throw new IOException(e);
+            throw new IOException("Đã có lỗi xảy ra ", e);
         }
-        materialsRepository.saveAllAndFlush(materials);
-        return new BaseResponse(200, "OK", "Nhập dữ liệu thành công");
     }
+    private void updateMaterial(Materials materials, MeterialFileImportDto dto) {
+        materials.setProductType(dto.getProductType());
+        materials.setName(dto.getName());
+        materials.setNote(dto.getNote());
+        materials.setUnit(dto.getUnit());
+        materials.setIndications(dto.getIndications());
+        materials.setStatus(1);
+    }
+
+    private Materials createNewMaterial( MeterialFileImportDto dto) {
+        Materials materials = new Materials();
+        materials.setProductType(dto.getProductType());
+        materials.setName(dto.getName());
+        materials.setNote(dto.getNote());
+        materials.setUnit(dto.getUnit());
+        materials.setIndications(dto.getIndications());
+        materials.setStatus(1);
+        materials.setCreateDate(com.example.jingangfarmmanagement.uitl.DateUtil.getCurrenDateTime());
+        return materials;
+    }
+
 }

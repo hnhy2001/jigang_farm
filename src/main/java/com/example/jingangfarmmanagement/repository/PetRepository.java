@@ -27,5 +27,5 @@ public interface PetRepository extends BaseRepository<Pet>, JpaSpecificationExec
             "AND f.id in :farmId " +
             "AND (:startDate is null or p.createDate >= :startDate )  " +
             "And (:endDate is null or p.createDate <= :endDate )")
-    List<Pet> findByCageIdFarmId(List<Long> cageId,List<Long> farmId,Long startDate, Long endDate);
+    List<Pet> findByCageIdFarmId(List<Long> cageId, List<Long> farmId,Long startDate, Long endDate);
 }
