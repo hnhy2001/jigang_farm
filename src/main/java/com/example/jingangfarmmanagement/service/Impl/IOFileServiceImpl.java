@@ -231,6 +231,7 @@ public class IOFileServiceImpl implements IOFileService {
         pet.setUilness(result);
         pet.setParentDad(dto.getParentDad());
         pet.setParentMon(dto.getParentMom());
+        pet.setCreateDate(com.example.jingangfarmmanagement.uitl.DateUtil.getCurrenDateTime());
         pet.setStatus(1);
         return pet;
     }

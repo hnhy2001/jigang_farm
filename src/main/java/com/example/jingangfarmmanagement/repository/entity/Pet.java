@@ -66,6 +66,6 @@ public class Pet extends BaseEntity{
     @JsonBackReference
     private List<TreatmentCard> treatmentCards;
     @ManyToMany(mappedBy = "pets")
-    @JsonBackReference
+    @JsonIgnore
     private List<MealVoucher> mealVouchers;
 }

@@ -1,5 +1,6 @@
 package com.example.jingangfarmmanagement.repository.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 
@@ -21,6 +22,6 @@ public class MealVoucher extends BaseEntity{
             joinColumns = @JoinColumn(name = "meal_voucher_id"),
             inverseJoinColumns = @JoinColumn(name = "pet_id")
     )
-    @JsonManagedReference
+    @JsonIgnore
     private List<Pet> pets = new ArrayList<>();
 }
