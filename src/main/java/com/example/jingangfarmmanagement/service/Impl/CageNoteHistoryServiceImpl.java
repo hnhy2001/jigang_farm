@@ -24,7 +24,7 @@ public class CageNoteHistoryServiceImpl extends BaseServiceImpl<CageNoteHistory>
     @Override
     public BaseResponse createCageNoteHistory(CageNoteHistory cageNoteHistory)  {
 
-        Optional<CageNoteHistory> cageNoteHistoryExist =cageNoteHistoryRepository.findByDate(cageNoteHistory.getCreateDate());
+        Optional<CageNoteHistory> cageNoteHistoryExist =cageNoteHistoryRepository.findByDate(cageNoteHistory.getCreateDate(), cageNoteHistory.getCage().getId());
         if (cageNoteHistoryExist.isPresent()) {
            cageNoteHistoryExist.get().setCage(cageNoteHistory.getCage());
            cageNoteHistoryExist.get().setNote(cageNoteHistory.getNote());
