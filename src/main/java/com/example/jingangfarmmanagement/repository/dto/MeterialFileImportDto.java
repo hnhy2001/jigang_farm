@@ -17,5 +17,8 @@ public class MeterialFileImportDto {
     private String unit;
     @ExcelProperty(value="Chỉ định")
     private String indications;
+    @ExcelProperty(value="Điều trị")
+    private String treatment;
+
 
 }

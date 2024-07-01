@@ -41,6 +41,8 @@ public class Materials extends BaseEntity {
     private String productType;
     @Column(name="indications")
     private String indications;
+    @Column(name="treatment")
+    private String treatment;
 //
 //    @Transient
 //    private Long estimateQuantity = 0L;

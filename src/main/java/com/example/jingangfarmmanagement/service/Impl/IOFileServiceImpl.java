@@ -199,7 +199,7 @@ public class IOFileServiceImpl implements IOFileService {
     private Uilness createNewUilness(String uilnessName) {
             Uilness uilness = new Uilness();
             uilness.setName(uilnessName);
-            uilness.setScore(1);
+            uilness.setScore(8);
             uilness.setStatus(1);
             uilness.setCreateDate(com.example.jingangfarmmanagement.uitl.DateUtil.getCurrenDateTime());
         return uilness;
@@ -265,24 +265,6 @@ public class IOFileServiceImpl implements IOFileService {
     }
 
 
-    private String getCellValue(Cell cell) {
-        switch (cell.getCellType()) {
-            case STRING:
-                return cell.getStringCellValue();
-            case NUMERIC:
-                if (DateUtil.isCellDateFormatted(cell)) {
-                    return cell.getDateCellValue().toString();
-                } else {
-                    return String.valueOf(cell.getNumericCellValue());
-                }
-            case BOOLEAN:
-                return String.valueOf(cell.getBooleanCellValue());
-            case FORMULA:
-                return cell.getCellFormula();
-            default:
-                return "";
-        }
-    }
 
     @Transactional
     public BaseResponse importMaterialsFromExcel(MultipartFile file) throws IOException {
@@ -370,6 +352,7 @@ public class IOFileServiceImpl implements IOFileService {
         materials.setNote(dto.getNote());
         materials.setUnit(dto.getUnit());
         materials.setIndications(dto.getIndications());
+        materials.setTreatment(dto.getTreatment());
         materials.setStatus(1);
     }
 
@@ -380,6 +363,7 @@ public class IOFileServiceImpl implements IOFileService {
         materials.setNote(dto.getNote());
         materials.setUnit(dto.getUnit());
         materials.setIndications(dto.getIndications());
+        materials.setTreatment(dto.getTreatment());
         materials.setStatus(1);
         materials.setCreateDate(com.example.jingangfarmmanagement.uitl.DateUtil.getCurrenDateTime());
         return materials;
