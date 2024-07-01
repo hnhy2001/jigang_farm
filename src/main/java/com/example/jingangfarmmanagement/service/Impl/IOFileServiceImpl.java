@@ -59,6 +59,8 @@ public class IOFileServiceImpl implements IOFileService {
                     .sheet()
                     .doReadSync();
 
+            boolean errorOccurred = false; // Flag to track if error occurred
+
             for (int i = 0; i < petFileImportDtos.size(); i++) {
                 PetFileImportDto dto = petFileImportDtos.get(i);
                 try {
@@ -91,7 +93,7 @@ public class IOFileServiceImpl implements IOFileService {
                         farm = createNewFarm(dto.getFarmName());
                         farms.add(farm);
                         farm = farmRepository.save(farm);
-                    } else if (farm.getStatus()!=1) {
+                    } else if (farm.getStatus() != 1) {
                         throw new IllegalArgumentException("Trại " + farm.getName() + " không hoạt động");
                     }
 
@@ -100,10 +102,9 @@ public class IOFileServiceImpl implements IOFileService {
                         cage = createNewCage(dto.getCageName(), dto.getFarmName());
                         cages.add(cage);
                         cage = cageRepository.save(cage);
-                    } else if (cage.getStatus()!=1) {
+                    } else if (cage.getStatus() != 1) {
                         throw new IllegalArgumentException("Chuồng " + cage.getName() + " không hoạt động");
                     }
-
 
                     // Check if the pet already exists in the pets list
                     boolean petFound = false;
@@ -113,7 +114,6 @@ public class IOFileServiceImpl implements IOFileService {
                                 existingPet.getCage().getFarm().getName().equals(dto.getFarmName())) {
                             throw new IllegalArgumentException("Trùng vật nuôi cùng trại cùng chuồng");
                         }
-
                     }
 
                     // If not found in the current batch, check database for existing pet
@@ -144,6 +144,8 @@ public class IOFileServiceImpl implements IOFileService {
                     String errorMessage = "File nhập liệu lỗi ở dòng " + (i + 1) + ": " + e.getMessage();
                     System.err.println(errorMessage);
                     errorMessages.add(errorMessage);
+                    errorOccurred = true; // Set error flag
+                    break; // Stop processing further rows
                 } catch (Exception e) {
                     // Log the error with the row information
                     String errorMessage = "File nhập liệu lỗi ở dòng" + (i + 1) + ": " + e.getMessage();
@@ -152,27 +154,30 @@ public class IOFileServiceImpl implements IOFileService {
                 }
             }
 
-            // Save any remaining entities
-            if (!farms.isEmpty()) {
-                farmRepository.saveAll(farms);
-            }
-            if (!cages.isEmpty()) {
-                cageRepository.saveAll(cages);
-            }
-            if (!pets.isEmpty()) {
-                petRepository.saveAll(pets);
+            // Save any remaining entities if no error occurred
+            if (!errorOccurred) {
+                if (!farms.isEmpty()) {
+                    farmRepository.saveAll(farms);
+                }
+                if (!cages.isEmpty()) {
+                    cageRepository.saveAll(cages);
+                }
+                if (!pets.isEmpty()) {
+                    petRepository.saveAll(pets);
+                }
             }
 
             // Check if there were any errors during processing
-            if (errorMessages.isEmpty()) {
-                return new BaseResponse(200, "OK", "Nhập dữ liệu thành công");
-            } else {
+            if (errorOccurred) {
                 return new BaseResponse(500, "Error", String.join("; ", errorMessages));
+            } else {
+                return new BaseResponse(200, "OK", "Nhập dữ liệu thành công");
             }
         } catch (IOException e) {
             throw new IOException("Đã có lỗi xảy ra ", e);
         }
     }
+
 
 
     private Cage createNewCage(String cageName, String farmName) {
