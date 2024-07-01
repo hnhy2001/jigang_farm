@@ -2,6 +2,7 @@ package com.example.jingangfarmmanagement.controller;
 
 import com.example.jingangfarmmanagement.model.req.AssignUserRoleReq;
 import com.example.jingangfarmmanagement.model.req.ChangePasswordReq;
+import com.example.jingangfarmmanagement.model.req.UserReq;
 import com.example.jingangfarmmanagement.repository.entity.User;
 import com.example.jingangfarmmanagement.model.BaseResponse;
 import com.example.jingangfarmmanagement.model.req.LoginRequest;
@@ -38,4 +39,10 @@ public class UserController extends BaseController<User> {
     public BaseResponse changePassword(@RequestBody ChangePasswordReq changePasswordReq) {
         return userService.changePassword(changePasswordReq);
     }
+
+    @PutMapping("/update/custom")
+    public BaseResponse customUpdate(@RequestParam Long id, @RequestBody UserReq user) {
+        return userService.customUpdate(id,user);
+    }
+
 }

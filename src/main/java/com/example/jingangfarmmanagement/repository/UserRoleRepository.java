@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface UserRoleRepository extends BaseRepository<UserRole>{
     List<UserRole> findAllByUser(User user);
+
+
 }

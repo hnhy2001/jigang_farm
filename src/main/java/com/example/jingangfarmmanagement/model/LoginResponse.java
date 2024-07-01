@@ -1,9 +1,12 @@
 package com.example.jingangfarmmanagement.model;
 
+import com.example.jingangfarmmanagement.repository.entity.Role;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -14,4 +17,5 @@ public class LoginResponse {
     private String userName;
     private String fullName;
     private Long userId;
+    private List<Role> role;
 }

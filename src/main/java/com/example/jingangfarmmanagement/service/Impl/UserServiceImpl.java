@@ -5,6 +5,7 @@ import com.example.jingangfarmmanagement.config.jwt.JwtTokenProvider;
 import com.example.jingangfarmmanagement.constants.Status;
 import com.example.jingangfarmmanagement.model.req.AssignUserRoleReq;
 import com.example.jingangfarmmanagement.model.req.ChangePasswordReq;
+import com.example.jingangfarmmanagement.model.req.UserReq;
 import com.example.jingangfarmmanagement.repository.entity.*;
 import com.example.jingangfarmmanagement.model.BaseResponse;
 import com.example.jingangfarmmanagement.model.LoginResponse;
@@ -33,7 +34,7 @@ public class UserServiceImpl extends BaseServiceImpl<User> implements UserServic
     private UserRepository userRepository;
 
     @Autowired
-    private RoleService roleService;
+    private RoleRepository roleRepository;
 
     @Autowired
     private HistoryService historyService;
@@ -64,7 +65,7 @@ public class UserServiceImpl extends BaseServiceImpl<User> implements UserServic
     public BaseResponse login(LoginRequest loginRequest) throws Exception {
 
         Optional<User> userOptional = userRepository.findByUserName(loginRequest.getUserName());
-        if (!userOptional.isPresent())
+        if (userOptional.isEmpty())
             return new BaseResponse(500, "Account không tồn tại", null);
 
         User user = userOptional.get();
@@ -83,6 +84,8 @@ public class UserServiceImpl extends BaseServiceImpl<User> implements UserServic
         loginResponse.setUserName(user.getUserName());
         loginResponse.setFullName(user.getFullName());
         loginResponse.setUserId(user.getId());
+        List<Role> role = userRoleRepository.findAllByUser(user).stream().map(UserRole::getRole).collect(Collectors.toList());
+        loginResponse.setRole(role);
         return new BaseResponse(200, "OK", loginResponse);
     }
 
@@ -102,7 +105,7 @@ public class UserServiceImpl extends BaseServiceImpl<User> implements UserServic
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         List<UserRole> userRoles = new ArrayList<>();
         User result = super.create(user);
-        result.getRole().stream().forEach(e -> {
+        result.getRole().forEach(e -> {
             UserRole userRole = new UserRole();
             userRole.setUser(result);
             userRole.setRole(e);
@@ -111,6 +114,39 @@ public class UserServiceImpl extends BaseServiceImpl<User> implements UserServic
         userRoleRepository.saveAll(userRoles);
         return new BaseResponse().success(result);
     }
+
+    @Override
+    public BaseResponse customUpdate(Long id, UserReq user) {
+        if (user.getUserName() == null) {
+            return new BaseResponse().fail("Tài khoản không được để trống");
+        }
+
+        Optional<User> userExistOptional = userRepository.findById(id);
+        if (userExistOptional.isEmpty()) {
+            return new BaseResponse().fail("Không tồn tại người dùng");
+        }
+        User existingUser = userExistOptional.get();
+        existingUser.setUpdateDate(DateUtil.getCurrenDateTime());
+        existingUser.setUserName(user.getUserName());
+        existingUser.setFullName(user.getFullName());
+        existingUser.setAddress(user.getAddress());
+        existingUser.setEmail(user.getEmail());
+
+        List<UserRole> existingUserRoles = userRoleRepository.findAllByUser(existingUser);
+        userRoleRepository.deleteAllInBatch(existingUserRoles);
+        List<UserRole> newUserRoles = new ArrayList<>();
+        for (var role : user.getRoleId()) {
+            UserRole userRole = new UserRole();
+            userRole.setUser(existingUser);
+            userRole.setRole(roleRepository.findById(role).get());
+            newUserRoles.add(userRole);
+        }
+        userRoleRepository.saveAllAndFlush(newUserRoles);
+        userRepository.saveAndFlush(existingUser);
+        return new BaseResponse().success(existingUser);
+    }
+
+
 
     @Override
     public BaseResponse changePassword(ChangePasswordReq changePasswordReq) {
