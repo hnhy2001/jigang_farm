@@ -37,6 +37,7 @@ public class CageNoteHistoryServiceImpl extends BaseServiceImpl<CageNoteHistory>
             cageNoteHistoryNew.setNote(cageNoteHistory.getNote());
             cageNoteHistoryNew.setWarning(cageNoteHistory.getWarning());
             cageNoteHistoryNew.setCreateDate(cageNoteHistory.getCreateDate());
+            cageNoteHistoryNew.setStatus(1);
             cageNoteHistoryRepository.save(cageNoteHistoryNew);
         }
         return new BaseResponse(200, "Thêm mới vật nuôi thành công", null);
