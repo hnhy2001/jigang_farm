@@ -8,6 +8,6 @@ import java.util.Optional;
 
 @Repository
 public interface CageNoteHistoryRepository extends BaseRepository<CageNoteHistory> {
-    @Query("SELECT c FROM CageNoteHistory c WHERE c.createDate = :date ")
-    Optional<CageNoteHistory> findByDate(Long date);
+    @Query("SELECT c FROM CageNoteHistory c WHERE c.createDate = :date AND c.cage.id = :cageId")
+    Optional<CageNoteHistory> findByDate(Long date, Long cageId);
 }
