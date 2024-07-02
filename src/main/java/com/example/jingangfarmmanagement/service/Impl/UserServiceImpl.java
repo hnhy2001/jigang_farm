@@ -186,6 +186,7 @@ public class UserServiceImpl extends BaseServiceImpl<User> implements UserServic
         List<UserRes> userResList= new ArrayList<>();
         for(var user : users){
             UserRes userRes =new UserRes();
+            userRes.setId(userRes.getId());
             userRes.setUserName(user.getUserName());
             userRes.setFullName(user.getFullName());
             userRes.setAddress(user.getAddress());
@@ -204,6 +205,7 @@ public class UserServiceImpl extends BaseServiceImpl<User> implements UserServic
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
         UserRes userRes =new UserRes();
+        userRes.setId(userRes.getId());
         userRes.setUserName(user.getUserName());
         userRes.setFullName(user.getFullName());
         userRes.setAddress(user.getAddress());
