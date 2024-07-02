@@ -15,4 +15,5 @@ public interface UserService extends BaseService<User> {
     User getUserByUsername(String username);
     public BaseResponse customUpdate(Long id, UserReq user);
     public Page<UserRes> searchUser(SearchReq req);
+    public BaseResponse getUserById(Long id);
 }

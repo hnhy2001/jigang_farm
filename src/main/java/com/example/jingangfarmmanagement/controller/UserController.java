@@ -47,5 +47,9 @@ public class UserController extends BaseController<User> {
     public BaseResponse search(SearchReq req) {
         return new BaseResponse(200, "Lấy dữ liệu thành công!", userService.searchUser(req));
     }
+    @GetMapping("/detail/custom")
+    public BaseResponse getUserById(@RequestParam Long id) {
+        return new BaseResponse(200, "Lấy dữ liệu thành công!", userService.getUserById(id));
+    }
 
 }

@@ -199,5 +199,19 @@ public class UserServiceImpl extends BaseServiceImpl<User> implements UserServic
 
         return new PageImpl<>(userResList, pageable, users.getTotalElements());
     }
+    @Override
+    public BaseResponse getUserById(Long id){
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+        UserRes userRes =new UserRes();
+        userRes.setUserName(user.getUserName());
+        userRes.setFullName(user.getFullName());
+        userRes.setAddress(user.getAddress());
+        userRes.setEmail(user.getEmail());
+        List<UserRole> existingUserRoles = userRoleRepository.findAllByUser(user);
+        List<Role> roles = !existingUserRoles.isEmpty() ? existingUserRoles.stream().map(UserRole::getRole).collect(Collectors.toList()) : null;
+        userRes.setRole(roles);
+        return new BaseResponse(200, "OK", userRes);
+    }
 }
 
