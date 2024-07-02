@@ -109,11 +109,11 @@ public class StatisticServiceImpl implements StatisticService {
                     }else {
                         value.setPetLive(value.getPetLive()+1);
                     }
-                    value.getStatisticPetByAgeList().forEach(age -> {
-                        if (pet.getAge() >= age.getFrom() && pet.getAge() < age.getTo()){
-                            age.setQuantity(age.getQuantity() + 1);
-                        }
-                    });
+//                    value.getStatisticPetByAgeList().forEach(age -> {
+//                        if (pet.getAge() >= age.getFrom() && pet.getAge() < age.getTo()){
+//                            age.setQuantity(age.getQuantity() + 1);
+//                        }
+//                    });
                     value.getStatisticPetByWeightList().forEach(weight -> {
                         if (pet.getWeight() >= weight.getFrom() && pet.getWeight() < weight.getTo()){
                             weight.setQuantity(weight.getQuantity() + 1);
@@ -172,11 +172,11 @@ public class StatisticServiceImpl implements StatisticService {
 //                    }else {
 //                        result.setPetNomal(result.getPetNomal()+1);
 //                    }
-                    result.getStatisticPetByAgeList().forEach(age -> {
-                        if (pet.getAge() >= age.getFrom() && pet.getAge() < age.getTo()){
-                            age.setQuantity(age.getQuantity() + 1);
-                        }
-                    });
+//                    result.getStatisticPetByAgeList().forEach(age -> {
+//                        if (pet.getAge() >= age.getFrom() && pet.getAge() < age.getTo()){
+//                            age.setQuantity(age.getQuantity() + 1);
+//                        }
+//                    });
                     result.getStatisticPetByWeightList().forEach(weight -> {
                         if (pet.getWeight() >= weight.getFrom() && pet.getWeight() < weight.getTo()){
                             weight.setQuantity(weight.getQuantity() + 1);
@@ -259,11 +259,11 @@ public class StatisticServiceImpl implements StatisticService {
 //                    }else {
 //                        result.setPetNomal(result.getPetNomal()+1);
 //                    }
-                    result.getStatisticPetByAgeList().forEach(age -> {
-                        if (pet.getAge() >= age.getFrom() && pet.getAge() < age.getTo()){
-                            age.setQuantity(age.getQuantity() + 1);
-                        }
-                    });
+//                    result.getStatisticPetByAgeList().forEach(age -> {
+//                        if (pet.getAge() >= age.getFrom() && pet.getAge() < age.getTo()){
+//                            age.setQuantity(age.getQuantity() + 1);
+//                        }
+//                    });
                     result.getStatisticPetByWeightList().forEach(weight -> {
                         if (pet.getWeight() >= weight.getFrom() && pet.getWeight() < weight.getTo()){
                             weight.setQuantity(weight.getQuantity() + 1);
