@@ -141,6 +141,7 @@ public class UserServiceImpl extends BaseServiceImpl<User> implements UserServic
         existingUser.setAddress(user.getAddress());
         existingUser.setEmail(user.getEmail());
 
+
         List<UserRole> existingUserRoles = userRoleRepository.findAllByUser(existingUser);
         userRoleRepository.deleteAllInBatch(existingUserRoles);
         List<UserRole> newUserRoles = new ArrayList<>();
@@ -191,6 +192,7 @@ public class UserServiceImpl extends BaseServiceImpl<User> implements UserServic
             userRes.setFullName(user.getFullName());
             userRes.setAddress(user.getAddress());
             userRes.setEmail(user.getEmail());
+            userRes.setStatus(user.getStatus());
             List<UserRole> existingUserRoles = userRoleRepository.findAllByUser(user);
             List<Role> roles = !existingUserRoles.isEmpty() ? existingUserRoles.stream().map(UserRole::getRole).collect(Collectors.toList()) : null;
             userRes.setRole(roles);
@@ -210,6 +212,7 @@ public class UserServiceImpl extends BaseServiceImpl<User> implements UserServic
         userRes.setFullName(user.getFullName());
         userRes.setAddress(user.getAddress());
         userRes.setEmail(user.getEmail());
+        userRes.setStatus(user.getStatus());
         List<UserRole> existingUserRoles = userRoleRepository.findAllByUser(user);
         List<Role> roles = !existingUserRoles.isEmpty() ? existingUserRoles.stream().map(UserRole::getRole).collect(Collectors.toList()) : null;
         userRes.setRole(roles);

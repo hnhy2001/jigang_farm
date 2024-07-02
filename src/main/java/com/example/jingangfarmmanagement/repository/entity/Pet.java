@@ -29,7 +29,7 @@ public class Pet extends BaseEntity{
     private String type;
 
     @Column(name = "age")
-    private int age;
+    private String age;
 
     @ManyToOne
     @JoinColumn(name = "cage", nullable = false)

@@ -95,7 +95,7 @@ public class PetServiceImpl extends BaseServiceImpl<Pet> implements PetService {
     @Override
     public BaseResponse updatePet (Pet pet) throws Exception {
         Pet entityMy = petRepository.getById(pet.getId());
-        Pet existingPet = petRepository.findByName(pet.getName());
+        Pet existingPet = petRepository.findByCageAndFarmAndName(pet.getName(),entityMy.getCage().getName(),entityMy.getCage().getFarm().getName());
         if (existingPet != null && !existingPet.getId().equals(pet.getId())) {
             return new BaseResponse(500, "Tên vật nuôi đã tồn tại", null);
         }

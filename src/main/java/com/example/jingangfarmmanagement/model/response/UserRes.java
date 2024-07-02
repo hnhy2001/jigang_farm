@@ -19,5 +19,6 @@ public class UserRes {
     private String email;
     private String address;
     private String fullName;
+    private int status;
     private List<Role> role;
 }
