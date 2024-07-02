@@ -2,6 +2,7 @@ package com.example.jingangfarmmanagement.service;
 
 import com.example.jingangfarmmanagement.model.BaseResponse;
 import com.example.jingangfarmmanagement.model.req.ChangeCageReq;
+import com.example.jingangfarmmanagement.model.req.ChangeStatusPetReq;
 import com.example.jingangfarmmanagement.model.req.SearchReq;
 import com.example.jingangfarmmanagement.model.req.UpdateWeightPetReq;
 import com.example.jingangfarmmanagement.projection.FarmProjection;
@@ -25,4 +26,5 @@ public interface PetService extends BaseService<Pet> {
 
     public BaseResponse updatePetWeight(UpdateWeightPetReq updateWeightPet) ;
     public BaseResponse findPetWithCageAndFarm(List<Long> cageId,List<Long> farmId, Long startDate, Long endDate);
+    public BaseResponse updatePetStatus(List<ChangeStatusPetReq> changeStatusPetReqs);
 }

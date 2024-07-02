@@ -3,6 +3,7 @@ package com.example.jingangfarmmanagement.service.Impl;
 import com.example.jingangfarmmanagement.constants.Status;
 import com.example.jingangfarmmanagement.model.BaseResponse;
 import com.example.jingangfarmmanagement.model.req.ChangeCageReq;
+import com.example.jingangfarmmanagement.model.req.ChangeStatusPetReq;
 import com.example.jingangfarmmanagement.model.req.SearchReq;
 import com.example.jingangfarmmanagement.model.req.UpdateWeightPetReq;
 import com.example.jingangfarmmanagement.projection.FarmProjection;
@@ -28,6 +29,7 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -111,6 +113,20 @@ public class PetServiceImpl extends BaseServiceImpl<Pet> implements PetService {
             pet.setWeight(updateWeightPet.getWeight());
         }
         return new BaseResponse(200, "Cập nhật cân nặng vật nuôi thành công",   petRepository.saveAll((pets)));
+    }
+    @Override
+    public BaseResponse updatePetStatus(List<ChangeStatusPetReq> changeStatusPetReqs)  {
+        List<Pet> pets= new ArrayList<>();
+        for(var changeStatusPetReq: changeStatusPetReqs){
+            Optional<Pet> pet = petRepository.findById(changeStatusPetReq.getPetId());
+            if(pet.isPresent()){
+                pet.get().setStatus(changeStatusPetReq.getStatus());
+                pet.get().setNote(changeStatusPetReq.getNote());
+                pet.get().setUpdateDate(DateUtil.getCurrenDateTime());
+                pets.add(pet.get());
+            }
+        }
+        return new BaseResponse(200, "Cập nhật trạng thái vật nuôi thành công",   petRepository.saveAll((pets)));
     }
     @Override
     public BaseResponse findPetWithCageAndFarm(List<Long> cageIds, List<Long> farmIds, Long startDate, Long endDate){

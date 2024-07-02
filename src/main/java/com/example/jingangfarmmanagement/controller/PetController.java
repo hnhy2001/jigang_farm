@@ -2,6 +2,7 @@ package com.example.jingangfarmmanagement.controller;
 
 import com.example.jingangfarmmanagement.model.BaseResponse;
 import com.example.jingangfarmmanagement.model.req.ChangeCageReq;
+import com.example.jingangfarmmanagement.model.req.ChangeStatusPetReq;
 import com.example.jingangfarmmanagement.model.req.UpdateWeightPetReq;
 import com.example.jingangfarmmanagement.repository.entity.Pet;
 import com.example.jingangfarmmanagement.service.BaseService;
@@ -50,6 +51,10 @@ public class PetController extends BaseController<Pet> {
                 @RequestParam(required = false) Long startDate,
                 @RequestParam(required = false) Long endDate) {
      return new BaseResponse(200, "Lấy dữ liệu thành công!", petService.findPetWithCageAndFarm(cageId,farmId,startDate,endDate));
+   }
+   @PostMapping("/change-status")
+    public BaseResponse updatePetStatus(@RequestBody List<ChangeStatusPetReq> changeStatusPetReqs){
+      return  petService.updatePetStatus(changeStatusPetReqs);
    }
 
 }
