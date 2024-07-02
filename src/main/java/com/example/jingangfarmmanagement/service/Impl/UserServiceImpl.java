@@ -3,23 +3,31 @@ package com.example.jingangfarmmanagement.service.Impl;
 
 import com.example.jingangfarmmanagement.config.jwt.JwtTokenProvider;
 import com.example.jingangfarmmanagement.constants.Status;
-import com.example.jingangfarmmanagement.model.req.AssignUserRoleReq;
-import com.example.jingangfarmmanagement.model.req.ChangePasswordReq;
-import com.example.jingangfarmmanagement.model.req.UserReq;
+import com.example.jingangfarmmanagement.model.req.*;
+import com.example.jingangfarmmanagement.model.response.MaterialRes;
+import com.example.jingangfarmmanagement.model.response.TreatmentHistoryRes;
+import com.example.jingangfarmmanagement.model.response.UserRes;
+import com.example.jingangfarmmanagement.query.CustomRsqlVisitor;
 import com.example.jingangfarmmanagement.repository.entity.*;
 import com.example.jingangfarmmanagement.model.BaseResponse;
 import com.example.jingangfarmmanagement.model.LoginResponse;
 import com.example.jingangfarmmanagement.repository.*;
-import com.example.jingangfarmmanagement.model.req.LoginRequest;
 import com.example.jingangfarmmanagement.service.*;
 import com.example.jingangfarmmanagement.uitl.DateUtil;
+import cz.jirutka.rsql.parser.RSQLParser;
+import cz.jirutka.rsql.parser.ast.Node;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
+import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -30,6 +38,7 @@ import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl extends BaseServiceImpl<User> implements UserService {
+    private static final String DELETED_FILTER =";status>-1" ;
     @Autowired
     private UserRepository userRepository;
 
@@ -166,6 +175,29 @@ public class UserServiceImpl extends BaseServiceImpl<User> implements UserServic
 
     private boolean isValidPassword(String userPass, String reqPass) {
         return !StringUtils.isEmpty(reqPass) && passwordEncoder.matches(reqPass, userPass);
+    }
+    @Override
+    public Page<UserRes> searchUser(SearchReq req) {
+        req.setFilter(req.getFilter().concat(DELETED_FILTER));
+        Node rootNode = new RSQLParser().parse(req.getFilter());
+        Specification<User> spec = rootNode.accept(new CustomRsqlVisitor<>());
+        Pageable pageable = getPage(req);
+        Page<User> users = userRepository.findAll(spec, pageable);
+        List<UserRes> userResList= new ArrayList<>();
+        for(var user : users){
+            UserRes userRes =new UserRes();
+            userRes.setUserName(user.getUserName());
+            userRes.setFullName(user.getFullName());
+            userRes.setAddress(user.getAddress());
+            userRes.setEmail(user.getEmail());
+            List<UserRole> existingUserRoles = userRoleRepository.findAllByUser(user);
+            List<Role> roles = !existingUserRoles.isEmpty() ? existingUserRoles.stream().map(UserRole::getRole).collect(Collectors.toList()) : null;
+            userRes.setRole(roles);
+            userResList.add(userRes);
+        }
+
+
+        return new PageImpl<>(userResList, pageable, users.getTotalElements());
     }
 }
 

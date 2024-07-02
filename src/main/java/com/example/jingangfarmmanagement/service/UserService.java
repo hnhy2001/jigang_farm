@@ -1,11 +1,10 @@
 package com.example.jingangfarmmanagement.service;
 
-import com.example.jingangfarmmanagement.model.req.AssignUserRoleReq;
-import com.example.jingangfarmmanagement.model.req.ChangePasswordReq;
-import com.example.jingangfarmmanagement.model.req.UserReq;
+import com.example.jingangfarmmanagement.model.req.*;
+import com.example.jingangfarmmanagement.model.response.UserRes;
 import com.example.jingangfarmmanagement.repository.entity.User;
 import com.example.jingangfarmmanagement.model.BaseResponse;
-import com.example.jingangfarmmanagement.model.req.LoginRequest;
+import org.springframework.data.domain.Page;
 
 import java.security.NoSuchAlgorithmException;
 
@@ -15,4 +14,5 @@ public interface UserService extends BaseService<User> {
     BaseResponse changePassword(ChangePasswordReq changePasswordReq);
     User getUserByUsername(String username);
     public BaseResponse customUpdate(Long id, UserReq user);
+    public Page<UserRes> searchUser(SearchReq req);
 }
