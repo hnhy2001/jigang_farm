@@ -9,6 +9,7 @@ import com.example.jingangfarmmanagement.repository.dto.PetFileImportDto;
 import com.example.jingangfarmmanagement.repository.entity.*;
 import com.example.jingangfarmmanagement.exception.GlobalException;
 import com.example.jingangfarmmanagement.service.IOFileService;
+import com.example.jingangfarmmanagement.uitl.DateUtil;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -217,6 +218,7 @@ public class IOFileServiceImpl implements IOFileService {
         pet.setUilness(result);
         pet.setParentDad(dto.getParentDad());
         pet.setParentMon(dto.getParentMom());
+        pet.setUpdateHeathDate(DateUtil.getCurrenDateTime());
         pet.setStatus(1);
     }
 
@@ -237,6 +239,7 @@ public class IOFileServiceImpl implements IOFileService {
         pet.setParentDad(dto.getParentDad());
         pet.setParentMon(dto.getParentMom());
         pet.setCreateDate(com.example.jingangfarmmanagement.uitl.DateUtil.getCurrenDateTime());
+        pet.setUpdateHeathDate(DateUtil.getCurrenDateTime());
         pet.setStatus(1);
         return pet;
     }

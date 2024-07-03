@@ -13,4 +13,5 @@ public class ChangeStatusPetReq {
     Long petId;
     int status;
     String note;
+    Long updateHealthDate;
 }

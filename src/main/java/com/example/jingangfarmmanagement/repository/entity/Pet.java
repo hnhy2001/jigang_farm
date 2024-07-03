@@ -68,4 +68,6 @@ public class Pet extends BaseEntity{
     @ManyToMany(mappedBy = "pets")
     @JsonIgnore
     private List<MealVoucher> mealVouchers;
+    @Column(name = "update_heath_date" )
+    private Long updateHeathDate;
 }

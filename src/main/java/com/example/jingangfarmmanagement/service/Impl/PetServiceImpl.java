@@ -123,6 +123,7 @@ public class PetServiceImpl extends BaseServiceImpl<Pet> implements PetService {
                 pet.get().setStatus(changeStatusPetReq.getStatus());
                 pet.get().setNote(changeStatusPetReq.getNote());
                 pet.get().setUpdateDate(DateUtil.getCurrenDateTime());
+                pet.get().setUpdateHeathDate(DateUtil.getCurrenDateTime());
                 pets.add(pet.get());
             }
         }
