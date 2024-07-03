@@ -52,9 +52,13 @@ public class PetController extends BaseController<Pet> {
                 @RequestParam(required = false) Long endDate) {
      return new BaseResponse(200, "Lấy dữ liệu thành công!", petService.findPetWithCageAndFarm(cageId,farmId,startDate,endDate));
    }
-   @PostMapping("/change-status")
-    public BaseResponse updatePetStatus(@RequestBody List<ChangeStatusPetReq> changeStatusPetReqs){
-      return  petService.updatePetStatus(changeStatusPetReqs);
+   @PostMapping("heath/change-status")
+    public BaseResponse updatePetHeathStatus(@RequestBody List<ChangeStatusPetReq> changeStatusPetReqs){
+      return  petService.updatePetHeathStatus(changeStatusPetReqs);
    }
+    @PostMapping("/change-condition")
+    public BaseResponse updatePetCondition(@RequestBody List<ChangeStatusPetReq> changeStatusPetReqs){
+        return  petService.updatePetCondition(changeStatusPetReqs);
+    }
 
 }

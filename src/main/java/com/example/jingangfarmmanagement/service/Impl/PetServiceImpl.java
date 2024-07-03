@@ -89,6 +89,17 @@ public class PetServiceImpl extends BaseServiceImpl<Pet> implements PetService {
     public BaseResponse createPet(Pet pet) throws Exception {
         pet.setStatus(Status.ACTIVE);
         pet.setCreateDate(DateUtil.getCurrenDateTime());
+        pet.setUpdateHeathDate(DateUtil.getCurrenDateTime());
+        pet.setLastDateUpdate(DateUtil.getCurrenDateTime());
+        pet.setPregnantDateUpdate(DateUtil.getCurrenDateTime());
+        pet.setPetCondition(1);
+        if(pet.getUilness()==null ||pet.getUilness().isBlank())
+        {
+            pet.setStatus(2);
+        }
+        else {
+            pet.setStatus(1);
+        }
         if (petRepository.existsByName(pet.getName())) {
             return new BaseResponse(500, "Tên vật nuôi đã tồn tại", null);
         }
@@ -103,6 +114,17 @@ public class PetServiceImpl extends BaseServiceImpl<Pet> implements PetService {
         }
         ObjectMapperUtils.map(pet, entityMy);
         pet.setUpdateDate(DateUtil.getCurrenDateTime());
+        pet.setUpdateHeathDate(DateUtil.getCurrenDateTime());
+        pet.setLastDateUpdate(DateUtil.getCurrenDateTime());
+        pet.setPregnantDateUpdate(DateUtil.getCurrenDateTime());
+        pet.setPetCondition(1);
+        if(pet.getUilness()==null ||pet.getUilness().isBlank())
+        {
+            pet.setStatus(2);
+        }
+        else {
+            pet.setStatus(1);
+        }
         return new BaseResponse(200, "Cập nhật vật nuôi thành công", petRepository.save(entityMy));
     }
 
@@ -115,7 +137,7 @@ public class PetServiceImpl extends BaseServiceImpl<Pet> implements PetService {
         return new BaseResponse(200, "Cập nhật cân nặng vật nuôi thành công",   petRepository.saveAll((pets)));
     }
     @Override
-    public BaseResponse updatePetStatus(List<ChangeStatusPetReq> changeStatusPetReqs)  {
+    public BaseResponse updatePetHeathStatus(List<ChangeStatusPetReq> changeStatusPetReqs)  {
         List<Pet> pets= new ArrayList<>();
         for(var changeStatusPetReq: changeStatusPetReqs){
             Optional<Pet> pet = petRepository.findById(changeStatusPetReq.getPetId());
@@ -124,6 +146,21 @@ public class PetServiceImpl extends BaseServiceImpl<Pet> implements PetService {
                 pet.get().setNote(changeStatusPetReq.getNote());
                 pet.get().setUpdateDate(DateUtil.getCurrenDateTime());
                 pet.get().setUpdateHeathDate(DateUtil.getCurrenDateTime());
+                pets.add(pet.get());
+            }
+        }
+        return new BaseResponse(200, "Cập nhật trạng thái vật nuôi thành công",   petRepository.saveAll((pets)));
+    }
+    @Override
+    public BaseResponse updatePetCondition(List<ChangeStatusPetReq> changeStatusPetReqs)  {
+        List<Pet> pets= new ArrayList<>();
+        for(var changeStatusPetReq: changeStatusPetReqs){
+            Optional<Pet> pet = petRepository.findById(changeStatusPetReq.getPetId());
+            if(pet.isPresent()){
+                pet.get().setUpdateDate(DateUtil.getCurrenDateTime());
+                pet.get().setUpdateHeathDate(DateUtil.getCurrenDateTime());
+                pet.get().setPetCondition(changeStatusPetReq.getPetCondition());
+                pet.get().setPregnantDateUpdate(changeStatusPetReq.getPregnantDateUpdate());
                 pets.add(pet.get());
             }
         }

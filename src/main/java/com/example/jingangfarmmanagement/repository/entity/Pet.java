@@ -70,4 +70,11 @@ public class Pet extends BaseEntity{
     private List<MealVoucher> mealVouchers;
     @Column(name = "update_heath_date" )
     private Long updateHeathDate;
+    @Column(name = "pet_condition" )
+    private int petCondition;
+    @Column(name = "last_date_update" )
+    private Long lastDateUpdate;
+    @Column(name = "pregnant_date_update" )
+    private Long pregnantDateUpdate;
+
 }

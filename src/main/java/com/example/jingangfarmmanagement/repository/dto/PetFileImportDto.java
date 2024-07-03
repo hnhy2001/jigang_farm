@@ -22,6 +22,8 @@ public class PetFileImportDto {
     private String sex;
     @ExcelProperty(value="Tình trạng bệnh")
     private String uilness;
+    @ExcelProperty(value="Tình trạng vật nuôi")
+    private String petCondition;
     @ExcelProperty(value="Cha")
     private String parentDad;
     @ExcelProperty(value="Mẹ")

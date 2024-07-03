@@ -219,7 +219,27 @@ public class IOFileServiceImpl implements IOFileService {
         pet.setParentDad(dto.getParentDad());
         pet.setParentMon(dto.getParentMom());
         pet.setUpdateHeathDate(DateUtil.getCurrenDateTime());
-        pet.setStatus(1);
+        pet.setStatus(dto.getUilness() != null ? 2 : 1);
+        if(dto.getPetCondition()==null){
+            dto.setPetCondition("");
+        }
+        switch (dto.getPetCondition().toLowerCase()) {
+            case "":
+                pet.setPetCondition(1);
+                break;
+            case "chửa":
+                pet.setPetCondition(2);
+                break;
+            case "ôm con":
+                pet.setPetCondition(3);
+                break;
+            case "thương tật vĩnh viễn":
+                pet.setPetCondition(4);
+                break;
+        }
+        pet.setUpdateHeathDate(DateUtil.getCurrenDateTime());
+        pet.setLastDateUpdate(DateUtil.getCurrenDateTime());
+        pet.setPregnantDateUpdate(DateUtil.getCurrenDateTime());
     }
 
     private Pet createNewPet(PetFileImportDto dto, Cage cage, int noPet,List<Uilness> uilnesses) {
@@ -239,8 +259,28 @@ public class IOFileServiceImpl implements IOFileService {
         pet.setParentDad(dto.getParentDad());
         pet.setParentMon(dto.getParentMom());
         pet.setCreateDate(com.example.jingangfarmmanagement.uitl.DateUtil.getCurrenDateTime());
+        pet.setStatus(dto.getUilness()!=null ? 2 : 1);
+        if(dto.getPetCondition()==null){
+            dto.setPetCondition("");
+        }
+        switch (dto.getPetCondition().toLowerCase()) {
+            case "":
+                pet.setPetCondition(1);
+                break;
+            case "chửa":
+                pet.setPetCondition(2);
+                break;
+            case "ôm con":
+                pet.setPetCondition(3);
+                break;
+            case "thương tật vĩnh viễn":
+                pet.setPetCondition(4);
+                break;
+        }
+
         pet.setUpdateHeathDate(DateUtil.getCurrenDateTime());
-        pet.setStatus(1);
+        pet.setLastDateUpdate(DateUtil.getCurrenDateTime());
+        pet.setPregnantDateUpdate(DateUtil.getCurrenDateTime());
         return pet;
     }
 
