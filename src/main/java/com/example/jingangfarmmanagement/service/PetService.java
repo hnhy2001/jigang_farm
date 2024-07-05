@@ -27,6 +27,6 @@ public interface PetService extends BaseService<Pet> {
     public BaseResponse updatePetWeight(UpdateWeightPetReq updateWeightPet) ;
     public BaseResponse findPetWithCageAndFarm(List<Long> cageId,List<Long> farmId, Long startDate, Long endDate);
 
-    public BaseResponse updatePetHeathStatus(List<ChangeStatusPetReq> changeStatusPetReqs);
-    public BaseResponse updatePetCondition(List<ChangeStatusPetReq> changeStatusPetReqs);
+    public BaseResponse updatePetStatus(List<ChangeStatusPetReq> changeStatusPetReqs);
+    public BaseResponse updatePetHealthCondition(List<ChangeStatusPetReq> changeStatusPetReqs);
 }

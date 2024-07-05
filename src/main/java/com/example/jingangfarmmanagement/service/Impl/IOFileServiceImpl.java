@@ -219,22 +219,22 @@ public class IOFileServiceImpl implements IOFileService {
         pet.setParentDad(dto.getParentDad());
         pet.setParentMon(dto.getParentMom());
         pet.setUpdateHeathDate(DateUtil.getCurrenDateTime());
-        pet.setStatus(dto.getUilness() != null ? 2 : 1);
-        if(dto.getPetCondition()==null){
-            dto.setPetCondition("");
+        pet.setPetCondition(dto.getUilness() != null ? 2 : 1);
+        if(dto.getStatus()==null){
+            dto.setStatus("");
         }
-        switch (dto.getPetCondition().toLowerCase()) {
+        switch (dto.getStatus().toLowerCase()) {
             case "":
-                pet.setPetCondition(1);
+                pet.setStatus(1);
                 break;
             case "chửa":
-                pet.setPetCondition(2);
+                pet.setStatus(2);
                 break;
             case "ôm con":
-                pet.setPetCondition(3);
+                pet.setStatus(3);
                 break;
             case "thương tật vĩnh viễn":
-                pet.setPetCondition(4);
+                pet.setStatus(4);
                 break;
         }
         pet.setUpdateHeathDate(DateUtil.getCurrenDateTime());
@@ -259,22 +259,22 @@ public class IOFileServiceImpl implements IOFileService {
         pet.setParentDad(dto.getParentDad());
         pet.setParentMon(dto.getParentMom());
         pet.setCreateDate(com.example.jingangfarmmanagement.uitl.DateUtil.getCurrenDateTime());
-        pet.setStatus(dto.getUilness()!=null ? 2 : 1);
-        if(dto.getPetCondition()==null){
-            dto.setPetCondition("");
+        pet.setPetCondition(dto.getUilness() != null ? 2 : 1);
+        if(dto.getStatus()==null){
+            dto.setStatus("");
         }
-        switch (dto.getPetCondition().toLowerCase()) {
+        switch (dto.getStatus().toLowerCase()) {
             case "":
-                pet.setPetCondition(1);
+                pet.setStatus(1);
                 break;
             case "chửa":
-                pet.setPetCondition(2);
+                pet.setStatus(2);
                 break;
             case "ôm con":
-                pet.setPetCondition(3);
+                pet.setStatus(3);
                 break;
             case "thương tật vĩnh viễn":
-                pet.setPetCondition(4);
+                pet.setStatus(4);
                 break;
         }
 
