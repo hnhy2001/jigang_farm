@@ -29,4 +29,5 @@ public interface PetService extends BaseService<Pet> {
 
     public BaseResponse updatePetHeathStatus(List<ChangeStatusPetReq> changeStatusPetReqs);
     public BaseResponse updatePetCondition(List<ChangeStatusPetReq> changeStatusPetReqs);
+
 }
