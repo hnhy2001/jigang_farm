@@ -54,11 +54,11 @@ public class PetController extends BaseController<Pet> {
    }
    @PostMapping("heath/change-status")
     public BaseResponse updatePetHeathStatus(@RequestBody List<ChangeStatusPetReq> changeStatusPetReqs){
-      return  petService.updatePetHeathStatus(changeStatusPetReqs);
+      return  petService.updatePetStatus(changeStatusPetReqs);
    }
     @PostMapping("/change-condition")
     public BaseResponse updatePetCondition(@RequestBody List<ChangeStatusPetReq> changeStatusPetReqs){
-        return  petService.updatePetCondition(changeStatusPetReqs);
+        return  petService.updatePetHealthCondition(changeStatusPetReqs);
     }
 
 }
