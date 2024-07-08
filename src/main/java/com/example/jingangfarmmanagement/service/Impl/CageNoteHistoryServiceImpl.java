@@ -12,7 +12,8 @@ import com.example.jingangfarmmanagement.uitl.DateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+import javax.swing.text.html.Option;
+import java.util.*;
 @Service
 public class CageNoteHistoryServiceImpl extends BaseServiceImpl<CageNoteHistory> implements CageNoteHistoryService {
     @Autowired
@@ -29,6 +30,7 @@ public class CageNoteHistoryServiceImpl extends BaseServiceImpl<CageNoteHistory>
            cageNoteHistoryExist.get().setCage(cageNoteHistory.getCage());
            cageNoteHistoryExist.get().setNote(cageNoteHistory.getNote());
            cageNoteHistoryExist.get().setWarning(cageNoteHistory.getWarning());
+           cageNoteHistoryExist.get().setIsReaction(cageNoteHistory.getIsReaction());
            cageNoteHistoryRepository.save(cageNoteHistoryExist.get());
         }
         else {
@@ -38,9 +40,18 @@ public class CageNoteHistoryServiceImpl extends BaseServiceImpl<CageNoteHistory>
             cageNoteHistoryNew.setWarning(cageNoteHistory.getWarning());
             cageNoteHistoryNew.setCreateDate(cageNoteHistory.getCreateDate());
             cageNoteHistoryNew.setStatus(1);
+            cageNoteHistoryNew.setIsReaction(0);
             cageNoteHistoryRepository.save(cageNoteHistoryNew);
         }
         return new BaseResponse(200, "Thêm mới vật nuôi thành công", null);
+    }
+
+    @Override
+    public BaseResponse changeCageNoteReaction(Long cageNoteId, int isReaction) {
+        CageNoteHistory cageNoteHistoryResult = cageNoteHistoryRepository.findAllById(cageNoteId);
+        cageNoteHistoryResult.setIsReaction(isReaction);
+        cageNoteHistoryRepository.save(cageNoteHistoryResult);
+        return new BaseResponse(200, "Success", null);
     }
 
 }

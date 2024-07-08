@@ -24,4 +24,8 @@ public class CageNoteHistoryController extends BaseController<CageNoteHistory> {
     public BaseResponse create(@RequestBody CageNoteHistory cageNoteHistory) throws Exception {
         return cageNoteHistoryService.createCageNoteHistory(cageNoteHistory);
     }
+    @PutMapping("/change-reaction-cage-note")
+    public BaseResponse changeCageNoteReaction(@RequestParam Long cageNoteId, int isReaction) throws  Exception {
+        return  cageNoteHistoryService.changeCageNoteReaction(cageNoteId,isReaction);
+    }
 }

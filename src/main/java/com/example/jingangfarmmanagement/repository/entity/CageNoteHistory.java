@@ -15,6 +15,7 @@ import javax.persistence.ManyToOne;
 public class CageNoteHistory extends BaseEntity{
     String note;
     int warning;
+    int isReaction;
     @ManyToOne
     @JoinColumn(name = "cage", nullable = false)
     private Cage cage;
