@@ -19,3 +19,9 @@ spring:
   mvc:
     pathmatch:
       matching-strategy: ant_path_matcher
+
+minio:
+  url: http://103.57.222.151:9000
+  access-key: FrD4IDKccM0ME5037Wlc
+  secret-key: Fwt3hY72wZhkabM7kGfIqryyhpIpJtEoun1api0K
+  bucket-name: jfarm

@@ -32,4 +32,8 @@ public class TreatmentCard extends BaseEntity{
     )
     @JsonManagedReference
     private List<Pet> pets = new ArrayList<>();
+
+    @OneToMany(mappedBy = "treatmentCard", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private List<ImageTreatmentCart> images;
 }

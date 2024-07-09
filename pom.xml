@@ -140,8 +140,13 @@
             <artifactId>dateparser</artifactId>
             <version>1.0.7</version>
         </dependency>
+        <!-- minio -->
+        <dependency>
+            <groupId>io.minio</groupId>
+            <artifactId>minio</artifactId>
+            <version>8.5.1</version>
+        </dependency>
     </dependencies>
-
     <build>
         <plugins>
             <plugin>
