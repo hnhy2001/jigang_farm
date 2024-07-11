@@ -17,5 +17,5 @@ public class TreatmentCardReq {
     int resultTypeCard;
     long resultTypeCardDate;
     List<Long> petIds;
-    String ulinessName;
+    List<String> ulinessName;
 }

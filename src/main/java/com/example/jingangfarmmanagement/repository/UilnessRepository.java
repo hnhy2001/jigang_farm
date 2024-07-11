@@ -9,5 +9,6 @@ import java.util.Optional;
 
 @Repository
 public interface UilnessRepository extends BaseRepository<Uilness>{
-    Optional<Uilness> findByName(String name);
+    Uilness findByName(String name);
+
 }
