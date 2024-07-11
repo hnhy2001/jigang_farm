@@ -19,6 +19,10 @@ spring:
   mvc:
     pathmatch:
       matching-strategy: ant_path_matcher
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
 
 minio:
   url: http://103.57.222.151:9000
