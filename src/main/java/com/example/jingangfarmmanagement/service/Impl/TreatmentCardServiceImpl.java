@@ -42,17 +42,42 @@ public class TreatmentCardServiceImpl extends BaseServiceImpl<TreatmentCard> imp
             treatmentCard.setStatus(1);
             treatmentCard.setCreateDate(req.getCreateDate());
             List<Uilness> uilnesses = new ArrayList<>();
-            for(var uilnessReq : req.getUlinessName()){
-            if (uilnessRepository.findByName(uilnessReq)!=null) {
-                Uilness existUilness = uilnessRepository.findByName(uilnessReq);
-                uilnesses.add(existUilness);           }
-            else{
-                Uilness uilness =new Uilness();
-                uilness.setName(uilnessReq);
-                uilness.setScore(1);
-                uilnessRepository.save(uilness);
+            for (var ulinessId : req.getUlinessIds()) {
+                Uilness uilness = uilnessRepository.findById(ulinessId)
+                        .orElseThrow();
                 uilnesses.add(uilness);
-            }}
+            }
+//            for(var uilnessReq : req.getUlinessName()){
+//                Uilness uilness;
+//                try {
+//                    Long uilnessId = Long.parseLong(uilnessReq);
+//                    uilness = uilnessRepository.findById(uilnessId).orElseThrow(() -> new Exception("Uilness not found"));
+//                    uilnesses.add(uilness);
+//                } catch (NumberFormatException e) {
+//                    uilness = uilnessRepository.findByName(uilnessReq);
+//                    if (uilness == null) {
+//                        Uilness resUilness =new Uilness();
+//                        resUilness.setName(uilnessReq);
+//                        resUilness.setScore(1);
+//                        resUilness.setStatus(1);
+//                        uilnessRepository.save(resUilness);
+//                        uilnesses.add(resUilness);
+//                    } else {
+//                        uilnesses.add(uilness);
+//                    }
+//                }
+//                if (uilnessRepository.findByName(uilnessReq)!=null) {
+//                    Uilness existUilness = uilnessRepository.findByName(uilnessReq);
+//                    uilnesses.add(existUilness);           }
+//                else{
+//                    Uilness uilness =new Uilness();
+//                    uilness.setName(uilnessReq);
+//                    uilness.setScore(1);
+//                    uilness.setStatus(1);
+//                    uilnessRepository.save(uilness);
+//                    uilnesses.add(uilness);
+//                }
+//            }
             treatmentCard.setUilnesses(uilnesses);
             List<Pet> pets = new ArrayList<>();
             for (var petId : req.getPetIds()) {
@@ -81,19 +106,24 @@ public class TreatmentCardServiceImpl extends BaseServiceImpl<TreatmentCard> imp
         treatmentCard.setCreateDate(req.getCreateDate());
         List<Uilness> existingUilnesses = treatmentCard.getUilnesses();
         existingUilnesses.clear();
-        List<Uilness> uilnesses = new ArrayList<>();
-        for(var uilnessReq : req.getUlinessName()){
-            if (uilnessRepository.findByName(uilnessReq)!=null) {
-                Uilness existUilness = uilnessRepository.findByName(uilnessReq);
-                uilnesses.add(existUilness);           }
-            else{
-                Uilness uilness =new Uilness();
-                uilness.setName(uilnessReq);
-                uilness.setScore(1);
-                uilness.setStatus(1);
-                uilnessRepository.save(uilness);
-                uilnesses.add(uilness);
-            }}
+        for (var ulinessId : req.getUlinessIds()) {
+            Uilness uilness = uilnessRepository.findById(ulinessId)
+                    .orElseThrow(() -> new EntityNotFoundException(Constant.ULINESS_NOT_FOUND));
+            existingUilnesses.add(uilness);
+        }
+//        List<Uilness> uilnesses = new ArrayList<>();
+//        for(var uilnessReq : req.getUlinessName()){
+//            if (uilnessRepository.findByName(uilnessReq)!=null) {
+//                Uilness existUilness = uilnessRepository.findByName(uilnessReq);
+//                uilnesses.add(existUilness);           }
+//            else{
+//                Uilness uilness =new Uilness();
+//                uilness.setName(uilnessReq);
+//                uilness.setScore(1);
+//                uilness.setStatus(1);
+//                uilnessRepository.save(uilness);
+//                uilnesses.add(uilness);
+//            }}
         treatmentCard.setUilnesses(existingUilnesses);
         List<Pet> existingPets = treatmentCard.getPets();
         existingPets.clear();
