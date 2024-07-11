@@ -29,7 +29,7 @@ public class Uilness extends BaseEntity{
     private String type;
 
     @Column(name = "score")
-    private int score;
+    private int score = 6;
 
     @Column(name = "recoment", length = 1000)
     private String recoment;
