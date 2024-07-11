@@ -35,7 +35,7 @@ public class ExportPetController extends BaseController<ExportPet> {
     }
     @GetMapping("/death/search")
     public BaseResponse searchExportPets(
-            @RequestParam Long cageId,
+            @RequestParam(required = false) Long cageId,
             @RequestParam(required = false) String name,
             @RequestParam(required = false) String code,
             @RequestParam(required = false) Integer sex,

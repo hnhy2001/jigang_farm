@@ -32,7 +32,7 @@ public interface ExportPetRepository extends BaseRepository<ExportPet> {
     @Query(value = "select ep from ExportPet ep " +
             "join Pet p on ep.petId = p.id " +
             "join Cage c on p.cage.id = c.id " +
-            "where c.id = :cageId " +
+            "where (:cageId is null or c.id = :cageId)" +
             "and (:name is null or p.name like %:name%) " +
             "and (:code is null or p.code like %:code%) " +
             "and (:sex is null or p.sex = :sex) " +
@@ -43,7 +43,7 @@ public interface ExportPetRepository extends BaseRepository<ExportPet> {
             countQuery = "select count(ep) from ExportPet ep " +
                     "join Pet p on ep.petId = p.id " +
                     "join Cage c on p.cage.id = c.id " +
-                    "where c.id = :cageId " +
+                    "where (:cageId is null or c.id = :cageId)" +
                     "and (:name is null or p.name like %:name%) " +
                     "and (:code is null or p.code like %:code%) " +
                     "and (:sex is null or p.sex = :sex) " +
