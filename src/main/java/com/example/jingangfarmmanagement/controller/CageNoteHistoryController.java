@@ -2,11 +2,8 @@ package com.example.jingangfarmmanagement.controller;
 
 import com.example.jingangfarmmanagement.model.BaseResponse;
 import com.example.jingangfarmmanagement.repository.entity.CageNoteHistory;
-import com.example.jingangfarmmanagement.repository.entity.CageType;
-import com.example.jingangfarmmanagement.repository.entity.Pet;
 import com.example.jingangfarmmanagement.service.BaseService;
 import com.example.jingangfarmmanagement.service.CageNoteHistoryService;
-import com.example.jingangfarmmanagement.service.CageTypeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

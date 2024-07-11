@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface TreatmentCardRepository extends BaseRepository<TreatmentCard> {
@@ -21,5 +22,6 @@ public interface TreatmentCardRepository extends BaseRepository<TreatmentCard> {
                     "WHERE p.id IN :petIds",
             nativeQuery = true)
     Page<TreatmentCard> findTreatmentCardsByPet(@Param("petIds") List<Long> petIds, Pageable pageable);
+
 
 }
