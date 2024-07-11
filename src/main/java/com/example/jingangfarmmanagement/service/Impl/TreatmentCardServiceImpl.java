@@ -90,6 +90,7 @@ public class TreatmentCardServiceImpl extends BaseServiceImpl<TreatmentCard> imp
                 Uilness uilness =new Uilness();
                 uilness.setName(uilnessReq);
                 uilness.setScore(1);
+                uilness.setStatus(1);
                 uilnessRepository.save(uilness);
                 uilnesses.add(uilness);
             }}

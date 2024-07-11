@@ -32,6 +32,7 @@ public class CageNoteHistoryServiceImpl extends BaseServiceImpl<CageNoteHistory>
            cageNoteHistoryExist.get().setWarning(cageNoteHistory.getWarning());
            cageNoteHistoryExist.get().setIsReaction(cageNoteHistory.getIsReaction());
            cageNoteHistoryRepository.save(cageNoteHistoryExist.get());
+           return new BaseResponse(200, "Cập nhật ghi chú thành công", cageNoteHistoryExist.get());
         }
         else {
             CageNoteHistory cageNoteHistoryNew =new CageNoteHistory();
@@ -42,8 +43,8 @@ public class CageNoteHistoryServiceImpl extends BaseServiceImpl<CageNoteHistory>
             cageNoteHistoryNew.setStatus(1);
             cageNoteHistoryNew.setIsReaction(0);
             cageNoteHistoryRepository.save(cageNoteHistoryNew);
+            return new BaseResponse(200, "Thêm mới ghi chú thành công", cageNoteHistoryNew);
         }
-        return new BaseResponse(200, "Thêm mới vật nuôi thành công", null);
     }
 
     @Override
