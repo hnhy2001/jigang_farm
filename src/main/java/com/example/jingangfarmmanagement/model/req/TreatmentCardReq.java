@@ -14,6 +14,8 @@ public class TreatmentCardReq {
     String code;
     String note;
     Long createDate;
+    int resultTypeCard;
+    long resultTypeCardDate;
     List<Long> petIds;
     List<Long> ulinessIds;
 }

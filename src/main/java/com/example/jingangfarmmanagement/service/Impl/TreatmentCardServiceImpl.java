@@ -6,6 +6,7 @@ import com.example.jingangfarmmanagement.repository.*;
 import com.example.jingangfarmmanagement.repository.entity.*;
 import com.example.jingangfarmmanagement.service.TreatmentCardService;
 import com.example.jingangfarmmanagement.uitl.Constant;
+import com.example.jingangfarmmanagement.uitl.DateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -35,6 +36,8 @@ public class TreatmentCardServiceImpl extends BaseServiceImpl<TreatmentCard> imp
             TreatmentCard treatmentCard = new TreatmentCard();
             treatmentCard.setCode(req.getCode());
             treatmentCard.setNote(req.getNote());
+            treatmentCard.setResultTypeCard(req.getResultTypeCard());
+            treatmentCard.setResultTypeCardDate(req.getResultTypeCard()==1 || req.getResultTypeCard()==2 ? DateUtil.getCurrenDateTime(): null);
             treatmentCard.setStatus(1);
             treatmentCard.setCreateDate(req.getCreateDate());
             List<Uilness> uilnesses = new ArrayList<>();
@@ -66,6 +69,8 @@ public class TreatmentCardServiceImpl extends BaseServiceImpl<TreatmentCard> imp
         treatmentCard.setCode(req.getCode());
         treatmentCard.setNote(req.getNote());
         treatmentCard.setStatus(1);
+        treatmentCard.setResultTypeCard(req.getResultTypeCard());
+        treatmentCard.setResultTypeCardDate(req.getResultTypeCard()==1 || req.getResultTypeCard()==2 ? DateUtil.getCurrenDateTime(): null);
         treatmentCard.setCreateDate(req.getCreateDate());
         List<Uilness> existingUilnesses = treatmentCard.getUilnesses();
         existingUilnesses.clear();

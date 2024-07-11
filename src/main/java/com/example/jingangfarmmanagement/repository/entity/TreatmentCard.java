@@ -18,6 +18,8 @@ import java.util.List;
 public class TreatmentCard extends BaseEntity{
     String code;
     String note;
+    int resultTypeCard;
+    long resultTypeCardDate;
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(name = "treatment_card_uiless",
             joinColumns = @JoinColumn(name = "treatment_card_id"),
