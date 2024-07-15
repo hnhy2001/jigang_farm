@@ -49,6 +49,7 @@ public class TreatmentHistoryServiceImpl extends BaseServiceImpl<TreatmentHistor
                 treatmentHistory.setStatus(1);
                 treatmentHistory.setTreatmentCardId(req.getTreatmentCardId());
                 treatmentHistory.setCheckingDate(req.getCheckingDate());
+                treatmentHistory.setUpdatedBy(req.getUpdatedBy());
                 treatmentHistoryRepository.save(treatmentHistory);
                 List<HistoryHealth> historyHealths = req.getHistoryHealths().stream().map(historyHealthReq -> {
                     HistoryHealth historyHealth = new HistoryHealth();
@@ -88,6 +89,7 @@ public class TreatmentHistoryServiceImpl extends BaseServiceImpl<TreatmentHistor
             treatmentHistory.setStatus(1);
             treatmentHistory.setTreatmentCardId(req.getTreatmentCardId());
             treatmentHistory.setCheckingDate(req.getCheckingDate());
+            treatmentHistory.setUpdatedBy(req.getUpdatedBy());
             treatmentHistoryRepository.save(treatmentHistory);
             List<HistoryHealth> historyHealths = req.getHistoryHealths().stream().map(historyHealthReq -> {
                 HistoryHealth historyHealth = new HistoryHealth();

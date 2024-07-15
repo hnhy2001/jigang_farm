@@ -15,4 +15,5 @@ public class TreatmentHistoryReq {
     private Long treatmentCardId;
     private Long checkingDate;
     List<TreatmentCardMaterialReq> materials;
+    private String updatedBy;
 }
