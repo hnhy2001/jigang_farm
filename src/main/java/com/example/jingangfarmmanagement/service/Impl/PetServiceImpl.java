@@ -76,6 +76,7 @@ public class PetServiceImpl extends BaseServiceImpl<Pet> implements PetService {
             changeCageHistory.setCageNameFrom(pet.getCage().getName());
             changeCageHistory.setCageNameTo(changeCageReq.getCage().getName());
             changeCageHistory.setCreateDate(DateUtil.getCurrenDateTime());
+            changeCageHistory.setNote(changeCageReq.getNote());
             pet.setCage(changeCageReq.getCage());
             return changeCageHistory;
         }).collect(Collectors.toList());

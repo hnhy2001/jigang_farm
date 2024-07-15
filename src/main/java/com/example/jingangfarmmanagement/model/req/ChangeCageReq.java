@@ -11,4 +11,5 @@ import java.util.List;
 public class ChangeCageReq {
     List<Long> petList;
     Cage cage;
+    String note;
 }

@@ -19,4 +19,5 @@ public class ChangeCageHistory extends BaseEntity{
     private String cageNameFrom;
     private String farmNameTo;
     private String cageNameTo;
+    private String note;
 }
