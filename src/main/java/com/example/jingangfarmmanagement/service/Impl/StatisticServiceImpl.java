@@ -81,6 +81,7 @@ public class StatisticServiceImpl implements StatisticService {
         for (int i = 1; i<=5; i++){
             list.add(new StatisticStatusUilnessPet().builder().point(i).name("Tình trạng bệnh " + i).totalPet(0).totalMale(0).totalFemale(0).build());
         }
+        list.add(new StatisticStatusUilnessPet().builder().point(0).name("Chưa có tình trạng bệnh").totalPet(0).totalMale(0).totalFemale(0).build());
         return list;
     }
 
