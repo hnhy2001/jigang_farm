@@ -200,7 +200,7 @@ public class IOFileServiceImpl implements IOFileService {
     private Uilness createNewUilness(String uilnessName) {
             Uilness uilness = new Uilness();
             uilness.setName(uilnessName);
-            uilness.setScore(8);
+            uilness.setScore(6);
             uilness.setStatus(1);
             uilness.setCreateDate(com.example.jingangfarmmanagement.uitl.DateUtil.getCurrenDateTime());
         return uilness;

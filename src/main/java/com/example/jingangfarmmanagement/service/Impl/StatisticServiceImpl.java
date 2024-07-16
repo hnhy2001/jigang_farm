@@ -154,19 +154,20 @@ public class StatisticServiceImpl implements StatisticService {
             result.setStatisticPetByAgeList(createStatisticByAge());
             result.setStatisticPetByWeightList(createStatisticByWeight());
             result.setStatisticStatusUilnessPetList(createStatisticStatusUilnessPet());
-            getCageList(e, cageList).forEach(cage -> {
-                getPetList(cage, petList).forEach(pet -> {
-                    result.setTotalPet(result.getTotalPet() + 1);
-                    if (pet.getSex() == 1){
-                        result.setTotalMale(result.getTotalMale() + 1);
-                    }else {
-                        result.setTotalFemale(result.getTotalFemale() + 1);
-                    }
-                    if (pet.getStatus() == -1){
-                        result.setPetDie(result.getPetDie()+1);
-                    }else {
-                        result.setPetLive(result.getPetLive()+1);
-                    }
+            if(!getCageList(e, cageList).isEmpty()) {
+                getCageList(e, cageList).forEach(cage -> {
+                    getPetList(cage, petList).forEach(pet -> {
+                        result.setTotalPet(result.getTotalPet() + 1);
+                        if (pet.getSex() == 1){
+                            result.setTotalMale(result.getTotalMale() + 1);
+                        }else {
+                            result.setTotalFemale(result.getTotalFemale() + 1);
+                        }
+                        if (pet.getStatus() == -1){
+                            result.setPetDie(result.getPetDie()+1);
+                        }else {
+                            result.setPetLive(result.getPetLive()+1);
+                        }
 //                    if (pet.getUilness() != null || !pet.getUilness().equals("")){
 //                        result.setPetUilness(result.getPetUilness()+1);
 //                    }else {
@@ -177,41 +178,42 @@ public class StatisticServiceImpl implements StatisticService {
 //                            age.setQuantity(age.getQuantity() + 1);
 //                        }
 //                    });
-                    result.getStatisticPetByWeightList().forEach(weight -> {
-                        if (pet.getWeight() >= weight.getFrom() && pet.getWeight() < weight.getTo()){
-                            weight.setQuantity(weight.getQuantity() + 1);
+                        result.getStatisticPetByWeightList().forEach(weight -> {
+                            if (pet.getWeight() >= weight.getFrom() && pet.getWeight() < weight.getTo()){
+                                weight.setQuantity(weight.getQuantity() + 1);
+                            }
+                        });
+                        if (!uilnessList.isEmpty() && pet.getStatus() != -1){
+                            if (pet.getUilness() == null){
+                                result.getStatisticStatusUilnessPetList().get(0).setTotalPet(result.getStatisticStatusUilnessPetList().get(0).getTotalPet() + 1);
+                                if (pet.getSex() == 1){
+                                    result.getStatisticStatusUilnessPetList().get(0).setTotalMale(result.getStatisticStatusUilnessPetList().get(0).getTotalMale() + 1);
+                                }else {
+                                    result.getStatisticStatusUilnessPetList().get(0).setTotalFemale(result.getStatisticStatusUilnessPetList().get(0).getTotalFemale() + 1);
+                                }
+                            }else {
+                                String[] uilnesses = pet.getUilness().split(",");
+                                AtomicInteger uilnessCheckPoint = new AtomicInteger(0);
+                                Arrays.stream(uilnesses).forEach(uilnessCode -> {
+                                    uilnessList.forEach(uilness -> {
+                                        if (uilnessCode.contains(uilness.getName())){
+                                            if (uilness.getScore() >= uilnessCheckPoint.get()){
+                                                uilnessCheckPoint.set(uilness.getScore());
+                                            }
+                                        }
+                                    });
+                                });
+                                result.getStatisticStatusUilnessPetList().get(uilnessCheckPoint.get()).setTotalPet(result.getStatisticStatusUilnessPetList().get(uilnessCheckPoint.get()).getTotalPet() + 1);
+                                if (pet.getSex() == 1){
+                                    result.getStatisticStatusUilnessPetList().get(uilnessCheckPoint.get()).setTotalMale(result.getStatisticStatusUilnessPetList().get(uilnessCheckPoint.get()).getTotalMale() + 1);
+                                }else {
+                                    result.getStatisticStatusUilnessPetList().get(uilnessCheckPoint.get()).setTotalFemale(result.getStatisticStatusUilnessPetList().get(uilnessCheckPoint.get()).getTotalFemale() + 1);
+                                }
+                            }
                         }
                     });
-                    if (!uilnessList.isEmpty() && pet.getStatus() != -1){
-                        if (pet.getUilness() == null){
-                            result.getStatisticStatusUilnessPetList().get(0).setTotalPet(result.getStatisticStatusUilnessPetList().get(0).getTotalPet() + 1);
-                            if (pet.getSex() == 1){
-                                result.getStatisticStatusUilnessPetList().get(0).setTotalMale(result.getStatisticStatusUilnessPetList().get(0).getTotalMale() + 1);
-                            }else {
-                                result.getStatisticStatusUilnessPetList().get(0).setTotalFemale(result.getStatisticStatusUilnessPetList().get(0).getTotalFemale() + 1);
-                            }
-                        }else {
-                            String[] uilnesses = pet.getUilness().split(",");
-                            AtomicInteger uilnessCheckPoint = new AtomicInteger(0);
-                            Arrays.stream(uilnesses).forEach(uilnessCode -> {
-                                uilnessList.forEach(uilness -> {
-                                    if (uilnessCode.contains(uilness.getName())){
-                                        if (uilness.getScore() >= uilnessCheckPoint.get()){
-                                            uilnessCheckPoint.set(uilness.getScore());
-                                        }
-                                    }
-                                });
-                            });
-                            result.getStatisticStatusUilnessPetList().get(uilnessCheckPoint.get()).setTotalPet(result.getStatisticStatusUilnessPetList().get(uilnessCheckPoint.get()).getTotalPet() + 1);
-                            if (pet.getSex() == 1){
-                                result.getStatisticStatusUilnessPetList().get(uilnessCheckPoint.get()).setTotalMale(result.getStatisticStatusUilnessPetList().get(uilnessCheckPoint.get()).getTotalMale() + 1);
-                            }else {
-                                result.getStatisticStatusUilnessPetList().get(uilnessCheckPoint.get()).setTotalFemale(result.getStatisticStatusUilnessPetList().get(uilnessCheckPoint.get()).getTotalFemale() + 1);
-                            }
-                        }
-                    }
                 });
-            });
+            }
             results.add(result);
         });
         Page<StatisticByFarmRes> res = new PageImpl<>(results, farmPage.getPageable(), farmPage.getTotalElements());
@@ -305,12 +307,12 @@ public class StatisticServiceImpl implements StatisticService {
     }
 
     public List<Cage> getCageList(Farm farm, List<Cage> cageList){
-        List<Cage> results = cageList.stream().filter(e -> e.getFarm().equals(farm) && e.getStatus() == 1).collect(Collectors.toList());
+        List<Cage> results = cageList.stream().filter(e -> e.getFarm().equals(farm) && e.getStatus() >= 1).collect(Collectors.toList());
         return results;
     }
 
     public List<Pet> getPetList(Cage cage, List<Pet> petList){
-        List<Pet> results = petList.stream().filter(e -> e.getCage().equals(cage) && e.getStatus() == 1).collect(Collectors.toList());
+        List<Pet> results = petList.stream().filter(e -> e.getCage().equals(cage) && e.getStatus() >= 1).collect(Collectors.toList());
         return results;
     }
 }
