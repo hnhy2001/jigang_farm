@@ -32,5 +32,17 @@ public interface PetRepository extends BaseRepository<Pet>, JpaSpecificationExec
             "and (:endDate is null or p.createDate <= :endDate)")
     List<Pet> findByFarmId(  Long farmId, Long startDate, Long endDate);
 
+    @Query(value = "SELECT * FROM pet " +
+            "WHERE id = (SELECT MAX(id) FROM pet WHERE SUBSTRING(name, 1, 4) = :month) " +
+            "AND CAST(RIGHT(name, 1) AS UNSIGNED) % 2 = 1", nativeQuery = true)
+    Pet findMenPetByNunbersOfMonth(String month);
+
+    @Query(value = "SELECT * FROM pet " +
+            "WHERE id = (SELECT MAX(id) FROM pet WHERE SUBSTRING(name, 1, 4) = :month) " +
+            "AND CAST(RIGHT(name, 1) AS UNSIGNED) % 2 = 0", nativeQuery = true)
+    Pet findWomenPetByNunbersOfMonth(String month);
+
+
+
 
 }

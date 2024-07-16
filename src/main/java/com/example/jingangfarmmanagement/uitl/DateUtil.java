@@ -8,6 +8,8 @@ public class DateUtil {
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
     private static final SimpleDateFormat dateTimeFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+    private static final SimpleDateFormat monthNow = new SimpleDateFormat("MM");
+    private static final SimpleDateFormat yearNow = new SimpleDateFormat("yy");
 
     public static Long getDate(Long dateTime) {
         return dateTime / 1000000;
@@ -19,5 +21,13 @@ public class DateUtil {
 
     public static Long getCurrenDateTime() {
         return Long.parseLong(dateTimeFormat.format(new Date()));
+    }
+
+    public static String getMonthNow(){
+        return monthNow.format(new Date());
+    }
+
+    public static String getYearNow(){
+        return yearNow.format(new Date());
     }
 }

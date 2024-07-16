@@ -9,6 +9,7 @@ import com.example.jingangfarmmanagement.repository.dto.PetFileImportDto;
 import com.example.jingangfarmmanagement.repository.entity.*;
 import com.example.jingangfarmmanagement.exception.GlobalException;
 import com.example.jingangfarmmanagement.service.IOFileService;
+import com.example.jingangfarmmanagement.service.PetService;
 import com.example.jingangfarmmanagement.uitl.DateUtil;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -41,9 +42,23 @@ public class IOFileServiceImpl implements IOFileService {
     MaterialsRepository materialsRepository;
     @Autowired
     private EntityManager entityManager;
+    @Autowired
+    private PetService petService;
+    private int menNumber = 1;
+    private int womenNumber = 2;
+
     @Override
     @Transactional
     public BaseResponse importPetsFromExcel(MultipartFile file) throws IOException {
+        Pet menPet = petService.getMenPetByNumbersOfMonth(DateUtil.getYearNow() + DateUtil.getMonthNow());
+        Pet womenPet = petService.getWomenPetByNumbersOfMonth(DateUtil.getYearNow() + DateUtil.getMonthNow());
+        if (menPet != null){
+            menNumber = Integer.parseInt(menPet.getName().substring(5,7)) + 2;
+        }
+
+        if (womenPet != null){
+            womenNumber = Integer.parseInt(womenPet.getName().substring(5,7)) + 2;
+        }
         List<Pet> pets = new ArrayList<>();
         List<Farm> farms = new ArrayList<>();
         List<Cage> cages = new ArrayList<>();
@@ -245,11 +260,11 @@ public class IOFileServiceImpl implements IOFileService {
     private Pet createNewPet(PetFileImportDto dto, Cage cage, int noPet,List<Uilness> uilnesses) {
         Pet pet = new Pet();
         pet.setCode("VN_" + dto.getFarmName() + "_" + dto.getCageName() + "_" + noPet);
-        pet.setName(dto.getName());
         pet.setType(dto.getType());
         pet.setAge(dto.getAge() != null ? dto.getAge() : "0");
         pet.setWeight(dto.getWeight() != null ? Double.parseDouble(dto.getWeight()) : 0);
         pet.setSex("Cái".equalsIgnoreCase(dto.getSex()) ? 0 : 1);
+        pet.setName(generateName(pet.getSex()));
         pet.setCage(cage);
         List<String> uilnessNames= uilnesses.stream().map(Uilness::getName).collect(Collectors.toList());
         String result = uilnessNames.stream()
@@ -410,6 +425,32 @@ public class IOFileServiceImpl implements IOFileService {
         materials.setStatus(1);
         materials.setCreateDate(com.example.jingangfarmmanagement.uitl.DateUtil.getCurrenDateTime());
         return materials;
+    }
+
+    public String generateName(int sex) {
+        String year = DateUtil.getYearNow();
+        String month = DateUtil.getMonthNow();
+        if (sex == 1) {
+            String result = year + month + getNumber(menNumber);
+            menNumber = menNumber + 2;
+            return result;
+        } else {
+            String result = year + month + getNumber(womenNumber);
+            womenNumber = womenNumber + 2;
+            return result;
+        }
+    }
+
+    public String getNumber(int number) {
+        if (number < 10) {
+            return "00" + number;
+        }
+
+        if (number < 100) {
+            return "0" + number;
+        }
+
+        return String.valueOf(number);
     }
 
 }

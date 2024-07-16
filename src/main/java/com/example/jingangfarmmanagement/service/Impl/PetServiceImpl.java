@@ -40,8 +40,10 @@ public class PetServiceImpl extends BaseServiceImpl<Pet> implements PetService {
     private PetRepository petRepository;
     @Autowired
     private ChangeCageHistoryRepository changeCageHistoryRepository;
+
     @Override
-    protected BaseRepository<Pet> getRepository() {return petRepository;
+    protected BaseRepository<Pet> getRepository() {
+        return petRepository;
     }
 
     @Override
@@ -93,22 +95,19 @@ public class PetServiceImpl extends BaseServiceImpl<Pet> implements PetService {
         pet.setUpdateHeathDate(DateUtil.getCurrenDateTime());
         pet.setLastDateUpdate(DateUtil.getCurrenDateTime());
         pet.setPregnantDateUpdate(DateUtil.getCurrenDateTime());
-        if(pet.getUilness()==null ||pet.getUilness().isBlank())
-        {
+        if (pet.getUilness() == null || pet.getUilness().isBlank()) {
             pet.setPetCondition(2);
-        }
-        else {
+        } else {
             pet.setPetCondition(1);
         }
-        if (petRepository.existsByName(pet.getName())) {
-            return new BaseResponse(500, "Tên vật nuôi đã tồn tại", null);
-        }
+        pet.setName(generateName(pet.getSex()));
         return new BaseResponse(200, "Thêm mới vật nuôi thành công", petRepository.save(pet));
     }
+
     @Override
-    public BaseResponse updatePet (Pet pet) throws Exception {
+    public BaseResponse updatePet(Pet pet) throws Exception {
         Pet entityMy = petRepository.getById(pet.getId());
-        Pet existingPet = petRepository.findByCageAndFarmAndName(pet.getName(),entityMy.getCage().getName(),entityMy.getCage().getFarm().getName());
+        Pet existingPet = petRepository.findByCageAndFarmAndName(pet.getName(), entityMy.getCage().getName(), entityMy.getCage().getFarm().getName());
         if (existingPet != null && !existingPet.getId().equals(pet.getId())) {
             return new BaseResponse(500, "Tên vật nuôi đã tồn tại", null);
         }
@@ -118,30 +117,29 @@ public class PetServiceImpl extends BaseServiceImpl<Pet> implements PetService {
         pet.setLastDateUpdate(DateUtil.getCurrenDateTime());
         pet.setPregnantDateUpdate(DateUtil.getCurrenDateTime());
         pet.setPetCondition(1);
-        if(pet.getUilness()==null ||pet.getUilness().isBlank())
-        {
+        if (pet.getUilness() == null || pet.getUilness().isBlank()) {
             pet.setStatus(2);
-        }
-        else {
+        } else {
             pet.setStatus(1);
         }
         return new BaseResponse(200, "Cập nhật vật nuôi thành công", petRepository.save(entityMy));
     }
 
     @Override
-    public BaseResponse updatePetWeight(UpdateWeightPetReq updateWeightPet)  {
+    public BaseResponse updatePetWeight(UpdateWeightPetReq updateWeightPet) {
         List<Pet> pets = petRepository.findByIdIn(updateWeightPet.getPetIds());
-        for(Pet pet: pets) {
+        for (Pet pet : pets) {
             pet.setWeight(updateWeightPet.getWeight());
         }
-        return new BaseResponse(200, "Cập nhật cân nặng vật nuôi thành công",   petRepository.saveAll((pets)));
+        return new BaseResponse(200, "Cập nhật cân nặng vật nuôi thành công", petRepository.saveAll((pets)));
     }
+
     @Override
-    public BaseResponse updatePetStatus(List<ChangeStatusPetReq> changeStatusPetReqs)  {
-        List<Pet> pets= new ArrayList<>();
-        for(var changeStatusPetReq: changeStatusPetReqs){
+    public BaseResponse updatePetStatus(List<ChangeStatusPetReq> changeStatusPetReqs) {
+        List<Pet> pets = new ArrayList<>();
+        for (var changeStatusPetReq : changeStatusPetReqs) {
             Optional<Pet> pet = petRepository.findById(changeStatusPetReq.getPetId());
-            if(pet.isPresent()){
+            if (pet.isPresent()) {
                 pet.get().setStatus(changeStatusPetReq.getStatus());
                 pet.get().setNote(changeStatusPetReq.getNote());
                 pet.get().setUpdateDate(DateUtil.getCurrenDateTime());
@@ -149,14 +147,15 @@ public class PetServiceImpl extends BaseServiceImpl<Pet> implements PetService {
                 pets.add(pet.get());
             }
         }
-        return new BaseResponse(200, "Cập nhật trạng thái vật nuôi thành công",   petRepository.saveAll((pets)));
+        return new BaseResponse(200, "Cập nhật trạng thái vật nuôi thành công", petRepository.saveAll((pets)));
     }
+
     @Override
-    public BaseResponse updatePetHealthCondition(List<ChangeStatusPetReq> changeStatusPetReqs)  {
-        List<Pet> pets= new ArrayList<>();
-        for(var changeStatusPetReq: changeStatusPetReqs){
+    public BaseResponse updatePetHealthCondition(List<ChangeStatusPetReq> changeStatusPetReqs) {
+        List<Pet> pets = new ArrayList<>();
+        for (var changeStatusPetReq : changeStatusPetReqs) {
             Optional<Pet> pet = petRepository.findById(changeStatusPetReq.getPetId());
-            if(pet.isPresent()){
+            if (pet.isPresent()) {
                 pet.get().setUpdateDate(DateUtil.getCurrenDateTime());
                 pet.get().setUpdateHeathDate(DateUtil.getCurrenDateTime());
                 pet.get().setPetCondition(changeStatusPetReq.getPetCondition());
@@ -164,25 +163,67 @@ public class PetServiceImpl extends BaseServiceImpl<Pet> implements PetService {
                 pets.add(pet.get());
             }
         }
-        return new BaseResponse(200, "Cập nhật trạng thái vật nuôi thành công",   petRepository.saveAll((pets)));
+        return new BaseResponse(200, "Cập nhật trạng thái vật nuôi thành công", petRepository.saveAll((pets)));
     }
+
     @Override
-    public BaseResponse findPetWithCageAndFarm(List<Long> cageIds, List<Long> farmIds, Long startDate, Long endDate){
+    public Pet getMenPetByNumbersOfMonth(String month) {
+        return petRepository.findMenPetByNunbersOfMonth(month);
+    }
+
+    @Override
+    public Pet getWomenPetByNumbersOfMonth(String month) {
+        return petRepository.findWomenPetByNunbersOfMonth(month);
+    }
+
+    @Override
+    public BaseResponse findPetWithCageAndFarm(List<Long> cageIds, List<Long> farmIds, Long startDate, Long endDate) {
         List<Pet> pets = new ArrayList<>();
         List<Pet> resultPets = new ArrayList<>();
-        if(!cageIds.isEmpty())
-        {
-            for(var cageId:cageIds){
-                pets =petRepository.findByCageId(cageId,startDate,endDate);
+        if (!cageIds.isEmpty()) {
+            for (var cageId : cageIds) {
+                pets = petRepository.findByCageId(cageId, startDate, endDate);
                 resultPets.addAll(pets);
             }
-        }else {
-            for(var farmId:farmIds){
-                pets =petRepository.findByFarmId(farmId,startDate,endDate);
+        } else {
+            for (var farmId : farmIds) {
+                pets = petRepository.findByFarmId(farmId, startDate, endDate);
                 resultPets.addAll(pets);
             }
         }
 
-        return new BaseResponse(200, "Lấy vật nuôi thành công",resultPets);
+        return new BaseResponse(200, "Lấy vật nuôi thành công", resultPets);
+    }
+
+    public String generateName(int sex) {
+        String year = DateUtil.getYearNow();
+        String month = DateUtil.getMonthNow();
+        if (sex == 1) {
+            Pet pet = this.getMenPetByNumbersOfMonth(year + month);
+            if (pet == null) {
+                return year + month + "001";
+            } else {
+                return year + month + getNumber(Integer.parseInt(String.valueOf(pet.getName().substring(5, 7))) + 2);
+            }
+        } else {
+            Pet pet = this.getWomenPetByNumbersOfMonth(year + month);
+            if (pet == null) {
+                return year + month + "002";
+            } else {
+                return year + month + getNumber(Integer.parseInt(String.valueOf(pet.getName().substring(5, 7)))  + 2);
+            }
+        }
+    }
+
+    public String getNumber(int number) {
+        if (number < 10) {
+            return "00" + number;
+        }
+
+        if (number < 100) {
+            return "0" + number;
+        }
+
+        return String.valueOf(number);
     }
 }
