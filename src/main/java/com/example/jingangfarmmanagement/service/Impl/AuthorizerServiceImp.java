@@ -14,7 +14,12 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+
+import javax.servlet.http.HttpServletRequest;
 import java.lang.annotation.Annotation;
+import java.nio.file.AccessDeniedException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -27,8 +32,9 @@ public class AuthorizerServiceImp implements AuthorizerService {
     @Autowired
     FunctionRoleService functionRoleService;
     @Override
-    public boolean authorize(Authentication authentication, String action, Object callerObj) throws Exception {
+    public boolean authorize(Authentication authentication, String action1, Object callerObj) throws Exception {
         String securedPath = extractSecuredPath(callerObj);
+        String action = getActionFromRequest();
         if (securedPath==null || "".equals(securedPath.trim())) {//login, logout
             return true;
         }
@@ -47,17 +53,19 @@ public class AuthorizerServiceImp implements AuthorizerService {
                 isAllow = true;
                 return isAllow;
             }
-            List<FunctionRole> functionRoles = functionRoleService.getByRole(customUserDetails.getUserRoles().get(0).getRole());
-//            if (functionRoles.get(0).getFunction().getFunction().equals(securedPath)){
-//                isAllow = true;
-//            }
 
-            if (!functionRoles.stream().filter(e -> e.getFunction().getFunction().equals(securedPath)).collect(Collectors.toList()).isEmpty()){
+            List<FunctionRole> functionRoles = new ArrayList<>();
+            customUserDetails.getUserRoles().stream().forEach(e -> {
+                List<FunctionRole> item = functionRoleService.getByRole(e.getRole());
+                functionRoles.addAll(item);
+            });
+
+            if (!functionRoles.stream().filter(e -> e.getFunction().getFunction().equals(securedPath)).filter(e -> e.getFunction().getAction().equals(action)).collect(Collectors.toList()).isEmpty()){
                 isAllow = true;
                 return isAllow;
             }
         } catch (Exception e) {
-            throw e;
+            e.printStackTrace();
         }
         return isAllow;
     }
@@ -71,5 +79,19 @@ public class AuthorizerServiceImp implements AuthorizerService {
             return ((RequestMapping) annotation.get()).value()[0];
         }
         return null;
+    }
+
+    private String getActionFromRequest() {
+        String path = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest().getRequestURI();
+        String[] pathSegments = path.split("/");
+        if (pathSegments.length > 4){
+            String result = pathSegments[4];
+            for (int i = 5; i < pathSegments.length; i++){
+                result = result + "/" + pathSegments[i];
+            }
+            return result;
+        }else {
+            return pathSegments[pathSegments.length - 1];
+        }
     }
 }

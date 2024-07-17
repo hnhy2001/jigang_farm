@@ -1,19 +1,20 @@
 package com.example.jingangfarmmanagement.controller;
 
-import com.example.jingangfarmmanagement.model.req.*;
-import com.example.jingangfarmmanagement.model.response.UserRes;
-import com.example.jingangfarmmanagement.repository.entity.User;
 import com.example.jingangfarmmanagement.model.BaseResponse;
+import com.example.jingangfarmmanagement.model.req.ChangePasswordReq;
+import com.example.jingangfarmmanagement.model.req.LoginRequest;
+import com.example.jingangfarmmanagement.model.req.SearchReq;
+import com.example.jingangfarmmanagement.model.req.UserReq;
+import com.example.jingangfarmmanagement.repository.entity.User;
 import com.example.jingangfarmmanagement.service.BaseService;
 import com.example.jingangfarmmanagement.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 
 @CrossOrigin
 @RestController
-@RequestMapping("/user")
+@RequestMapping("user")
 public class UserController extends BaseController<User> {
     @Autowired
     private UserService userService;

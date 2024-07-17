@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.security.NoSuchAlgorithmException;
 
 @RestController
+@PreAuthorize("@appAuthorizer.authorize(authentication, #action, this)")
 public abstract class BaseController<T extends BaseEntity> {
     protected abstract BaseService<T> getService();
 

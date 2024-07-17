@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 public class RoleController extends BaseController<Role> {
     @Autowired
     private RoleService roleService;
-    @Autowired
 
     @Override
     protected BaseService<Role> getService() {
