@@ -26,12 +26,13 @@ public class Materials extends BaseEntity {
 
     @Column(name = "cargo")
     private String cargo;
-
-    @Transient
+    @Column(name="expiration_date")
     private Long expirationDate;
 
     @Column(name = "unit")
     private String unit;
+    @Column(name = "first_inventory")
+    private String firstInventory;
 
     @Column(name = "price")
     private String price;

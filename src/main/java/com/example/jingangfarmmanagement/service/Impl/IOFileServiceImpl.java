@@ -25,6 +25,10 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -409,8 +413,11 @@ public class IOFileServiceImpl implements IOFileService {
         materials.setName(dto.getName());
         materials.setNote(dto.getNote());
         materials.setUnit(dto.getUnit());
+        materials.setCargo(dto.getCargo());
+        materials.setFirstInventory(dto.getFirstInventory());
         materials.setIndications(dto.getIndications());
         materials.setTreatment(dto.getTreatment());
+        materials.setExpirationDate(!dto.getExpirationDate().isBlank() ? convertDateStringToLong(dto.getExpirationDate()):0L);
         materials.setStatus(1);
     }
 
@@ -421,10 +428,21 @@ public class IOFileServiceImpl implements IOFileService {
         materials.setNote(dto.getNote());
         materials.setUnit(dto.getUnit());
         materials.setIndications(dto.getIndications());
+        materials.setCargo(dto.getCargo());
+        materials.setFirstInventory(dto.getFirstInventory());
         materials.setTreatment(dto.getTreatment());
+        materials.setExpirationDate(!dto.getExpirationDate().isBlank() ? convertDateStringToLong(dto.getExpirationDate()):0L);
         materials.setStatus(1);
         materials.setCreateDate(com.example.jingangfarmmanagement.uitl.DateUtil.getCurrenDateTime());
         return materials;
+    }
+    public static long convertDateStringToLong(String dateString) {
+        DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
+        LocalDate date = LocalDate.parse(dateString, inputFormatter);
+        LocalDateTime dateTime = LocalDateTime.of(date, LocalTime.MIDNIGHT);
+        String outputString = dateTime.format(outputFormatter);
+        return Long.parseLong(outputString);
     }
 
     public String generateName(int sex) {
