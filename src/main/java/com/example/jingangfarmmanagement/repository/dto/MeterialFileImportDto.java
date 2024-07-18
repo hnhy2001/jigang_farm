@@ -19,6 +19,8 @@ public class MeterialFileImportDto {
     private String indications;
     @ExcelProperty(value="Điều trị")
     private String treatment;
+    @ExcelProperty(value = "Hạn sử dụng")
+    private String expirationDate;
 
 
 }
