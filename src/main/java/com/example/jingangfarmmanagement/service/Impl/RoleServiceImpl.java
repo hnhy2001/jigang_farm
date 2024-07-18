@@ -52,7 +52,7 @@ public class RoleServiceImpl extends BaseServiceImpl<Role> implements RoleServic
             FunctionRole functionRole = new FunctionRole();
             functionRole.setRole(role);
             functionRole.setFunction(e);
-            functionRole.setStatus(1);
+            functionRole.setStatus(0);
             functionRoleList.add(functionRole);
         });
         functionRoleService.createAll(functionRoleList);

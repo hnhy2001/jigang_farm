@@ -52,10 +52,15 @@ public class UserServiceImpl extends BaseServiceImpl<User> implements UserServic
     private UserRoleRepository userRoleRepository;
 
     @Autowired
+    private UserRoleService userRoleService;
+
+    @Autowired
     private ModelMapper modelMapper;
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
     private BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    @Autowired
+    private FunctionRoleService functionRoleService;
 
     @Override
     protected BaseRepository<User> getRepository() {
@@ -93,11 +98,26 @@ public class UserServiceImpl extends BaseServiceImpl<User> implements UserServic
         loginResponse.setUserName(user.getUserName());
         loginResponse.setFullName(user.getFullName());
         loginResponse.setUserId(user.getId());
+        loginResponse.setFunctions(getListFunction(user));
         List<Role> role = userRoleRepository.findAllByUser(user).stream().map(UserRole::getRole).collect(Collectors.toList());
         loginResponse.setRole(role);
         return new BaseResponse(200, "OK", loginResponse);
     }
 
+    List<Function> getListFunction(User user){
+        List<UserRole> roleList = userRoleService.getUserRoleByUserId(user);
+        List<Function> result = new ArrayList<>();
+        roleList.stream().forEach(e -> {
+            List<FunctionRole> functionRoleList = functionRoleService.getByRole(e.getRole());
+            functionRoleList.stream().forEach(functionRole -> {
+                if(functionRole.getStatus() == 1){
+                    result.add(functionRole.getFunction());
+
+                }
+            });
+        });
+        return result;
+    }
     @Override
     public BaseResponse customCreate(User user) throws Exception {
         if (user.getUserName() == null){
