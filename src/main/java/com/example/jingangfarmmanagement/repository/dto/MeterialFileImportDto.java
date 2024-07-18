@@ -9,8 +9,12 @@ import lombok.Setter;
 public class MeterialFileImportDto {
     @ExcelProperty(value="Nhóm hàng")
     private String productType;
+    @ExcelProperty(value = "Số lô")
+    private String cargo;
     @ExcelProperty(value="Tên vật tư")
     private String name;
+    @ExcelProperty(value = "Số tồn đầu")
+    private String firstInventory;
     @ExcelProperty(value="Liều lượng khuyến nghị")
     private String note;
     @ExcelProperty(value="Đơn vị")

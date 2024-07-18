@@ -413,6 +413,8 @@ public class IOFileServiceImpl implements IOFileService {
         materials.setName(dto.getName());
         materials.setNote(dto.getNote());
         materials.setUnit(dto.getUnit());
+        materials.setCargo(dto.getCargo());
+        materials.setFirstInventory(dto.getFirstInventory());
         materials.setIndications(dto.getIndications());
         materials.setTreatment(dto.getTreatment());
         materials.setExpirationDate(!dto.getExpirationDate().isBlank() ? convertDateStringToLong(dto.getExpirationDate()):0L);
@@ -426,6 +428,8 @@ public class IOFileServiceImpl implements IOFileService {
         materials.setNote(dto.getNote());
         materials.setUnit(dto.getUnit());
         materials.setIndications(dto.getIndications());
+        materials.setCargo(dto.getCargo());
+        materials.setFirstInventory(dto.getFirstInventory());
         materials.setTreatment(dto.getTreatment());
         materials.setExpirationDate(!dto.getExpirationDate().isBlank() ? convertDateStringToLong(dto.getExpirationDate()):0L);
         materials.setStatus(1);
