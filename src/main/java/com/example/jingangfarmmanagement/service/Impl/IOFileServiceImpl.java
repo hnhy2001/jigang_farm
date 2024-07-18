@@ -351,24 +351,18 @@ public class IOFileServiceImpl implements IOFileService {
                     if (dto.getName() == null ) {
                         throw new IllegalArgumentException("Thiếu một trong các trường bắt buộc: tên vật tư");
                     }
-                    // Check if the pet already exists in the pets list
-                    boolean materialFound = false;
-                    for (Materials existingMaterials : materials) {
-                        if (existingMaterials.getName().equals(dto.getName())) {
-                            throw new IllegalArgumentException("Trùng vật tư");
-                        }
-
-                    }
-
-                    // If not found in the current batch, check database for existing pet
-                    if (!materialFound) {
-                        Materials material = materialsRepository.findByName(dto.getName());
-                        if (material != null) {
-                            updateMaterial(material, dto);
+                    if(dto.getCargo()!=null){
+                        Optional<Materials> material = materialsRepository.findByNameAndCargo(dto.getName(), dto.getCargo());
+                        if (material.isPresent() ) {
+                            updateMaterial(material.get(), dto);
                         } else {
-                            material = createNewMaterial(dto);
+                            material = Optional.of(createNewMaterial(dto));
                             noMaterial++;
                         }
+                        materials.add(material.get());
+                    }else {
+                        Materials material = createNewMaterial(dto);
+                        noMaterial++;
                         materials.add(material);
                     }
                     // Batch processing: save every batchSize pets
@@ -431,7 +425,7 @@ public class IOFileServiceImpl implements IOFileService {
         materials.setCargo(dto.getCargo());
         materials.setFirstInventory(dto.getFirstInventory());
         materials.setTreatment(dto.getTreatment());
-        materials.setExpirationDate(!dto.getExpirationDate().isBlank() ? convertDateStringToLong(dto.getExpirationDate()):0L);
+        materials.setExpirationDate(dto.getExpirationDate()!=null ? convertDateStringToLong(dto.getExpirationDate()):0L);
         materials.setStatus(1);
         materials.setCreateDate(com.example.jingangfarmmanagement.uitl.DateUtil.getCurrenDateTime());
         return materials;
