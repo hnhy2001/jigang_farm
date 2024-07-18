@@ -40,6 +40,10 @@ public class AuthorizerServiceImp implements AuthorizerService {
         }
 //        String menuCode = securedPath.substring(1);//Bỏ dấu "/" ở đầu Path
         boolean isAllow = false;
+        if(action.equals("login")){
+            isAllow = true;
+            return isAllow;
+        }
         try {
             UsernamePasswordAuthenticationToken user = (UsernamePasswordAuthenticationToken) authentication;
             if (user==null){

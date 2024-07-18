@@ -29,15 +29,15 @@ public class FunctionServiceImpl extends BaseServiceImpl<Function> implements Fu
 
     @Override
     public BaseResponse customCreate(FunctionReq functionReq) throws Exception {
-        ModelMapper modelMapper = new ModelMapper();
-        Function function = modelMapper.map(functionReq, Function.class);
-        function.setStatus(1);
-        function.setCreateDate(DateUtil.getCurrenDateTime());
-        Function result = functionRepository.save(function);
-        FunctionRole functionRole = new FunctionRole();
-        functionRole.setFunction(result);
-        functionRole.setRole(functionReq.getRole());
-        functionRoleService.create(functionRole);
-        return new BaseResponse().success(result);
+//        ModelMapper modelMapper = new ModelMapper();
+//        Function function = modelMapper.map(functionReq, Function.class);
+//        function.setStatus(1);
+//        function.setCreateDate(DateUtil.getCurrenDateTime());
+//        Function result = functionRepository.save(function);
+//        FunctionRole functionRole = new FunctionRole();
+//        functionRole.setFunction(result);
+//        functionRole.setRole(functionReq.getRole());
+//        functionRoleService.create(functionRole);
+        return new BaseResponse().success(null);
     }
 }

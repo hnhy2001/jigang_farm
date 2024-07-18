@@ -19,4 +19,10 @@ public class Function extends BaseEntity {
 
     @Column(name = "action")
     private String action;
+
+    @Column(name = "url")
+    private String url;
+
+    @Column(name = "device")
+    private String device;
 }
