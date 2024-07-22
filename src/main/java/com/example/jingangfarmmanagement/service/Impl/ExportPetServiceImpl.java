@@ -87,6 +87,7 @@ public class ExportPetServiceImpl extends BaseServiceImpl<ExportPet> implements 
                     exportPetRes.setNote(exportPet.getNote());
                     exportPetRes.setType(exportPet.getType());
                     exportPetRes.setPet(pet.orElse(null));
+                    exportPetRes.setImages(exportPet.getImages());
                     return exportPetRes;
                 })
                 .collect(Collectors.toList());
@@ -124,6 +125,7 @@ public class ExportPetServiceImpl extends BaseServiceImpl<ExportPet> implements 
             exportPetRes.setNote(exportPet.getNote());
             exportPetRes.setType(exportPet.getType());
             exportPetRes.setPet(pet.orElse(null));
+            exportPetRes.setImages(exportPet.getImages());
             return exportPetRes;
         }).collect(Collectors.toList());
         return new PageImpl<>(exportPetResList, pageable, exportPets.getTotalElements());
