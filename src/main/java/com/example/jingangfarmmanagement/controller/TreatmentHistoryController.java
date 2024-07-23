@@ -25,13 +25,13 @@ public class TreatmentHistoryController extends BaseController<TreatmentHistory>
         return treatmentHistoryService;
     }
     @PostMapping("/treatment/create")
-    public BaseResponse createTreatmentHistory(@RequestBody List<TreatmentHistoryReq> req)  {
-        return treatmentHistoryService.createTreatmentHistory(req);
+    public BaseResponse createTreatmentHistory(@RequestBody List<TreatmentHistoryReq> req,@RequestParam Long quantityPet)  {
+        return treatmentHistoryService.createTreatmentHistory(req,quantityPet);
     }
 
     @PutMapping("/treatment/update")
-    public BaseResponse updateTreatmentHistory(@RequestParam Long id,@RequestBody List<TreatmentHistoryReq> req) {
-        return treatmentHistoryService.updateTreatmentHistory(id,req);
+    public BaseResponse updateTreatmentHistory(@RequestParam Long id,@RequestBody List<TreatmentHistoryReq> req,@RequestParam Long quantityPet) {
+        return treatmentHistoryService.updateTreatmentHistory(id,req,quantityPet);
     }
     @GetMapping("/treatment/get-by-id")
     public BaseResponse getTreatmentHistoryById(@RequestParam Long id){

@@ -11,8 +11,8 @@ import org.springframework.data.domain.Page;
 import java.util.List;
 
 public interface TreatmentHistoryService extends BaseService<TreatmentHistory>{
-    public BaseResponse createTreatmentHistory(List<TreatmentHistoryReq> req);
-    public BaseResponse updateTreatmentHistory(Long treatmentCardHistoryId,List<TreatmentHistoryReq> req);
+    public BaseResponse createTreatmentHistory(List<TreatmentHistoryReq> req,Long quantityPet);
+    public BaseResponse updateTreatmentHistory(Long treatmentCardHistoryId,List<TreatmentHistoryReq> req,Long quantityPet);
     public BaseResponse getTreatmentHistoryById(Long id);
     public Page<TreatmentHistoryRes> searchTreatmentHistory(SearchReq req);
 

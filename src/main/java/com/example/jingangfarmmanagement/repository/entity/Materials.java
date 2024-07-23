@@ -46,12 +46,6 @@ public class Materials extends BaseEntity {
     private String treatment;
 //
 //    @Transient
-//    private Long estimateQuantity = 0L;
-//
-//    @Transient
-//    private Long actualQuantity = 0L;
-//
-//    @Transient
 //    private Long unitPridce = 0L;
 //
 //    @Transient

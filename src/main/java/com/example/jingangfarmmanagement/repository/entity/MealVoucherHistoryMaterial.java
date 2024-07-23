@@ -13,5 +13,5 @@ import javax.persistence.Entity;
 public class MealVoucherHistoryMaterial extends BaseEntity{
     private Long mealVoucherHistoryId;
     private Long materialId;
-    private Long quantity;
+    private Double quantity;
 }

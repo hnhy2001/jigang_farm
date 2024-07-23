@@ -20,5 +20,5 @@ import javax.persistence.ManyToOne;
 public class TreatmentHistoryMaterial extends BaseEntity{
     private Long treatmentHistoryId;
     private Long materialId;
-    private Long quantity;
+    private Double quantity;
 }

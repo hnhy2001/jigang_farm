@@ -9,5 +9,5 @@ import lombok.*;
 @Setter
 public class TreatmentCardMaterialReq {
     Long materialId;
-    Long quantity;
+    Double quantity;
 }

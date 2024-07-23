@@ -17,6 +17,6 @@ public class MaterialRes {
     private String unit;
     private String price;
     private String note;
-    private Long quantity;
+    private Double quantity;
     private Long id;
 }

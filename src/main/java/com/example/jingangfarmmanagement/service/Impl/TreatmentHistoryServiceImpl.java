@@ -3,6 +3,7 @@ package com.example.jingangfarmmanagement.service.Impl;
 import com.example.jingangfarmmanagement.mapper.TreatmentCardMapper;
 import com.example.jingangfarmmanagement.model.BaseResponse;
 import com.example.jingangfarmmanagement.model.req.SearchReq;
+import com.example.jingangfarmmanagement.model.req.TreatmentCardMaterialReq;
 import com.example.jingangfarmmanagement.model.req.TreatmentHistoryReq;
 import com.example.jingangfarmmanagement.model.response.MaterialRes;
 import com.example.jingangfarmmanagement.model.response.TreatmentHistoryRes;
@@ -10,7 +11,6 @@ import com.example.jingangfarmmanagement.query.CustomRsqlVisitor;
 import com.example.jingangfarmmanagement.repository.*;
 import com.example.jingangfarmmanagement.repository.entity.*;
 import com.example.jingangfarmmanagement.service.TreatmentHistoryService;
-import com.example.jingangfarmmanagement.uitl.Constant;
 import cz.jirutka.rsql.parser.RSQLParser;
 import cz.jirutka.rsql.parser.ast.Node;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +42,7 @@ public class TreatmentHistoryServiceImpl extends BaseServiceImpl<TreatmentHistor
         return treatmentHistoryRepository;
     }
     @Override
-    public BaseResponse createTreatmentHistory(List<TreatmentHistoryReq> reqList) {
+    public BaseResponse createTreatmentHistory(List<TreatmentHistoryReq> reqList,Long quantityPet) {
         try {
             for(var req:reqList) {
                 TreatmentHistory treatmentHistory = new TreatmentHistory();
@@ -70,6 +70,9 @@ public class TreatmentHistoryServiceImpl extends BaseServiceImpl<TreatmentHistor
                     treatmentCardMaterial.setMaterialId(material.getId());
                     treatmentCardMaterial.setQuantity(materialReq.getQuantity());
                     treatmentHistoryMaterialRepository.save(treatmentCardMaterial);
+                    if(!calculatorMaterial(material,materialReq,null,true,quantityPet)){
+                        return new BaseResponse(500, "Số lượng trong kho không đủ", null);
+                    }
                 }
               }
             return new BaseResponse(200, "OK", null);
@@ -77,10 +80,58 @@ public class TreatmentHistoryServiceImpl extends BaseServiceImpl<TreatmentHistor
             return new BaseResponse(500, "Internal Server Error", null);
         }
     }
+    public boolean calculatorMaterial(Materials material, TreatmentCardMaterialReq materialReq, List<TreatmentHistoryMaterial> treatmentCardMaterial, boolean create,Long quantityPet) {
+        Double materialQuantity = material.getFirstInventory() != null ? Double.parseDouble(material.getFirstInventory()) : 0.0;
+        Double newMaterialQuantity = materialReq.getQuantity() != null ? materialReq.getQuantity() * quantityPet : 0.0;
+
+        // Kiểm tra nếu treatmentCardMaterial là null
+        if (treatmentCardMaterial != null) {
+            TreatmentHistoryMaterial matchingMaterial = null;
+            for (TreatmentHistoryMaterial thm : treatmentCardMaterial) {
+                if (thm.getMaterialId().equals(materialReq.getMaterialId())) {
+                    matchingMaterial = thm;
+                    break;
+                }
+            }
+
+            if (matchingMaterial != null) {
+                if (!create) {
+                    material.setFirstInventory(String.valueOf(materialQuantity));
+                    materialsRepository.save(material);
+                    return true;
+                } else {
+                    if (materialQuantity >= newMaterialQuantity) {
+                        materialQuantity -= newMaterialQuantity;
+                        material.setFirstInventory(String.valueOf(materialQuantity));
+                        materialsRepository.save(material);
+                        return true;
+                    } else {
+                        return false;
+                    }
+                }
+            }
+        }
+        // Nếu treatmentCardMaterial là null hoặc không tìm thấy matchingMaterial
+        if (materialQuantity >= newMaterialQuantity) {
+            materialQuantity -= newMaterialQuantity;
+            material.setFirstInventory(String.valueOf(materialQuantity));
+            materialsRepository.save(material);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+
     @Override
     @Transactional
-    public BaseResponse updateTreatmentHistory(Long treatmentCardId, List<TreatmentHistoryReq> reqList) {
+    public BaseResponse updateTreatmentHistory(Long treatmentCardId, List<TreatmentHistoryReq> reqList,Long quantityPet) {
         List<TreatmentHistory> treatmentHistoryList = treatmentHistoryRepository.findByTreatmentCardId(treatmentCardId);
+        List<TreatmentHistoryMaterial> existTreatmentHistoryMaterials = new ArrayList<>();
+        for (var treatmentHistory : treatmentHistoryList) {
+            existTreatmentHistoryMaterials.addAll(treatmentHistoryMaterialRepository.findByTreatmentHistoryId(treatmentHistory.getId()));
+        }
+
         treatmentHistoryRepository.deleteAll(treatmentHistoryList);
         treatmentHistoryList.clear();
         // Update the properties
@@ -105,6 +156,9 @@ public class TreatmentHistoryServiceImpl extends BaseServiceImpl<TreatmentHistor
             for (var materialReq : req.getMaterials()) {
                 Materials material = materialsRepository.findById(materialReq.getMaterialId())
                         .orElseThrow();
+                if(!calculatorMaterial(material,materialReq,existTreatmentHistoryMaterials,false,quantityPet)){
+                    return new BaseResponse(500, "Số lượng trong kho không đủ", null);
+                }
                 TreatmentHistoryMaterial treatmentCardMaterial = new TreatmentHistoryMaterial();
                 treatmentCardMaterial.setTreatmentHistoryId(treatmentHistory.getId());
                 treatmentCardMaterial.setMaterialId(material.getId());

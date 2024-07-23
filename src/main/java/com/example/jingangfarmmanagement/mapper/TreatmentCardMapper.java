@@ -10,7 +10,7 @@ public interface TreatmentCardMapper {
     TreatmentCardMapper INSTANCE = Mappers.getMapper(TreatmentCardMapper.class);
 
 
-    default MaterialRes toMaterialRes(Materials materials, Long quantity) {
+    default MaterialRes toMaterialRes(Materials materials, Double quantity) {
         if (materials == null) {
             return null;
         }
