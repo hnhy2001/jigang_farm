@@ -180,7 +180,7 @@ public class PetServiceImpl extends BaseServiceImpl<Pet> implements PetService {
     public BaseResponse findPetWithCageAndFarm(List<Long> cageIds, List<Long> farmIds, Long startDate, Long endDate) {
         List<Pet> pets = new ArrayList<>();
         List<Pet> resultPets = new ArrayList<>();
-        if (cageIds!=null) {
+        if (!cageIds.isEmpty()) {
             for (var cageId : cageIds) {
                 pets = petRepository.findByCageId(cageId, startDate, endDate);
                 resultPets.addAll(pets);

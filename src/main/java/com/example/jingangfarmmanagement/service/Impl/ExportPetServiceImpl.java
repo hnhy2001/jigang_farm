@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -44,7 +45,7 @@ public class ExportPetServiceImpl extends BaseServiceImpl<ExportPet> implements 
                 pet.setStatus(-1);
                 petRepository.save(pet);
             }
-            ExportPet exportPet  =new ExportPet(petId, req.getReasonExport(), req.getExportDate(), req.getType(),req.getNote());
+            ExportPet exportPet  =new ExportPet(petId, req.getReasonExport(), req.getExportDate(), req.getType(),req.getNote(),new ArrayList<>());
             exportPet.setStatus(1);
             return  exportPet;
         }).collect(Collectors.toList());
@@ -86,6 +87,7 @@ public class ExportPetServiceImpl extends BaseServiceImpl<ExportPet> implements 
                     exportPetRes.setNote(exportPet.getNote());
                     exportPetRes.setType(exportPet.getType());
                     exportPetRes.setPet(pet.orElse(null));
+                    exportPetRes.setImages(exportPet.getImages());
                     return exportPetRes;
                 })
                 .collect(Collectors.toList());
@@ -123,6 +125,7 @@ public class ExportPetServiceImpl extends BaseServiceImpl<ExportPet> implements 
             exportPetRes.setNote(exportPet.getNote());
             exportPetRes.setType(exportPet.getType());
             exportPetRes.setPet(pet.orElse(null));
+            exportPetRes.setImages(exportPet.getImages());
             return exportPetRes;
         }).collect(Collectors.toList());
         return new PageImpl<>(exportPetResList, pageable, exportPets.getTotalElements());
