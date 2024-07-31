@@ -70,9 +70,9 @@ public class TreatmentHistoryServiceImpl extends BaseServiceImpl<TreatmentHistor
                     treatmentCardMaterial.setMaterialId(material.getId());
                     treatmentCardMaterial.setQuantity(materialReq.getQuantity());
                     treatmentHistoryMaterialRepository.save(treatmentCardMaterial);
-                    if(!calculatorMaterial(material,materialReq,null,true,quantityPet)){
-                        return new BaseResponse(500, "Số lượng trong kho không đủ", null);
-                    }
+//                    if(!calculatorMaterial(material,materialReq,null,true,quantityPet)){
+//                        return new BaseResponse(500, "Số lượng trong kho không đủ", null);
+//                    }
                 }
               }
             return new BaseResponse(200, "OK", null);
@@ -80,47 +80,47 @@ public class TreatmentHistoryServiceImpl extends BaseServiceImpl<TreatmentHistor
             return new BaseResponse(500, "Internal Server Error", null);
         }
     }
-    public boolean calculatorMaterial(Materials material, TreatmentCardMaterialReq materialReq, List<TreatmentHistoryMaterial> treatmentCardMaterial, boolean create,Long quantityPet) {
-        Double materialQuantity = material.getFirstInventory() != null ? Double.parseDouble(material.getFirstInventory()) : 0.0;
-        Double newMaterialQuantity = materialReq.getQuantity() != null ? materialReq.getQuantity() * quantityPet : 0.0;
-
-        // Kiểm tra nếu treatmentCardMaterial là null
-        if (treatmentCardMaterial != null) {
-            TreatmentHistoryMaterial matchingMaterial = null;
-            for (TreatmentHistoryMaterial thm : treatmentCardMaterial) {
-                if (thm.getMaterialId().equals(materialReq.getMaterialId())) {
-                    matchingMaterial = thm;
-                    break;
-                }
-            }
-
-            if (matchingMaterial != null) {
-                if (!create) {
-                    material.setFirstInventory(String.valueOf(materialQuantity));
-                    materialsRepository.save(material);
-                    return true;
-                } else {
-                    if (materialQuantity >= newMaterialQuantity) {
-                        materialQuantity -= newMaterialQuantity;
-                        material.setFirstInventory(String.valueOf(materialQuantity));
-                        materialsRepository.save(material);
-                        return true;
-                    } else {
-                        return false;
-                    }
-                }
-            }
-        }
-        // Nếu treatmentCardMaterial là null hoặc không tìm thấy matchingMaterial
-        if (materialQuantity >= newMaterialQuantity) {
-            materialQuantity -= newMaterialQuantity;
-            material.setFirstInventory(String.valueOf(materialQuantity));
-            materialsRepository.save(material);
-            return true;
-        } else {
-            return false;
-        }
-    }
+//    public boolean calculatorMaterial(Materials material, TreatmentCardMaterialReq materialReq, List<TreatmentHistoryMaterial> treatmentCardMaterial, boolean create,Long quantityPet) {
+//        Double materialQuantity = material.getFirstInventory() != null ? Double.parseDouble(material.getFirstInventory()) : 0.0;
+//        Double newMaterialQuantity = materialReq.getQuantity() != null ? materialReq.getQuantity() * quantityPet : 0.0;
+//
+//        // Kiểm tra nếu treatmentCardMaterial là null
+//        if (treatmentCardMaterial != null) {
+//            TreatmentHistoryMaterial matchingMaterial = null;
+//            for (TreatmentHistoryMaterial thm : treatmentCardMaterial) {
+//                if (thm.getMaterialId().equals(materialReq.getMaterialId())) {
+//                    matchingMaterial = thm;
+//                    break;
+//                }
+//            }
+//
+//            if (matchingMaterial != null) {
+//                if (!create) {
+//                    material.setFirstInventory(String.valueOf(materialQuantity));
+//                    materialsRepository.save(material);
+//                    return true;
+//                } else {
+//                    if (materialQuantity >= newMaterialQuantity) {
+//                        materialQuantity -= newMaterialQuantity;
+//                        material.setFirstInventory(String.valueOf(materialQuantity));
+//                        materialsRepository.save(material);
+//                        return true;
+//                    } else {
+//                        return false;
+//                    }
+//                }
+//            }
+//        }
+//        // Nếu treatmentCardMaterial là null hoặc không tìm thấy matchingMaterial
+//        if (materialQuantity >= newMaterialQuantity) {
+//            materialQuantity -= newMaterialQuantity;
+//            material.setFirstInventory(String.valueOf(materialQuantity));
+//            materialsRepository.save(material);
+//            return true;
+//        } else {
+//            return false;
+//        }
+//    }
 
 
     @Override
@@ -156,9 +156,9 @@ public class TreatmentHistoryServiceImpl extends BaseServiceImpl<TreatmentHistor
             for (var materialReq : req.getMaterials()) {
                 Materials material = materialsRepository.findById(materialReq.getMaterialId())
                         .orElseThrow();
-                if(!calculatorMaterial(material,materialReq,existTreatmentHistoryMaterials,false,quantityPet)){
-                    return new BaseResponse(500, "Số lượng trong kho không đủ", null);
-                }
+//                if(!calculatorMaterial(material,materialReq,existTreatmentHistoryMaterials,false,quantityPet)){
+//                    return new BaseResponse(500, "Số lượng trong kho không đủ", null);
+//                }
                 TreatmentHistoryMaterial treatmentCardMaterial = new TreatmentHistoryMaterial();
                 treatmentCardMaterial.setTreatmentHistoryId(treatmentHistory.getId());
                 treatmentCardMaterial.setMaterialId(material.getId());
