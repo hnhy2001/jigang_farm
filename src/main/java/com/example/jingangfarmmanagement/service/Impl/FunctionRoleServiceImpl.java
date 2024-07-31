@@ -24,7 +24,7 @@ import java.util.Set;
 
 @Service
 public class FunctionRoleServiceImpl implements FunctionRoleService {
-    private static final String DELETED_FILTER = ";status>-1";
+    private static final String DELETED_FILTER = ";status>0";
 
     @Autowired
     private FunctionRoleRepository functionRoleRepository;
