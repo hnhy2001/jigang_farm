@@ -7,6 +7,7 @@ import com.example.jingangfarmmanagement.repository.dto.PetStatisticDto;
 import com.example.jingangfarmmanagement.repository.entity.ExportPet;
 import com.example.jingangfarmmanagement.service.BaseService;
 import com.example.jingangfarmmanagement.service.ExportPetService;
+import com.example.jingangfarmmanagement.service.Impl.PetStatisticImpl;
 import com.example.jingangfarmmanagement.service.PetStatisticService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -21,17 +22,28 @@ import java.util.List;
 @RequestMapping("pet-statistic")
 public class PetStatisticController  {
     @Autowired
-    PetStatisticService petStatisticService;
+    PetStatisticImpl petStatisticService;
 
 
     @GetMapping("/total")
     public PetStatisticDto petStatistic(@RequestParam(required = false) Long startDate,
                                         @RequestParam(required = false) Long endDate,
                                         @RequestParam(required = false) List<Integer> sex,
-                                        @RequestParam(required = false)  List<Integer> status,
+                                        @RequestParam(required = false) List<Integer> status,
                                         @RequestParam(required = false) List<Long> cageId,
                                         @RequestParam(required = false) List<Long> farmId,
-                                        @RequestParam(required = false) int age) {
-     return petStatisticService.petStatistic(startDate,endDate,sex,status,cageId,farmId,age);
+                                        @RequestParam(required = false) Integer age) {  // Change int to Integer
+        return petStatisticService.petStatistic(startDate, endDate, sex, status, cageId, farmId, age);
+    }
+
+    @GetMapping("/total/death")
+    public List<Object[]> petStatisticDeath(@RequestParam(required = false) Long startDate,
+                                            @RequestParam(required = false) Long endDate,
+                                            @RequestParam(required = false) List<Integer> sex,
+                                            @RequestParam(required = false)  List<Integer> status,
+                                            @RequestParam(required = false) List<Long> cageId,
+                                            @RequestParam(required = false) List<Long> farmId,
+                                            @RequestParam(required = false) Integer age) {
+        return petStatisticService.filterPetDeath(startDate,endDate,sex,status,cageId,farmId,age);
     }
 }

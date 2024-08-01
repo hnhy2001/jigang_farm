@@ -17,18 +17,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 @Service
-public abstract class PetStatisticImpl implements PetStatisticService {
+public class PetStatisticImpl {
     @Autowired
     PetRepository petRepository;
     @PersistenceContext
     private EntityManager entityManager;
 
-    public List<Object[]> filterPetCommon(Long startDate, Long endDate, List<Integer> sex, List<Integer> status, List<Long> cageId, List<Long> farmId, int age) {
-        StringBuilder jpql = new StringBuilder("SELECT DATE(p.createdDate) as createDate, COUNT(p) as count " +
+    public List<Object[]> filterPetCommon(Long startDate, Long endDate, List<Integer> sex, List<Integer> status, List<Long> cageId, List<Long> farmId, Integer age) {
+        StringBuilder jpql = new StringBuilder("SELECT DATE(p.createDate) as createDate,p.name as name, COUNT(p) as count " +
                 "FROM Pet p " +
                 "JOIN p.cage c " +
                 "JOIN c.farm f " +
-                "WHERE p.createdDate BETWEEN :startDate AND :endDate ");
+                "WHERE p.createDate BETWEEN :startDate AND :endDate ");
 
         if (sex != null && !sex.isEmpty()) {
             jpql.append("AND p.sex IN :sex ");
@@ -42,8 +42,8 @@ public abstract class PetStatisticImpl implements PetStatisticService {
         if (farmId != null && !farmId.isEmpty()) {
             jpql.append("AND c.farm.id IN :farmId ");
         }
-        jpql.append("GROUP BY DATE(p.createdDate) " +
-                "ORDER BY DATE(p.createdDate)");
+        jpql.append("GROUP BY DATE(p.createDate),name " +
+                "ORDER BY DATE(p.createDate)");
 
         TypedQuery<Object[]> query = entityManager.createQuery(jpql.toString(), Object[].class);
         query.setParameter("startDate", startDate);
@@ -62,53 +62,53 @@ public abstract class PetStatisticImpl implements PetStatisticService {
             query.setParameter("farmId", farmId);
         }
 
+
         List<Object[]> results = query.getResultList();
         List<Object[]> filteredResults = new ArrayList<>();
 
-        if (age != 0) {
-            filteredResults = results.stream()
-                    .filter(result -> {
-                        // Giả sử rằng tên con vật được lưu trữ trong một thuộc tính `name` của `Pet`
-                        Pet pet = (Pet)result[0];
-                        String name = pet.getName();
-                        String yearStr = name.substring(0, 2);
-                        String monthStr = name.substring(2, 4);
-                        int birthYear = Integer.parseInt("20" + yearStr);
-                        int birthMonth = Integer.parseInt(monthStr);
+//        if (age != 0) {
+//            filteredResults = results.stream()
+//                    .filter(result -> {
+//                        // Giả sử rằng tên con vật được lưu trữ trong một thuộc tính `name` của `Pet`
+//                        String name = result[0].toString();
+//                        String yearStr = name.substring(0, 2);
+//                        String monthStr = name.substring(2, 4);
+//                        int birthYear = Integer.parseInt("20" + yearStr);
+//                        int birthMonth = Integer.parseInt(monthStr);
+//
+//                        // Tính số tháng tuổi
+//                        LocalDate birthDate = LocalDate.of(birthYear, birthMonth, 1);
+//                        LocalDate currentDate = LocalDate.now();
+//                        int ageInMonths = (int) Period.between(birthDate, currentDate).toTotalMonths();
+//
+//                        // Lọc theo tuổi
+//                        switch (age) {
+//                            case 1:
+//                                return ageInMonths <= 12;
+//                            case 2:
+//                                return ageInMonths > 12 && ageInMonths <= 19;
+//                            case 3:
+//                                return ageInMonths >= 24 && ageInMonths <= 48;
+//                            case 4:
+//                                return ageInMonths > 48;
+//                            default:
+//                                return false;
+//                        }
+//                    })
+//                    .collect(Collectors.toList());
+//        }
 
-                        // Tính số tháng tuổi
-                        LocalDate birthDate = LocalDate.of(birthYear, birthMonth, 1);
-                        LocalDate currentDate = LocalDate.now();
-                        int ageInMonths = (int) Period.between(birthDate, currentDate).toTotalMonths();
-
-                        // Lọc theo tuổi
-                        switch (age) {
-                            case 1:
-                                return ageInMonths <= 12;
-                            case 2:
-                                return ageInMonths > 12 && ageInMonths <= 19;
-                            case 3:
-                                return ageInMonths >= 24 && ageInMonths <= 48;
-                            case 4:
-                                return ageInMonths > 48;
-                            default:
-                                return false;
-                        }
-                    })
-                    .collect(Collectors.toList());
-        }
-
-        return filteredResults;
+        return results;
     }
-    @Override
-    public PetStatisticDto petStatistic(Long startDate, Long endDate, List<Integer> sex, List<Integer> status, List<Long> cageId, List<Long> farmId, int age) {
+
+    public PetStatisticDto petStatistic(Long startDate, Long endDate, List<Integer> sex, List<Integer> status, List<Long> cageId, List<Long> farmId, Integer age) {
         List<Object[]> resultMales = filterPetCommon(startDate, endDate, List.of(0), status, cageId, farmId, age);
         List<Object[]> resultFeMales = filterPetCommon(startDate, endDate, List.of(1), status, cageId, farmId, age);
         long totalCountMale = resultMales.stream()
-                .mapToLong(result -> (Long) result[1])
+                .mapToLong(result -> (Long) result[2])
                 .sum();
         long totalCountFeMale = resultFeMales.stream()
-                .mapToLong(result -> (Long) result[1])
+                .mapToLong(result -> (Long) result[2])
                 .sum();
         return new PetStatisticDto(totalCountMale,totalCountFeMale,0L);
     }
@@ -123,14 +123,14 @@ public abstract class PetStatisticImpl implements PetStatisticService {
 //
 //        return query.getResultList();
 //    }
-    @Override
-    public List<Object[]> filterPetDeath(Long startDate, Long endDate, List<Integer> sex, List<Integer> status, List<Long> cageId, List<Long> farmId, int age) {
-        StringBuilder jpql = new StringBuilder("SELECT p.sex, DATE(p.createdDate) as createDate, COUNT(p) as count " +
+
+    public List<Object[]> filterPetDeath(Long startDate, Long endDate, List<Integer> sex, List<Integer> status, List<Long> cageId, List<Long> farmId, Integer age) {
+        StringBuilder jpql = new StringBuilder("SELECT p.sex, DATE(p.createDate) as createDate, COUNT(p) as count " +
                 "FROM Pet p " +
                 "JOIN p.cage c " +
                 "JOIN c.farm f " +
                 "JOIN ExportPet ep on p.id = ep.petId " +
-                "WHERE p.createdDate BETWEEN :startDate AND :endDate ");
+                "WHERE p.createDate BETWEEN :startDate AND :endDate ");
 
         if (sex != null && !sex.isEmpty()) {
             jpql.append("AND p.sex IN :sex ");
@@ -144,8 +144,8 @@ public abstract class PetStatisticImpl implements PetStatisticService {
         if (farmId != null && !farmId.isEmpty()) {
             jpql.append("AND c.farm.id IN :farmId ");
         }
-        jpql.append("GROUP BY p.sex, DATE(p.createdDate) " +
-                "ORDER BY DATE(p.createdDate), p.sex");
+        jpql.append("GROUP BY p.sex, DATE(p.createDate) " +
+                "ORDER BY DATE(p.createDate), p.sex");
 
         TypedQuery<Object[]> query = entityManager.createQuery(jpql.toString(), Object[].class);
         query.setParameter("startDate", startDate);
