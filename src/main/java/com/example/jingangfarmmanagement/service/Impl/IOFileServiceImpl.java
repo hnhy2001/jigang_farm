@@ -282,6 +282,7 @@ public class IOFileServiceImpl implements IOFileService {
         pet.setPetCondition(dto.getUilness() != null ? 2 : 1);
         if(dto.getStatus()==null){
             dto.setStatus("");
+
         }
         switch (dto.getStatus().toLowerCase()) {
             case "":
