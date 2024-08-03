@@ -229,7 +229,8 @@ public class IOFileServiceImpl implements IOFileService {
         pet.setType(dto.getType());
         pet.setAge(dto.getAge() != null ? dto.getAge() : "0");
         pet.setWeight(dto.getWeight() != null ? Double.parseDouble(dto.getWeight()) : 0);
-        pet.setSex("Cái".equalsIgnoreCase(dto.getSex()) ? 0 : 1);
+        pet.setSex(Integer.parseInt(dto.getSex()));
+        pet.setName(dto.getName());
         List<String> uilnessNames= uilnesses.stream().map(Uilness::getName).collect(Collectors.toList());
         String result = uilnessNames.stream()
                 .map(name -> name)
@@ -267,8 +268,8 @@ public class IOFileServiceImpl implements IOFileService {
         pet.setType(dto.getType());
         pet.setAge(dto.getAge() != null ? dto.getAge() : "0");
         pet.setWeight(dto.getWeight() != null ? Double.parseDouble(dto.getWeight()) : 0);
-        pet.setSex("Cái".equalsIgnoreCase(dto.getSex()) ? 0 : 1);
-        pet.setName(generateName(pet.getSex()));
+        pet.setSex(Integer.parseInt(dto.getSex()));
+        pet.setName(dto.getName());
         pet.setCage(cage);
         List<String> uilnessNames= uilnesses.stream().map(Uilness::getName).collect(Collectors.toList());
         String result = uilnessNames.stream()
