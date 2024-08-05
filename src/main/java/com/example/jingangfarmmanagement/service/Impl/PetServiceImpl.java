@@ -329,8 +329,10 @@ public class PetServiceImpl extends BaseServiceImpl<Pet> implements PetService {
                 filter = filter.concat(filterStatus.get().substring(0, filterStatus.get().length() - 1) + ")").concat(";");
             }
         }
-        filter = filter.concat("cage.id==" + req.getCage().getId());
-        return filter.concat(DELETED_FILTER).concat(";createDate>=" + req.getStartDate()).concat(";createDate<=" + req.getEndDate());
+        if(req.getCage() != null){
+            filter = filter.concat("cage.id==" + req.getCage().getId()).concat(";");
+        }
+        return filter.concat("status>-1").concat(";createDate>=" + req.getStartDate()).concat(";createDate<=" + req.getEndDate());
     }
 
     public double calculateAge(String yymm) throws DateTimeParseException {
@@ -363,7 +365,7 @@ public class PetServiceImpl extends BaseServiceImpl<Pet> implements PetService {
 
     public Boolean checkRegex(String input){
         // Regex để kiểm tra chuỗi có 7 ký tự và đều là số
-        String regex = "^\\d{7}$";
+        String regex = "^\\d{2}(0[1-9]|1[0-2])\\d{3}$";
 
         // Tạo Pattern từ regex
         Pattern pattern = Pattern.compile(regex);
