@@ -3,6 +3,7 @@ package com.example.jingangfarmmanagement.controller;
 import com.example.jingangfarmmanagement.model.BaseResponse;
 import com.example.jingangfarmmanagement.model.req.ExportPetReq;
 import com.example.jingangfarmmanagement.model.response.ExportPetRes;
+import com.example.jingangfarmmanagement.repository.dto.PetDeathStatisticDto;
 import com.example.jingangfarmmanagement.repository.dto.PetStatisticDto;
 import com.example.jingangfarmmanagement.repository.entity.ExportPet;
 import com.example.jingangfarmmanagement.service.BaseService;
@@ -37,13 +38,13 @@ public class PetStatisticController  {
     }
 
     @GetMapping("/total/death")
-    public List<Object[]> petStatisticDeath(@RequestParam(required = false) Long startDate,
-                                            @RequestParam(required = false) Long endDate,
-                                            @RequestParam(required = false) List<Integer> sex,
-                                            @RequestParam(required = false)  List<Integer> status,
-                                            @RequestParam(required = false) List<Long> cageId,
-                                            @RequestParam(required = false) List<Long> farmId,
-                                            @RequestParam(required = false) Integer age) {
-        return petStatisticService.filterPetDeath(startDate,endDate,sex,status,cageId,farmId,age);
+    public List<PetDeathStatisticDto> petStatisticDeath(@RequestParam(required = false) Long startDate,
+                                                        @RequestParam(required = false) Long endDate,
+                                                        @RequestParam(required = false) List<Integer> sex,
+                                                        @RequestParam(required = false)  List<Integer> status,
+                                                        @RequestParam(required = false) List<Long> cageId,
+                                                        @RequestParam(required = false) List<Long> farmId,
+                                                        @RequestParam(required = false) Integer age) {
+        return petStatisticService.getPetDeathPerDay(startDate,endDate,sex,status,cageId,farmId,age);
     }
 }
