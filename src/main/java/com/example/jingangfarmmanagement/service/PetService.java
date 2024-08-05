@@ -1,10 +1,7 @@
 package com.example.jingangfarmmanagement.service;
 
 import com.example.jingangfarmmanagement.model.BaseResponse;
-import com.example.jingangfarmmanagement.model.req.ChangeCageReq;
-import com.example.jingangfarmmanagement.model.req.ChangeStatusPetReq;
-import com.example.jingangfarmmanagement.model.req.SearchReq;
-import com.example.jingangfarmmanagement.model.req.UpdateWeightPetReq;
+import com.example.jingangfarmmanagement.model.req.*;
 import com.example.jingangfarmmanagement.projection.FarmProjection;
 import com.example.jingangfarmmanagement.projection.PetProjection;
 import com.example.jingangfarmmanagement.repository.entity.Pet;
@@ -31,5 +28,7 @@ public interface PetService extends BaseService<Pet> {
     public BaseResponse updatePetHealthCondition(List<ChangeStatusPetReq> changeStatusPetReqs);
     public Pet getMenPetByNumbersOfMonth(String month);
     public Pet getWomenPetByNumbersOfMonth(String month);
+    public BaseResponse statisticQuantityUnilness(StatisticQuantityUnilessReq req);
+    public BaseResponse statisticQuantityUnilnessType(StatisticQuantityUnilessReq req);
 
 }

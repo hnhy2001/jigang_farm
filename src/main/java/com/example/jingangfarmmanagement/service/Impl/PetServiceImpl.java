@@ -2,20 +2,22 @@ package com.example.jingangfarmmanagement.service.Impl;
 
 import com.example.jingangfarmmanagement.constants.Status;
 import com.example.jingangfarmmanagement.model.BaseResponse;
-import com.example.jingangfarmmanagement.model.req.ChangeCageReq;
-import com.example.jingangfarmmanagement.model.req.ChangeStatusPetReq;
-import com.example.jingangfarmmanagement.model.req.SearchReq;
-import com.example.jingangfarmmanagement.model.req.UpdateWeightPetReq;
-import com.example.jingangfarmmanagement.projection.FarmProjection;
+import com.example.jingangfarmmanagement.model.req.*;
+import com.example.jingangfarmmanagement.model.response.StatisticQuantityUnilessItemRes;
+import com.example.jingangfarmmanagement.model.response.StatisticQuantityUnilessRes;
+import com.example.jingangfarmmanagement.model.response.StatisticQuantityUnilessTypeItemRes;
+import com.example.jingangfarmmanagement.model.response.StatisticQuantityUnilessTypeRes;
 import com.example.jingangfarmmanagement.projection.PetProjection;
 import com.example.jingangfarmmanagement.query.CustomRsqlVisitor;
 import com.example.jingangfarmmanagement.repository.BaseRepository;
 import com.example.jingangfarmmanagement.repository.ChangeCageHistoryRepository;
 import com.example.jingangfarmmanagement.repository.PetRepository;
+import com.example.jingangfarmmanagement.repository.UilnessRepository;
 import com.example.jingangfarmmanagement.repository.entity.ChangeCageHistory;
-import com.example.jingangfarmmanagement.repository.entity.Farm;
 import com.example.jingangfarmmanagement.repository.entity.Pet;
+import com.example.jingangfarmmanagement.repository.entity.Uilness;
 import com.example.jingangfarmmanagement.service.PetService;
+import com.example.jingangfarmmanagement.service.UilnessService;
 import com.example.jingangfarmmanagement.uitl.DateUtil;
 import com.example.jingangfarmmanagement.uitl.ObjectMapperUtils;
 import cz.jirutka.rsql.parser.RSQLParser;
@@ -27,9 +29,13 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.time.LocalDate;
+import java.time.Period;
+import java.time.format.DateTimeParseException;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
@@ -40,6 +46,9 @@ public class PetServiceImpl extends BaseServiceImpl<Pet> implements PetService {
     private PetRepository petRepository;
     @Autowired
     private ChangeCageHistoryRepository changeCageHistoryRepository;
+
+    @Autowired
+    private UilnessService uilnessService;
 
     @Override
     protected BaseRepository<Pet> getRepository() {
@@ -176,6 +185,7 @@ public class PetServiceImpl extends BaseServiceImpl<Pet> implements PetService {
         return petRepository.findWomenPetByNunbersOfMonth(month);
     }
 
+
     @Override
     public BaseResponse findPetWithCageAndFarm(List<Long> cageIds, List<Long> farmIds, Long startDate, Long endDate) {
         List<Pet> pets = new ArrayList<>();
@@ -225,5 +235,147 @@ public class PetServiceImpl extends BaseServiceImpl<Pet> implements PetService {
         }
 
         return String.valueOf(number);
+    }
+
+    @Override
+    public BaseResponse statisticQuantityUnilness(StatisticQuantityUnilessReq req) {
+        String filter = getFilter(req);
+        Node rootNode = new RSQLParser().parse(filter);
+        Specification<Pet> spec = rootNode.accept(new CustomRsqlVisitor<>());
+//        List<Pet> allData = petRepository.findAll(spec);
+        List<Pet> allData = getStatisticData(petRepository.findAll(spec), req.getFromAge(), req.getToAge());
+        List<Uilness> uilnessList = uilnessService.getAll();
+        List<StatisticQuantityUnilessItemRes> itemResList = new ArrayList<>();
+        for(int i = 0; i <= 6 ; i++) {
+            StatisticQuantityUnilessItemRes itemRes = new StatisticQuantityUnilessItemRes();
+            itemRes.setQuantity(0L);
+            itemRes.setDiseaseLevel(i);
+            itemResList.add(itemRes);
+        }
+        StatisticQuantityUnilessRes result = new StatisticQuantityUnilessRes();
+        result.setTotalPet((long) allData.size());
+        allData.stream().forEach(e -> {
+            uilnessList.stream().forEach(uilness -> {
+                if (e.getUilness().equals(uilness.getName())){
+                    itemResList.get(uilness.getScore()).setQuantity(itemResList.get(uilness.getScore()).getQuantity() + 1L);
+                }
+            });
+        });
+        result.setStatisticQuantityUnilessItem(itemResList);
+        return new BaseResponse().success(result);
+    }
+
+    @Override
+    public BaseResponse statisticQuantityUnilnessType(StatisticQuantityUnilessReq req) {
+        String filter = getFilter(req);
+        Node rootNode = new RSQLParser().parse(filter);
+        Specification<Pet> spec = rootNode.accept(new CustomRsqlVisitor<>());
+//        List<Pet> allData = petRepository.findAll(spec);
+        List<Pet> allData = getStatisticData(petRepository.findAll(spec), req.getFromAge(), req.getToAge());
+        List<Uilness> uilnessList = uilnessService.getAll();
+        Set<String> itemSet = new HashSet<>();
+
+        for(int i = 0; i < uilnessList.size() ; i++) {
+            if (uilnessList.get(i).getType() != null){
+                itemSet.add(uilnessList.get(i).getType());
+            }
+        }
+        List<StatisticQuantityUnilessTypeItemRes> itemResList = new ArrayList<>();
+        List<String> stringList = new ArrayList<>(itemSet);
+        for(int i = 0; i < stringList.size() ; i++) {
+            StatisticQuantityUnilessTypeItemRes item = new StatisticQuantityUnilessTypeItemRes();
+            item.setQuantity(0L);
+            item.setDiseaseLevel(stringList.get(i));
+            itemResList.add(item);
+        }
+        StatisticQuantityUnilessTypeRes result = new StatisticQuantityUnilessTypeRes();
+        result.setTotalPet((long) allData.size());
+        allData.stream().forEach(e -> {
+            uilnessList.stream().forEach(uilness -> {
+                if (e.getUilness().equals(uilness.getName()) && uilness.getType() != null){
+                    itemResList.stream().forEach(type -> {
+                        if (type.getDiseaseLevel().equals(uilness.getType())){
+                            type.setQuantity(type.getQuantity() + 1L);
+                        }
+                    });
+                }
+            });
+        });
+        result.setStatisticQuantityUnilessTypeItem(itemResList);
+        return new BaseResponse().success(result);
+    }
+
+    public List<Pet> getStatisticData(List<Pet> data, double fromAge, double toAge){
+        List<Pet> result = new ArrayList<>();
+        data.stream().forEach(e -> {
+            if (calculateAge(e.getName()) <= toAge && calculateAge(e.getName()) >= fromAge){
+                result.add(e);
+            }
+        });
+        return result;
+    }
+
+    public String getFilter(StatisticQuantityUnilessReq req){
+        String filter = "";
+        if (req.getSex() != 999){
+            filter = filter.concat("sex==" + req.getSex()).concat(";");
+        }
+        if (req.getStatusList() != null){
+            if (!req.getStatusList().isEmpty()){
+                AtomicReference<String> filterStatus = new AtomicReference<>("status=in=(");
+                req.getStatusList().stream().forEach(e -> {
+                    filterStatus.set(filterStatus.get() + e + ",");
+                });
+                filter = filter.concat(filterStatus.get().substring(0, filterStatus.get().length() - 1) + ")").concat(";");
+            }
+        }
+        filter = filter.concat("cage.id==" + req.getCage().getId());
+        return filter.concat(DELETED_FILTER).concat(";createDate>=" + req.getStartDate()).concat(";createDate<=" + req.getEndDate());
+    }
+
+    public double calculateAge(String yymm) throws DateTimeParseException {
+        if (!checkRegex(yymm)){
+            return 0.0;
+        }
+        // Tách yy và mm từ chuỗi yymm
+        int yy = Integer.parseInt(yymm.substring(0, 2));
+        int mm = Integer.parseInt(yymm.substring(2, 4));
+
+        // Chuyển đổi yy thành năm đầy đủ
+        int year;
+        if (yy < 50) {
+            year = 2000 + yy;
+        } else {
+            year = 1900 + yy;
+        }
+
+        // Tạo ngày sinh từ year và mm
+        LocalDate birthDate = LocalDate.of(year, mm, 1);
+        LocalDate currentDate = LocalDate.now();
+
+        // Tính tuổi
+        Period period = Period.between(birthDate, currentDate);
+
+        // Chuyển đổi tuổi thành số thập phân (năm + tháng/12)
+        double age = period.getYears() + period.getMonths()/12.0;
+        return age;
+    }
+
+    public Boolean checkRegex(String input){
+        // Regex để kiểm tra chuỗi có 7 ký tự và đều là số
+        String regex = "^\\d{7}$";
+
+        // Tạo Pattern từ regex
+        Pattern pattern = Pattern.compile(regex);
+
+        // Tạo Matcher từ chuỗi input
+        Matcher matcher = pattern.matcher(input);
+
+        // Kiểm tra xem chuỗi có khớp với regex không
+        if (matcher.matches()) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }

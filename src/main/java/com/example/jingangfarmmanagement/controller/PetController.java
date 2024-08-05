@@ -3,6 +3,7 @@ package com.example.jingangfarmmanagement.controller;
 import com.example.jingangfarmmanagement.model.BaseResponse;
 import com.example.jingangfarmmanagement.model.req.ChangeCageReq;
 import com.example.jingangfarmmanagement.model.req.ChangeStatusPetReq;
+import com.example.jingangfarmmanagement.model.req.StatisticQuantityUnilessReq;
 import com.example.jingangfarmmanagement.model.req.UpdateWeightPetReq;
 import com.example.jingangfarmmanagement.repository.entity.Pet;
 import com.example.jingangfarmmanagement.service.BaseService;
@@ -59,6 +60,16 @@ public class PetController extends BaseController<Pet> {
     @PostMapping("/change-condition")
     public BaseResponse updatePetCondition(@RequestBody List<ChangeStatusPetReq> changeStatusPetReqs){
         return  petService.updatePetHealthCondition(changeStatusPetReqs);
+    }
+
+    @PostMapping("/statistic-quantity-uniness")
+    public BaseResponse statisticQuantityUniness(@RequestBody StatisticQuantityUnilessReq req){
+        return  petService.statisticQuantityUnilness(req);
+    }
+
+    @PostMapping("/statistic-quantity-uniness-type")
+    public BaseResponse statisticQuantityUninessType(@RequestBody StatisticQuantityUnilessReq req){
+        return  petService.statisticQuantityUnilnessType(req);
     }
 
 }
