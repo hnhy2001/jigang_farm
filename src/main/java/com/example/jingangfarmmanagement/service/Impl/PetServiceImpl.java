@@ -9,13 +9,10 @@ import com.example.jingangfarmmanagement.model.response.StatisticQuantityUniless
 import com.example.jingangfarmmanagement.model.response.StatisticQuantityUnilessTypeRes;
 import com.example.jingangfarmmanagement.projection.PetProjection;
 import com.example.jingangfarmmanagement.query.CustomRsqlVisitor;
-import com.example.jingangfarmmanagement.repository.BaseRepository;
-import com.example.jingangfarmmanagement.repository.ChangeCageHistoryRepository;
-import com.example.jingangfarmmanagement.repository.PetRepository;
-import com.example.jingangfarmmanagement.repository.UilnessRepository;
-import com.example.jingangfarmmanagement.repository.entity.ChangeCageHistory;
-import com.example.jingangfarmmanagement.repository.entity.Pet;
-import com.example.jingangfarmmanagement.repository.entity.Uilness;
+import com.example.jingangfarmmanagement.repository.*;
+import com.example.jingangfarmmanagement.repository.entity.*;
+import com.example.jingangfarmmanagement.service.CageService;
+import com.example.jingangfarmmanagement.service.FarmService;
 import com.example.jingangfarmmanagement.service.PetService;
 import com.example.jingangfarmmanagement.service.UilnessService;
 import com.example.jingangfarmmanagement.uitl.DateUtil;
@@ -49,6 +46,11 @@ public class PetServiceImpl extends BaseServiceImpl<Pet> implements PetService {
 
     @Autowired
     private UilnessService uilnessService;
+
+    @Autowired
+    private CageRepository cageService;
+    @Autowired
+    private CageRepository cageRepository;
 
     @Override
     protected BaseRepository<Pet> getRepository() {
@@ -331,6 +333,24 @@ public class PetServiceImpl extends BaseServiceImpl<Pet> implements PetService {
         }
         if(req.getCage() != null){
             filter = filter.concat("cage.id==" + req.getCage().getId()).concat(";");
+        }
+
+        if(req.getFarm() != null){
+            SearchReq cageSearch = new SearchReq();
+            cageSearch.setFilter(("farm.id==" + req.getFarm().getId()).concat(";status>-1"));
+            cageSearch.setPage(0);
+            cageSearch.setSize(9999999);
+            cageSearch.setSort("id,asc");
+            Node rootNode = new RSQLParser().parse(cageSearch.getFilter());
+            Specification<Cage> spec = rootNode.accept(new CustomRsqlVisitor<>());
+            List<Cage> cageList  = cageRepository.findAll(spec);
+            if (!cageList.isEmpty()){
+                AtomicReference<String> filterCage = new AtomicReference<>("cage.id=in=(");
+                cageList.stream().forEach(e -> {
+                    filterCage.set(filterCage.get() + e.getId() + ",");
+                });
+                filter = filter.concat(filterCage.get().substring(0, filterCage.get().length() - 1) + ")").concat(";");
+            }
         }
         return filter.concat("status>-1").concat(";createDate>=" + req.getStartDate()).concat(";createDate<=" + req.getEndDate());
     }
