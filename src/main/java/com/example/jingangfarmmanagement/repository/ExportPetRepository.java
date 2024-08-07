@@ -37,6 +37,7 @@ public interface ExportPetRepository extends BaseRepository<ExportPet> {
             "and (:code is null or p.code like %:code%) " +
             "and (:sex is null or p.sex = :sex) " +
             "and (:age is null or p.age = :age) " +
+            "and (:type is null or ep.type = :type) " +
             "and (:startExportDate is null or ep.exportDate >= :startExportDate) " +
             "and (:endExportDate is null or ep.exportDate <= :endExportDate) " +
             "and (:note is null or ep.note like %:note%)",
@@ -48,6 +49,7 @@ public interface ExportPetRepository extends BaseRepository<ExportPet> {
                     "and (:code is null or p.code like %:code%) " +
                     "and (:sex is null or p.sex = :sex) " +
                     "and (:age is null or p.age = :age) " +
+                    "and (:type is null or ep.type = :type) " +
                     "and (:startExportDate is null or ep.exportDate >= :startExportDate) " +
                     "and (:endExportDate is null or ep.exportDate <= :endExportDate) " +
                     "and (:note is null or ep.note like %:note%)")
@@ -57,6 +59,7 @@ public interface ExportPetRepository extends BaseRepository<ExportPet> {
             @Param("code") String code,
             @Param("sex") Integer sex,
             @Param("age") Integer age,
+            @Param("type") Integer type,
             @Param("startExportDate") Long startExportDate,
             @Param("endExportDate") Long endExportDate,
             @Param("note") String note,

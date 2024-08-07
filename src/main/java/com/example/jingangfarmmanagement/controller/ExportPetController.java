@@ -40,6 +40,7 @@ public class ExportPetController extends BaseController<ExportPet> {
             @RequestParam(required = false) String code,
             @RequestParam(required = false) Integer sex,
             @RequestParam(required = false) Integer age,
+            @RequestParam(required = false) Integer type,
             @RequestParam(required = false) Long startExportDate,
             @RequestParam(required = false) Long endExportDate,
             @RequestParam(required = false) String note,
@@ -47,7 +48,7 @@ public class ExportPetController extends BaseController<ExportPet> {
             @RequestParam(defaultValue = "10") int size
     ) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<ExportPetRes> resultPage = exportPetService.searchExportPet(cageId, name, code, sex, age,startExportDate,endExportDate, note, pageable);
+        Page<ExportPetRes> resultPage = exportPetService.searchExportPet(cageId, name, code, sex, age, type ,startExportDate,endExportDate, note, pageable);
         return new BaseResponse(200, "Lấy dữ liệu thành công!",resultPage);
     }
     @GetMapping("death-pet/count")
