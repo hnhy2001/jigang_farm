@@ -26,6 +26,7 @@ public class PetStatisticController  {
     PetStatisticImpl petStatisticService;
 
 
+
     @GetMapping("/total")
     public PetStatisticDto petStatistic(@RequestParam(required = false) Long startDate,
                                         @RequestParam(required = false) Long endDate,
@@ -47,4 +48,19 @@ public class PetStatisticController  {
                                                         @RequestParam(required = false) Integer age) {
         return petStatisticService.getPetDeathPerDay(startDate,endDate,sex,status,cageId,farmId,age);
     }
+    @GetMapping("/total/born")
+    public List<PetDeathStatisticDto> petStatisticBorn(@RequestParam(required = false) Long startDate,
+                                                        @RequestParam(required = false) Long endDate,
+                                                        @RequestParam(required = false) List<Integer> sex,
+                                                        @RequestParam(required = false)  List<Integer> status,
+                                                        @RequestParam(required = false) List<Long> cageId,
+                                                        @RequestParam(required = false) List<Long> farmId,
+                                                        @RequestParam(required = false) Integer age) {
+        return petStatisticService.getPetBornPerDay(startDate,endDate,sex,status,cageId,farmId,age);
+    }
+    @GetMapping("/sync")
+    public void syncDateOfBirth() {
+        petStatisticService.syncDateOfBirth();
+    }
+
 }

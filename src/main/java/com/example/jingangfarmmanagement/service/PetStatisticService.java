@@ -17,4 +17,5 @@ public interface PetStatisticService extends BaseService<Pet> {
 
     public PetStatisticDto petStatistic(Long startDate, Long endDate, List<Integer> sex, List<Integer> status, List<Long> cageId, List<Long> farmId, int age) ;
     public List<Object[]> filterPetDeath(Long startDate, Long endDate, List<Integer> sex, List<Integer> status, List<Long> cageId, List<Long> farmId, int age) ;
+
 }

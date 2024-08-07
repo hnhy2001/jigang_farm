@@ -31,8 +31,8 @@ public class Pet extends BaseEntity{
     @Column(name = "age")
     private String age;
 
-    @Column(name = "age_number")
-    private Long ageNumber;
+    @Column(name = "birth_number")
+    private Long birthNumber;
 
     @ManyToOne
     @JoinColumn(name = "cage", nullable = false)
