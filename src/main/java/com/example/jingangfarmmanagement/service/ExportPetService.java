@@ -13,5 +13,5 @@ public interface ExportPetService extends BaseService<ExportPet> {
      Page<ExportPetRes> searchExportPet(SearchReq req);
      BaseResponse getExportPetById(Long id);
       BaseResponse getDeathPetByFarmAndCage(Long cageId);
-     Page<ExportPetRes> searchExportPet(Long cageId, String name, String code, Integer sex, Integer age, Long startExportDate,Long endExportDate, String note, Pageable pageable);
+     Page<ExportPetRes> searchExportPet(Long cageId, String name, String code, Integer sex, Integer age, Integer type, Long startExportDate,Long endExportDate, String note, Pageable pageable);
 }
