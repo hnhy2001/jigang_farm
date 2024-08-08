@@ -329,12 +329,12 @@ public class PetStatisticImpl {
 //    return new ArrayList<>(dailyStats.values());
 //}
     public List<PetDeathStatisticDto> getPetDeathPerDay(Long startDate, Long endDate, List<Integer> sex, List<Integer> status, List<Long> cageId, List<Long> farmId, Integer age) {
-        StringBuilder jpql = new StringBuilder("SELECT p.sex as sex, DATE(p.createDate) as createDate, COUNT(p) as quantity " +
+        StringBuilder jpql = new StringBuilder("SELECT p.sex as sex, DATE(ep.exportDate) as exportDate, COUNT(p) as quantity " +
                 "FROM Pet p " +
                 "JOIN p.cage c " +
                 "JOIN c.farm f " +
                 "JOIN ExportPet ep on p.id = ep.petId " +
-                "WHERE p.createDate BETWEEN :startDate AND :endDate ");
+                "WHERE ep.exportDate BETWEEN :startDate AND :endDate ");
 
         if (sex != null && !sex.isEmpty()) {
             jpql.append("AND p.sex IN :sex ");
@@ -348,8 +348,8 @@ public class PetStatisticImpl {
         if (farmId != null && !farmId.isEmpty()) {
             jpql.append("AND c.farm.id IN :farmId ");
         }
-        jpql.append("GROUP BY p.sex, DATE(p.createDate) " +
-                "ORDER BY DATE(p.createDate), p.sex");
+        jpql.append("GROUP BY p.sex, DATE(ep.exportDate) " +
+                "ORDER BY DATE(ep.exportDate), p.sex");
 
         TypedQuery<Object[]> query = entityManager.createQuery(jpql.toString(), Object[].class);
         query.setParameter("startDate", startDate);
@@ -415,8 +415,8 @@ public class PetStatisticImpl {
             } else if (sexValue == 0) {
                 stat.setFemaleDeaths(stat.getFemaleDeaths() + quantity);
             }
-            else {
-                stat.setNaDeaths(stat.getFemaleDeaths() + quantity);
+            else if(sexValue==2){
+                stat.setNaDeaths(stat.getNaDeaths() + quantity);
             }
             dailyStats.put(date, stat);
         }
@@ -509,8 +509,8 @@ public class PetStatisticImpl {
             } else if (sexValue == 0) {
                 stat.setFemaleDeaths(stat.getFemaleDeaths() + quantity);
             }
-            else {
-                stat.setNaDeaths(stat.getFemaleDeaths() + quantity);
+            else if(sexValue==2) {
+                stat.setNaDeaths(stat.getNaDeaths() + quantity);
             }
             dailyStats.put(date, stat);
         }
