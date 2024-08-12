@@ -27,12 +27,12 @@ public class PetStatisticImpl {
     PetRepository petRepository;
     @PersistenceContext
     private EntityManager entityManager;
-    public List<Object[]> filterPetCommon(Long startDate, Long endDate, List<Integer> sex, List<Integer> status, List<Long> cageId, List<Long> farmId, Integer age) {
+    public List<Object[]> filterPetCommon( Long endDate, List<Integer> sex, List<Integer> status, List<Long> cageId, List<Long> farmId, Integer age) {
         StringBuilder jpql = new StringBuilder("SELECT DATE(p.createDate) as createDate, p.name as name, COUNT(p) as count " +
                 "FROM Pet p " +
                 "JOIN p.cage c " +
                 "JOIN c.farm f " +
-                "WHERE p.createDate BETWEEN :startDate AND :endDate ");
+                "WHERE p.birthNumber <= :endDate ");
 
         if (sex != null && !sex.isEmpty()) {
             jpql.append("AND p.sex IN :sex ");
@@ -50,7 +50,6 @@ public class PetStatisticImpl {
                 "ORDER BY DATE(p.createDate)");
 
         TypedQuery<Object[]> query = entityManager.createQuery(jpql.toString(), Object[].class);
-        query.setParameter("startDate", startDate);
         query.setParameter("endDate", endDate);
 
         if (sex != null && !sex.isEmpty()) {
@@ -176,10 +175,10 @@ public class PetStatisticImpl {
 //        return results;
 //    }
 
-    public PetStatisticDto petStatistic(Long startDate, Long endDate, List<Integer> sex, List<Integer> status, List<Long> cageId, List<Long> farmId, Integer age) {
-        List<Object[]> resultMales = filterPetCommon(startDate, endDate, List.of(1), status, cageId, farmId, age);
-        List<Object[]> resultFeMales = filterPetCommon(startDate, endDate, List.of(0), status, cageId, farmId, age);
-        List<Object[]> resultNaMales = filterPetCommon(startDate, endDate, List.of(2), status, cageId, farmId, age);
+    public PetStatisticDto petStatistic( Long endDate, List<Integer> sex, List<Integer> status, List<Long> cageId, List<Long> farmId, Integer age) {
+        List<Object[]> resultMales = filterPetCommon(endDate, List.of(1), status, cageId, farmId, age);
+        List<Object[]> resultFeMales = filterPetCommon(endDate, List.of(0), status, cageId, farmId, age);
+        List<Object[]> resultNaMales = filterPetCommon(endDate, List.of(2), status, cageId, farmId, age);
 
         long totalCountMale = 0L;
         long totalCountFeMale = 0L;
@@ -543,9 +542,9 @@ public class PetStatisticImpl {
             return formatDate(calculateDateFromYymmxxx(dateStr));
         }
 
-        // Xử lý định dạng yym-x-xx-cnx
-        if (dateStr != null && dateStr.matches("\\d{2}-\\d-\\d{2}-\\w+")) {
-            return formatDate(calculateDateFromYymXxxCnx(dateStr));
+        if (dateStr != null && dateStr.matches("\\d{2}\\d{2}-.*")) {
+            LocalDateTime date = calculateDateFromYymXxxCnx(dateStr);
+            return formatDate(date);
         }
 
         // Nếu định dạng không hợp lệ
@@ -572,12 +571,7 @@ public class PetStatisticImpl {
             yyyy = "20" + yy;
 
 
-        int day;
-        try {
-            day = Integer.parseInt(xxx.substring(0, 2));
-        } catch (NumberFormatException e) {
-            return null;
-        }
+        int day=01;
 
         LocalDate birthDate;
         try {
@@ -591,11 +585,11 @@ public class PetStatisticImpl {
 
     /**
      * Tạo ngày sinh từ chuỗi định dạng yym-x-xx-cnx.
-     * @param yymXxxCnx Chuỗi định dạng yym-x-xx-cnx (ví dụ: "080-5-15-CN6").
+     * @param yymmXxxCnx Chuỗi định dạng yym-x-xx-cnx (ví dụ: "080-5-15-CN6").
      * @return Đối tượng LocalDateTime đại diện cho ngày sinh hoặc null nếu ngày sinh không hợp lệ.
      */
-    private static LocalDateTime calculateDateFromYymXxxCnx(String yymXxxCnx) {
-        String[] parts = yymXxxCnx.split("-");
+    private static LocalDateTime calculateDateFromYymXxxCnx(String yymmXxxCnx) {
+        String[] parts = yymmXxxCnx.split("-");
         if (parts.length < 3) {
             return null;
         }

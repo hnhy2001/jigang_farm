@@ -10,7 +10,8 @@ import java.util.List;
 @Repository
 public interface PetRepository extends BaseRepository<Pet>, JpaSpecificationExecutorWithProjection<Pet> {
     List<Pet> findByIdIn(List<Long> ids);
-
+    @Query("Select p from Pet p where p.id >=9230")
+    List<Pet> findByIdNon();
     List<Pet> findAllByStatus(int status);
 
     boolean existsByName(String name);

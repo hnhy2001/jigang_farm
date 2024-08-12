@@ -37,6 +37,8 @@ public class IOFileServiceImpl implements IOFileService {
     @Autowired
     CageRepository cageRepository;
     @Autowired
+    LogRepository logRepository;
+    @Autowired
     UilnessRepository uilnessRepository;
     @Autowired
     FarmRepository farmRepository;
@@ -54,15 +56,19 @@ public class IOFileServiceImpl implements IOFileService {
     @Override
     @Transactional
     public BaseResponse importPetsFromExcel(MultipartFile file) throws IOException {
-        Pet menPet = petService.getMenPetByNumbersOfMonth(DateUtil.getYearNow() + DateUtil.getMonthNow());
-        Pet womenPet = petService.getWomenPetByNumbersOfMonth(DateUtil.getYearNow() + DateUtil.getMonthNow());
-        if (menPet != null){
-            menNumber = Integer.parseInt(menPet.getName().substring(5,7)) + 2;
-        }
+//        Pet menPet = petService.getMenPetByNumbersOfMonth(DateUtil.getYearNow() + DateUtil.getMonthNow());
+//        Pet womenPet = petService.getWomenPetByNumbersOfMonth(DateUtil.getYearNow() + DateUtil.getMonthNow());
+//        int menNumber = 0;
+//        int womenNumber = 0;
+//
+//        if (menPet != null) {
+//            menNumber = Integer.parseInt(menPet.getName().substring(5, 7)) + 2;
+//        }
+//
+//        if (womenPet != null) {
+//            womenNumber = Integer.parseInt(womenPet.getName().substring(5, 7)) + 2;
+//        }
 
-        if (womenPet != null){
-            womenNumber = Integer.parseInt(womenPet.getName().substring(5,7)) + 2;
-        }
         List<Pet> pets = new ArrayList<>();
         List<Farm> farms = new ArrayList<>();
         List<Cage> cages = new ArrayList<>();
@@ -71,15 +77,18 @@ public class IOFileServiceImpl implements IOFileService {
         int noPet = totalPets + 1;
 
         // Batch size configuration
-        int batchSize = 50;  // You can adjust this value based on your requirements
+        int batchSize = 50; // Adjust as needed
+
+        // Get the file name
+        String fileName = file.getOriginalFilename();
+        boolean errorOccurred = false;
+        String errorMessage = null;
 
         try {
             List<PetFileImportDto> petFileImportDtos = EasyExcel.read(file.getInputStream())
                     .head(PetFileImportDto.class)
                     .sheet()
                     .doReadSync();
-
-            boolean errorOccurred = false; // Flag to track if error occurred
 
             for (int i = 0; i < petFileImportDtos.size(); i++) {
                 PetFileImportDto dto = petFileImportDtos.get(i);
@@ -160,22 +169,24 @@ public class IOFileServiceImpl implements IOFileService {
                         entityManager.clear();
                     }
                 } catch (IllegalArgumentException e) {
-                    // Return BaseResponse with the error message immediately
-                    String errorMessage = "File nhập liệu lỗi ở dòng " + (i + 1) + ": " + e.getMessage();
-                    System.err.println(errorMessage);
-                    errorMessages.add(errorMessage);
-                    errorOccurred = true; // Set error flag
-                    break; // Stop processing further rows
+                    // Capture the error message and set errorOccurred flag
+                    errorMessage = "File nhập liệu lỗi ở dòng " + (i + 1) + ": " + e.getMessage();
+                    errorOccurred = true;
+                    break; // Exit the loop and stop processing
                 } catch (Exception e) {
-                    // Log the error with the row information
-                    String errorMessage = "File nhập liệu lỗi ở dòng" + (i + 1) + ": " + e.getMessage();
-                    System.err.println(errorMessage);
-                    errorMessages.add(errorMessage);
+                    // Capture the error message and set errorOccurred flag
+                    errorMessage = "File nhập liệu lỗi ở dòng " + (i + 1) + ": " + e.getMessage();
+                    errorOccurred = true;
+                    break; // Exit the loop and stop processing
                 }
             }
 
-            // Save any remaining entities if no error occurred
-            if (!errorOccurred) {
+            // Save the log entry based on the outcome
+            if (errorOccurred) {
+                logError(errorMessage, fileName); // Log the error
+                return new BaseResponse(500, "Error", errorMessage);
+            } else {
+                // Save any remaining entities
                 if (!farms.isEmpty()) {
                     farmRepository.saveAll(farms);
                 }
@@ -185,18 +196,177 @@ public class IOFileServiceImpl implements IOFileService {
                 if (!pets.isEmpty()) {
                     petRepository.saveAll(pets);
                 }
-            }
 
-            // Check if there were any errors during processing
-            if (errorOccurred) {
-                return new BaseResponse(500, "Error", String.join("; ", errorMessages));
-            } else {
+                logSuccess(fileName); // Log the success
                 return new BaseResponse(200, "OK", "Nhập dữ liệu thành công");
             }
         } catch (IOException e) {
             throw new IOException("Đã có lỗi xảy ra ", e);
         }
     }
+
+    // Method to log errors
+    private void logError(String message, String fileName) {
+        Log log = new Log();
+        log.setLog(message);
+        log.setFileName(fileName);
+        log.setResult("fail");
+        logRepository.save(log);
+    }
+
+    // Method to log success
+    private void logSuccess(String fileName) {
+        Log log = new Log();
+        log.setLog("Import successful");
+        log.setFileName(fileName);
+        log.setResult("success");
+        logRepository.save(log);
+    }
+//    @Transactional
+//    public BaseResponse importPetsFromExcel(MultipartFile file) throws IOException {
+//        Pet menPet = petService.getMenPetByNumbersOfMonth(DateUtil.getYearNow() + DateUtil.getMonthNow());
+//        Pet womenPet = petService.getWomenPetByNumbersOfMonth(DateUtil.getYearNow() + DateUtil.getMonthNow());
+//        if (menPet != null){
+//            menNumber = Integer.parseInt(menPet.getName().substring(5,7)) + 2;
+//        }
+//
+//        if (womenPet != null){
+//            womenNumber = Integer.parseInt(womenPet.getName().substring(5,7)) + 2;
+//        }
+//        List<Pet> pets = new ArrayList<>();
+//        List<Farm> farms = new ArrayList<>();
+//        List<Cage> cages = new ArrayList<>();
+//        List<String> errorMessages = new ArrayList<>();
+//        int totalPets = petRepository.findAll().size();
+//        int noPet = totalPets + 1;
+//
+//        // Batch size configuration
+//        int batchSize = 50;  // You can adjust this value based on your requirements
+//
+//        try {
+//            List<PetFileImportDto> petFileImportDtos = EasyExcel.read(file.getInputStream())
+//                    .head(PetFileImportDto.class)
+//                    .sheet()
+//                    .doReadSync();
+//
+//            boolean errorOccurred = false; // Flag to track if error occurred
+//
+//            for (int i = 0; i < petFileImportDtos.size(); i++) {
+//                PetFileImportDto dto = petFileImportDtos.get(i);
+//                try {
+//                    // Validate fields
+//                    if (dto.getFarmName() == null || dto.getCageName() == null || dto.getName() == null) {
+//                        throw new IllegalArgumentException("Thiếu một trong các trường bắt buộc: tên trại, tên chuồng, hoặc tên vật nuôi");
+//                    }
+//
+//                    // Clear uilnesses list for each pet import
+//                    List<Uilness> uilnesses = new ArrayList<>();
+//
+//                    // Process uilnesses from DTO
+//                    String uilnessData = dto.getUilness();
+//                    if (uilnessData != null && !uilnessData.isEmpty()) {
+//                        String[] uilnessNames = uilnessData.split(",");
+//                        for (String uilnessName : uilnessNames) {
+//                            Uilness expertUilness = getUilness(uilnessName.trim());
+//                            if (expertUilness == null) {
+//                                Uilness newUilness = createNewUilness(uilnessName.trim());
+//                                uilnessRepository.save(newUilness);
+//                                uilnesses.add(newUilness);
+//                            } else {
+//                                uilnesses.add(expertUilness);
+//                            }
+//                        }
+//                    }
+//
+//                    Farm farm = getFarm(dto.getFarmName());
+//                    if (farm == null) {
+//                        farm = createNewFarm(dto.getFarmName());
+//                        farms.add(farm);
+//                        farm = farmRepository.save(farm);
+//                    } else if (farm.getStatus() != 1) {
+//                        throw new IllegalArgumentException("Trại " + farm.getName() + " không hoạt động");
+//                    }
+//
+//                    Cage cage = getCage(dto.getCageName(), dto.getFarmName());
+//                    if (cage == null) {
+//                        cage = createNewCage(dto.getCageName(), dto.getFarmName());
+//                        cages.add(cage);
+//                        cage = cageRepository.save(cage);
+//                    } else if (cage.getStatus() != 1) {
+//                        throw new IllegalArgumentException("Chuồng " + cage.getName() + " không hoạt động");
+//                    }
+//
+//                    // Check if the pet already exists in the pets list
+//                    boolean petFound = false;
+//                    for (Pet existingPet : pets) {
+//                        if (existingPet.getName().equals(dto.getName()) &&
+//                                existingPet.getCage().getName().equals(dto.getCageName()) &&
+//                                existingPet.getCage().getFarm().getName().equals(dto.getFarmName())) {
+//                            throw new IllegalArgumentException("Trùng vật nuôi cùng trại cùng chuồng");
+//                        }
+//                    }
+//
+//                    // If not found in the current batch, check database for existing pet
+//                    if (!petFound) {
+//                        Pet pet = petRepository.findByCageAndFarmAndName(dto.getName(), dto.getCageName(), dto.getFarmName());
+//                        if (pet != null) {
+//                            updatePet(pet, dto, uilnesses);
+//                        } else {
+//                            pet = createNewPet(dto, cage, noPet, uilnesses);
+//                            noPet++;
+//                        }
+//                        pets.add(pet);
+//                    }
+//
+//                    // Batch processing: save every batchSize pets
+//                    if ((i + 1) % batchSize == 0 || i == petFileImportDtos.size() - 1) {
+//                        petRepository.saveAll(pets);
+//                        farms.clear();
+//                        cages.clear();
+//                        pets.clear();
+//
+//                        // Flush and clear to manage memory
+//                        entityManager.flush();
+//                        entityManager.clear();
+//                    }
+//                } catch (IllegalArgumentException e) {
+//                    // Return BaseResponse with the error message immediately
+//                    String errorMessage = "File nhập liệu lỗi ở dòng " + (i + 1) + ": " + e.getMessage();
+//                    System.err.println(errorMessage);
+//                    errorMessages.add(errorMessage);
+//                    errorOccurred = true; // Set error flag
+//                    break; // Stop processing further rows
+//                } catch (Exception e) {
+//                    // Log the error with the row information
+//                    String errorMessage = "File nhập liệu lỗi ở dòng" + (i + 1) + ": " + e.getMessage();
+//                    System.err.println(errorMessage);
+//                    errorMessages.add(errorMessage);
+//                }
+//            }
+//
+//            // Save any remaining entities if no error occurred
+//            if (!errorOccurred) {
+//                if (!farms.isEmpty()) {
+//                    farmRepository.saveAll(farms);
+//                }
+//                if (!cages.isEmpty()) {
+//                    cageRepository.saveAll(cages);
+//                }
+//                if (!pets.isEmpty()) {
+//                    petRepository.saveAll(pets);
+//                }
+//            }
+//
+//            // Check if there were any errors during processing
+//            if (errorOccurred) {
+//                return new BaseResponse(500, "Error", String.join("; ", errorMessages));
+//            } else {
+//                return new BaseResponse(200, "OK", "Nhập dữ liệu thành công");
+//            }
+//        } catch (IOException e) {
+//            throw new IOException("Đã có lỗi xảy ra ", e);
+//        }
+//    }
 
 
 
