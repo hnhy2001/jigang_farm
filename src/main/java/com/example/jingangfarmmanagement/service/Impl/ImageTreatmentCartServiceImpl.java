@@ -3,10 +3,13 @@ package com.example.jingangfarmmanagement.service.Impl;
 import com.example.jingangfarmmanagement.model.BaseResponse;
 import com.example.jingangfarmmanagement.repository.BaseRepository;
 import com.example.jingangfarmmanagement.repository.ImageTreatmentCartRepository;
+import com.example.jingangfarmmanagement.repository.TreatmentCardRepository;
 import com.example.jingangfarmmanagement.repository.entity.ImageTreatmentCart;
 import com.example.jingangfarmmanagement.repository.entity.TreatmentCard;
 import com.example.jingangfarmmanagement.service.ImageTreatmentCartService;
 import com.example.jingangfarmmanagement.service.TreatmentCardService;
+import com.example.jingangfarmmanagement.uitl.ContextUtil;
+import com.example.jingangfarmmanagement.uitl.DateUtil;
 import io.minio.*;
 import io.minio.errors.MinioException;
 import io.minio.http.Method;
@@ -29,10 +32,13 @@ public class ImageTreatmentCartServiceImpl extends BaseServiceImpl<ImageTreatmen
     private String bucketName;
 
     @Autowired
-    TreatmentCardService treatmentCardService;
+    TreatmentCardRepository treatmentCardService;
 
     @Autowired
     private MinioClient minioClient;
+
+    @Autowired
+    ContextUtil contextUtil;
 
     @Override
     protected BaseRepository<ImageTreatmentCart> getRepository() {
@@ -49,13 +55,10 @@ public class ImageTreatmentCartServiceImpl extends BaseServiceImpl<ImageTreatmen
                 minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucketName).build());
             }
 
-            String forder = "treatment_cart" + file.getOriginalFilename();
+            String forder = "treatment_cart" + contextUtil.getUserName() + file.getOriginalFilename() + DateUtil.getCurrenDateTime();
             // Upload file lên MinIO
             minioClient.putObject(PutObjectArgs.builder().bucket(bucketName).object(forder).stream(file.getInputStream(), file.getInputStream().available(), -1).contentType("image/jpeg").build());
-            String presignedObjectUrl = minioClient.getPresignedObjectUrl(
-                    GetPresignedObjectUrlArgs.builder().method(Method.GET).bucket(bucketName).object(forder).build()
-            );
-            ImageTreatmentCart image = ImageTreatmentCart.builder().url(presignedObjectUrl).treatmentCard(treatmentCard).build();
+            ImageTreatmentCart image = ImageTreatmentCart.builder().url(forder).treatmentCard(treatmentCard).build();
             super.create(image);
             return new BaseResponse().success("File uploaded successfully: " + file.getOriginalFilename());
         } catch (MinioException | IOException | NoSuchAlgorithmException | InvalidKeyException e) {

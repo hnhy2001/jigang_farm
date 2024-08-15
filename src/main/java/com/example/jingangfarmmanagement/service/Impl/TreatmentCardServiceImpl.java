@@ -7,7 +7,12 @@ import com.example.jingangfarmmanagement.repository.entity.*;
 import com.example.jingangfarmmanagement.service.TreatmentCardService;
 import com.example.jingangfarmmanagement.uitl.Constant;
 import com.example.jingangfarmmanagement.uitl.DateUtil;
+import io.minio.GetPresignedObjectUrlArgs;
+import io.minio.MinioClient;
+import io.minio.errors.MinioException;
+import io.minio.http.Method;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -15,6 +20,9 @@ import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
+import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -27,6 +35,13 @@ public class TreatmentCardServiceImpl extends BaseServiceImpl<TreatmentCard> imp
     UilnessRepository uilnessRepository;
     @Autowired
     PetRepository petRepository;
+
+    @Autowired
+    private MinioClient minioClient;
+
+    @Value("${minio.bucket-name}")
+    private String bucketName;
+
     @Override
     protected BaseRepository<TreatmentCard> getRepository() {
         return treatmentCardRepository;
@@ -111,5 +126,30 @@ public class TreatmentCardServiceImpl extends BaseServiceImpl<TreatmentCard> imp
     public Page<TreatmentCard> findTreatmentHistoriesByPet(List<Long> petIds, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         return treatmentCardRepository.findTreatmentCardsByPet(petIds, pageable);
+    }
+
+    @Override
+    public TreatmentCard getById(Long id) throws Exception {
+        TreatmentCard result = this.getRepository().findById(id).orElseThrow(
+                () -> new Exception(String.format("Dữ liệu có id %s không tồn tại!", id))
+        );
+        getAllFileWithName(result.getImages());
+        return result;
+    }
+
+    public List<ImageTreatmentCart> getAllFileWithName(List<ImageTreatmentCart> req) {
+        req.stream().forEach(e -> {
+            try {
+                String presignedObjectUrl = minioClient.getPresignedObjectUrl(
+                        GetPresignedObjectUrlArgs.builder().method(Method.GET).bucket(bucketName).object(e.getUrl()).build()
+                );
+                e.setUrl(presignedObjectUrl);
+            } catch (MinioException | IOException | NoSuchAlgorithmException | InvalidKeyException ex) {
+                System.err.println("Error occurred: " + ex);
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
+            }
+        });
+        return req;
     }
 }

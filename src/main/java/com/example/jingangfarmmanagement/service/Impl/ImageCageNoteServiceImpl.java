@@ -2,6 +2,7 @@ package com.example.jingangfarmmanagement.service.Impl;
 
 import com.example.jingangfarmmanagement.model.BaseResponse;
 import com.example.jingangfarmmanagement.repository.BaseRepository;
+import com.example.jingangfarmmanagement.repository.CageNoteHistoryRepository;
 import com.example.jingangfarmmanagement.repository.ImageCageNoteRepository;
 import com.example.jingangfarmmanagement.repository.entity.CageNoteHistory;
 import com.example.jingangfarmmanagement.repository.entity.ImageCageNote;
@@ -10,6 +11,8 @@ import com.example.jingangfarmmanagement.repository.entity.TreatmentCard;
 import com.example.jingangfarmmanagement.service.CageNoteHistoryService;
 import com.example.jingangfarmmanagement.service.ImageCageNoteService;
 import com.example.jingangfarmmanagement.service.TreatmentCardService;
+import com.example.jingangfarmmanagement.uitl.ContextUtil;
+import com.example.jingangfarmmanagement.uitl.DateUtil;
 import io.minio.*;
 import io.minio.errors.MinioException;
 import io.minio.http.Method;
@@ -31,10 +34,13 @@ public class ImageCageNoteServiceImpl extends BaseServiceImpl<ImageCageNote> imp
     private String bucketName;
 
     @Autowired
-    CageNoteHistoryService cageNoteHistoryService;
+    CageNoteHistoryRepository cageNoteHistoryService;
 
     @Autowired
     private MinioClient minioClient;
+
+    @Autowired
+    ContextUtil contextUtil;
 
 
     @Override
@@ -47,13 +53,10 @@ public class ImageCageNoteServiceImpl extends BaseServiceImpl<ImageCageNote> imp
                 minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucketName).build());
             }
 
-            String forder ="cage_note" + file.getOriginalFilename();
+            String forder ="cage_note/" + contextUtil.getUserName() + file.getOriginalFilename() + DateUtil.getCurrenDateTime();
             // Upload file lên MinIO
             minioClient.putObject(PutObjectArgs.builder().bucket(bucketName).object(forder).stream(file.getInputStream(), file.getInputStream().available(), -1).contentType("image/jpeg").build());
-            String presignedObjectUrl = minioClient.getPresignedObjectUrl(
-                    GetPresignedObjectUrlArgs.builder().method(Method.GET).bucket(bucketName).object(forder).build()
-            );
-            ImageCageNote image = ImageCageNote.builder().url(presignedObjectUrl).cageNoteHistory(cageNoteHistory).build();
+            ImageCageNote image = ImageCageNote.builder().url(forder).cageNoteHistory(cageNoteHistory).build();
             super.create(image);
             return new BaseResponse().success("File uploaded successfully: " + file.getOriginalFilename());
         } catch (MinioException | IOException | NoSuchAlgorithmException | InvalidKeyException e) {

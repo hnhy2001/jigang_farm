@@ -2,6 +2,7 @@ package com.example.jingangfarmmanagement.service.Impl;
 
 import com.example.jingangfarmmanagement.model.BaseResponse;
 import com.example.jingangfarmmanagement.repository.BaseRepository;
+import com.example.jingangfarmmanagement.repository.ExportPetRepository;
 import com.example.jingangfarmmanagement.repository.ImageExportPetRepository;
 import com.example.jingangfarmmanagement.repository.ImageTreatmentCartRepository;
 import com.example.jingangfarmmanagement.repository.entity.*;
@@ -9,6 +10,8 @@ import com.example.jingangfarmmanagement.service.ExportPetService;
 import com.example.jingangfarmmanagement.service.ImageExportPetService;
 import com.example.jingangfarmmanagement.service.ImageTreatmentCartService;
 import com.example.jingangfarmmanagement.service.TreatmentCardService;
+import com.example.jingangfarmmanagement.uitl.ContextUtil;
+import com.example.jingangfarmmanagement.uitl.DateUtil;
 import io.minio.*;
 import io.minio.errors.MinioException;
 import io.minio.http.Method;
@@ -30,10 +33,13 @@ public class ImageExportPetServiceImpl extends BaseServiceImpl<ImageExportPet> i
     private String bucketName;
 
     @Autowired
-    ExportPetService exportPetService;
+    ExportPetRepository exportPetService;
 
     @Autowired
     private MinioClient minioClient;
+
+    @Autowired
+    ContextUtil contextUtil;
 
     @Override
     protected BaseRepository<ImageExportPet> getRepository() {
@@ -50,13 +56,10 @@ public class ImageExportPetServiceImpl extends BaseServiceImpl<ImageExportPet> i
                 minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucketName).build());
             }
 
-            String forder = "export_pet" + file.getOriginalFilename();
+            String forder = "export_pet" + contextUtil.getUserName() + file.getOriginalFilename() + DateUtil.getCurrenDateTime();
             // Upload file lên MinIO
             minioClient.putObject(PutObjectArgs.builder().bucket(bucketName).object(forder).stream(file.getInputStream(), file.getInputStream().available(), -1).contentType("image/jpeg").build());
-            String presignedObjectUrl = minioClient.getPresignedObjectUrl(
-                    GetPresignedObjectUrlArgs.builder().method(Method.GET).bucket(bucketName).object(forder).build()
-            );
-            ImageExportPet image = ImageExportPet.builder().url(presignedObjectUrl).exportPet(exportPet).build();
+            ImageExportPet image = ImageExportPet.builder().url(forder).exportPet(exportPet).build();
             super.create(image);
             return new BaseResponse().success("File uploaded successfully: " + file.getOriginalFilename());
         } catch (MinioException | IOException | NoSuchAlgorithmException | InvalidKeyException e) {

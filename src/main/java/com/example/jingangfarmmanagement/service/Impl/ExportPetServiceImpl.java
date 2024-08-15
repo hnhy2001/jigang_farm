@@ -12,13 +12,21 @@ import com.example.jingangfarmmanagement.repository.entity.*;
 import com.example.jingangfarmmanagement.service.ExportPetService;
 import cz.jirutka.rsql.parser.RSQLParser;
 import cz.jirutka.rsql.parser.ast.Node;
+import io.minio.GetPresignedObjectUrlArgs;
+import io.minio.MinioClient;
+import io.minio.errors.MinioException;
+import io.minio.http.Method;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
+import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -31,6 +39,13 @@ public class ExportPetServiceImpl extends BaseServiceImpl<ExportPet> implements 
     ExportPetRepository exportPetRepository;
     @Autowired
     PetRepository petRepository;
+
+    @Autowired
+    private MinioClient minioClient;
+
+    @Value("${minio.bucket-name}")
+    private String bucketName;
+
     @Override
     protected BaseRepository<ExportPet> getRepository() {
         return exportPetRepository;
@@ -129,5 +144,30 @@ public class ExportPetServiceImpl extends BaseServiceImpl<ExportPet> implements 
             return exportPetRes;
         }).collect(Collectors.toList());
         return new PageImpl<>(exportPetResList, pageable, exportPets.getTotalElements());
+    }
+
+    @Override
+    public ExportPet getById(Long id) throws Exception {
+        ExportPet result = this.getRepository().findById(id).orElseThrow(
+                () -> new Exception(String.format("Dữ liệu có id %s không tồn tại!", id))
+        );
+        getAllFileWithName(result.getImages());
+        return result;
+    }
+
+    public List<ImageExportPet> getAllFileWithName(List<ImageExportPet> req) {
+        req.stream().forEach(e -> {
+            try {
+                String presignedObjectUrl = minioClient.getPresignedObjectUrl(
+                        GetPresignedObjectUrlArgs.builder().method(Method.GET).bucket(bucketName).object(e.getUrl()).build()
+                );
+                e.setUrl(presignedObjectUrl);
+            } catch (MinioException | IOException | NoSuchAlgorithmException | InvalidKeyException ex) {
+                System.err.println("Error occurred: " + ex);
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
+            }
+        });
+        return req;
     }
 }
