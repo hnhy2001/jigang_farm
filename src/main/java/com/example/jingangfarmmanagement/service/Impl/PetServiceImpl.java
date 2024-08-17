@@ -42,6 +42,8 @@ public class PetServiceImpl extends BaseServiceImpl<Pet> implements PetService {
     @Autowired
     private PetRepository petRepository;
     @Autowired
+    PetStatisticImpl petStatistic;
+    @Autowired
     private ChangeCageHistoryRepository changeCageHistoryRepository;
 
     @Autowired
@@ -111,6 +113,7 @@ public class PetServiceImpl extends BaseServiceImpl<Pet> implements PetService {
         } else {
             pet.setPetCondition(1);
         }
+        petStatistic.syncDateOfBirthWithPetIds(List.of(pet));
         pet.setName(generateName(pet.getSex()));
         return new BaseResponse(200, "Thêm mới vật nuôi thành công", petRepository.save(pet));
     }
@@ -127,6 +130,7 @@ public class PetServiceImpl extends BaseServiceImpl<Pet> implements PetService {
         pet.setUpdateHeathDate(DateUtil.getCurrenDateTime());
         pet.setLastDateUpdate(DateUtil.getCurrenDateTime());
         pet.setPregnantDateUpdate(DateUtil.getCurrenDateTime());
+        petStatistic.syncDateOfBirthWithPetIds(List.of(pet));
         pet.setPetCondition(1);
         if (pet.getUilness() == null || pet.getUilness().isBlank()) {
             pet.setStatus(2);

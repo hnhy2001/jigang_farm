@@ -14,10 +14,9 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
 import java.sql.Date;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.Period;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -27,7 +26,7 @@ public class PetStatisticImpl {
     PetRepository petRepository;
     @PersistenceContext
     private EntityManager entityManager;
-    public List<Object[]> filterPetCommon( Long endDate, List<Integer> sex, List<Integer> status, List<Long> cageId, List<Long> farmId, Integer age) {
+    public List<Object[]> filterPetCommon( Long endDate, List<Integer> sex, List<Integer> status, List<Long> cageId, List<Long> farmId,double fromAge,double toAge) {
         StringBuilder jpql = new StringBuilder("SELECT DATE(p.createDate) as createDate, p.name as name, COUNT(p) as count " +
                 "FROM Pet p " +
                 "JOIN p.cage c " +
@@ -46,6 +45,9 @@ public class PetStatisticImpl {
         if (farmId != null && !farmId.isEmpty()) {
             jpql.append("AND c.farm.id IN :farmId ");
         }
+        jpql.append("AND (TIMESTAMPDIFF(YEAR, STR_TO_DATE(p.birthNumber, '%Y%m%d%H%i%s'), CURRENT_DATE()) " +
+                "+ (TIMESTAMPDIFF(MONTH, STR_TO_DATE(p.birthNumber, '%Y%m%d%H%i%s'), CURRENT_DATE()) % 12) / 12.0 " +
+                "BETWEEN :fromAge AND :toAge) ");
         jpql.append("GROUP BY DATE(p.createDate), p.name " +
                 "ORDER BY DATE(p.createDate)");
 
@@ -65,38 +67,9 @@ public class PetStatisticImpl {
             query.setParameter("farmId", farmId);
         }
 
+        query.setParameter("fromAge", fromAge);
+        query.setParameter("toAge", toAge);
         List<Object[]> results = query.getResultList();
-
-        if (age != null) {
-            results = results.stream()
-                    .filter(result -> {
-                        LocalDate createDate = ((Date) result[0]).toLocalDate();
-                        String petName = (String) result[1];
-                        String yearStr = petName.substring(0, 2);
-                        String monthStr = petName.substring(2, 4);
-                        int birthYear = Integer.parseInt("20" + yearStr);
-                        int birthMonth = Integer.parseInt(monthStr);
-
-                        LocalDate birthDate = LocalDate.of(birthYear, birthMonth, 1);
-                        LocalDate currentDate = LocalDate.now();
-                        int ageInMonths = (int) Period.between(birthDate, currentDate).toTotalMonths();
-
-                        switch (age) {
-                            case 1:
-                                return ageInMonths <= 12;
-                            case 2:
-                                return ageInMonths > 12 && ageInMonths <= 24;
-                            case 3:
-                                return ageInMonths > 24 && ageInMonths <= 48;
-                            case 4:
-                                return ageInMonths > 48;
-                            default:
-                                return false;
-                        }
-                    })
-                    .collect(Collectors.toList());
-        }
-
         return results;
     }
 
@@ -175,10 +148,10 @@ public class PetStatisticImpl {
 //        return results;
 //    }
 
-    public PetStatisticDto petStatistic( Long endDate, List<Integer> sex, List<Integer> status, List<Long> cageId, List<Long> farmId, Integer age) {
-        List<Object[]> resultMales = filterPetCommon(endDate, List.of(1), status, cageId, farmId, age);
-        List<Object[]> resultFeMales = filterPetCommon(endDate, List.of(0), status, cageId, farmId, age);
-        List<Object[]> resultNaMales = filterPetCommon(endDate, List.of(2), status, cageId, farmId, age);
+    public PetStatisticDto petStatistic( Long endDate, List<Integer> sex, List<Integer> status, List<Long> cageId, List<Long> farmId, double fromAge,double toAge) {
+        List<Object[]> resultMales = filterPetCommon(endDate, List.of(1), status, cageId, farmId, fromAge,toAge);
+        List<Object[]> resultFeMales = filterPetCommon(endDate, List.of(0), status, cageId, farmId, fromAge,toAge);
+        List<Object[]> resultNaMales = filterPetCommon(endDate, List.of(2), status, cageId, farmId, fromAge,toAge);
 
         long totalCountMale = 0L;
         long totalCountFeMale = 0L;
@@ -327,7 +300,7 @@ public class PetStatisticImpl {
 //
 //    return new ArrayList<>(dailyStats.values());
 //}
-    public List<PetDeathStatisticDto> getPetDeathPerDay(Long startDate, Long endDate, List<Integer> sex, List<Integer> status, List<Long> cageId, List<Long> farmId, Integer age) {
+    public List<PetDeathStatisticDto> getPetDeathPerDay(Long startDate, Long endDate, List<Integer> sex, List<Integer> status, List<Long> cageId, List<Long> farmId, double fromAge,double toAge) {
         StringBuilder jpql = new StringBuilder("SELECT p.sex as sex, DATE(ep.exportDate) as exportDate, COUNT(p) as quantity " +
                 "FROM Pet p " +
                 "JOIN p.cage c " +
@@ -347,6 +320,11 @@ public class PetStatisticImpl {
         if (farmId != null && !farmId.isEmpty()) {
             jpql.append("AND c.farm.id IN :farmId ");
         }
+
+        jpql.append("AND (TIMESTAMPDIFF(YEAR, STR_TO_DATE(p.birthNumber, '%Y%m%d%H%i%s'), CURRENT_DATE()) " +
+                "+ (TIMESTAMPDIFF(MONTH, STR_TO_DATE(p.birthNumber, '%Y%m%d%H%i%s'), CURRENT_DATE()) % 12) / 12.0 " +
+                "BETWEEN :fromAge AND :toAge) ");
+
         jpql.append("GROUP BY p.sex, DATE(ep.exportDate) " +
                 "ORDER BY DATE(ep.exportDate), p.sex");
 
@@ -366,40 +344,23 @@ public class PetStatisticImpl {
         if (farmId != null && !farmId.isEmpty()) {
             query.setParameter("farmId", farmId);
         }
+        query.setParameter("fromAge", fromAge);
+        query.setParameter("toAge", toAge);
 
         List<Object[]> results = query.getResultList();
 
-        if (age != null) {
-            results = results.stream()
-                    .filter(result -> {
-                        LocalDate createDate = ((Date) result[1]).toLocalDate();
-                        // Assuming the name of the pet is in the result and parsing the birth date from it
-                        String petName = (String) result[0]; // Adjust this according to your actual data structure
-                        String yearStr = petName.substring(0, 2);
-                        String monthStr = petName.substring(2, 4);
-                        int birthYear = Integer.parseInt("20" + yearStr);
-                        int birthMonth = Integer.parseInt(monthStr);
-
-                        LocalDate birthDate = LocalDate.of(birthYear, birthMonth, 1);
-                        LocalDate currentDate = LocalDate.now();
-                        int ageInMonths = (int) Period.between(birthDate, currentDate).toTotalMonths();
-
-                        switch (age) {
-                            case 1:
-                                return ageInMonths <= 12;
-                            case 2:
-                                return ageInMonths > 12 && ageInMonths <= 24;
-                            case 3:
-                                return ageInMonths > 24 && ageInMonths <= 48;
-                            case 4:
-                                return ageInMonths > 48;
-                            default:
-                                return false;
-                        }
-                    })
-                    .collect(Collectors.toList());
-        }
-
+//        // Filter results by age range using calculateAge
+//        List<Object[]> filteredResults = results.stream()
+//                .filter(result -> {
+//                    Date birthDate = (Date) result[1]; ;
+//                    try {
+//                        double ageInYears = calculateAge(birthDate);
+//                        return ageInYears >= fromAge && ageInYears <= toAge ;
+//                    } catch (DateTimeParseException e) {
+//                        return false;
+//                    }
+//                })
+//                .collect(Collectors.toList());
         Map<LocalDate, PetDeathStatisticDto> dailyStats = new LinkedHashMap<>();
 
         for (Object[] result : results) {
@@ -422,7 +383,7 @@ public class PetStatisticImpl {
 
         return new ArrayList<>(dailyStats.values());
     }
-    public List<PetDeathStatisticDto> getPetBornPerDay(Long startDate, Long endDate, List<Integer> sex, List<Integer> status, List<Long> cageId, List<Long> farmId, Integer age) {
+    public List<PetDeathStatisticDto> getPetBornPerDay(Long startDate, Long endDate, List<Integer> sex, List<Integer> status, List<Long> cageId, List<Long> farmId, double fromAge, double toAge) {
         StringBuilder jpql = new StringBuilder("SELECT p.sex as sex, DATE(p.birthNumber) as birthNumber, COUNT(p) as quantity " +
                 "FROM Pet p " +
                 "JOIN p.cage c " +
@@ -441,7 +402,8 @@ public class PetStatisticImpl {
         if (farmId != null && !farmId.isEmpty()) {
             jpql.append("AND c.farm.id IN :farmId ");
         }
-        jpql.append("GROUP BY p.sex, DATE(p.birthNumber) " +
+        jpql.append("AND p.name LIKE :petNamePattern " +
+                "GROUP BY p.sex, DATE(p.birthNumber) " +
                 "ORDER BY DATE(p.birthNumber), p.sex");
 
         TypedQuery<Object[]> query = entityManager.createQuery(jpql.toString(), Object[].class);
@@ -460,43 +422,24 @@ public class PetStatisticImpl {
         if (farmId != null && !farmId.isEmpty()) {
             query.setParameter("farmId", farmId);
         }
-
+        query.setParameter("petNamePattern", "%CN%");
         List<Object[]> results = query.getResultList();
 
-        if (age != null) {
-            results = results.stream()
-                    .filter(result -> {
-                        LocalDate createDate = ((Date) result[1]).toLocalDate();
-                        // Assuming the name of the pet is in the result and parsing the birth date from it
-                        String petName = (String) result[0]; // Adjust this according to your actual data structure
-                        String yearStr = petName.substring(0, 2);
-                        String monthStr = petName.substring(2, 4);
-                        int birthYear = Integer.parseInt("20" + yearStr);
-                        int birthMonth = Integer.parseInt(monthStr);
-
-                        LocalDate birthDate = LocalDate.of(birthYear, birthMonth, 1);
-                        LocalDate currentDate = LocalDate.now();
-                        int ageInMonths = (int) Period.between(birthDate, currentDate).toTotalMonths();
-
-                        switch (age) {
-                            case 1:
-                                return ageInMonths <= 12;
-                            case 2:
-                                return ageInMonths > 12 && ageInMonths <= 24;
-                            case 3:
-                                return ageInMonths > 24 && ageInMonths <= 48;
-                            case 4:
-                                return ageInMonths > 48;
-                            default:
-                                return false;
-                        }
-                    })
-                    .collect(Collectors.toList());
-        }
-
+        // Filter results by age range using calculateAge
+        List<Object[]> filteredResults = results.stream()
+                .filter(result -> {
+                    Date birthDate = (Date) result[1]; ;
+                    try {
+                        double ageInYears = calculateAge(birthDate);
+                        return ageInYears >= fromAge && ageInYears <= toAge ;
+                    } catch (DateTimeParseException e) {
+                        return false;
+                    }
+                })
+                .collect(Collectors.toList());
         Map<LocalDate, PetDeathStatisticDto> dailyStats = new LinkedHashMap<>();
 
-        for (Object[] result : results) {
+        for (Object[] result : filteredResults) {
             int sexValue = (int) result[0];
             LocalDate date = ((Date) result[1]).toLocalDate();
             Long quantity = (Long) result[2];
@@ -523,7 +466,7 @@ public class PetStatisticImpl {
 
         // Cập nhật ngày sinh cho từng đối tượng Pet
         pets.forEach(pet -> {
-            Long dateOfBirth = calculateBirthDate(pet.getName())!=null ? Long.valueOf(calculateBirthDate(pet.getName())):0L;
+            Long dateOfBirth = calculateBirthDate(pet.getName())!=null ? Long.valueOf(calculateBirthDate(pet.getName())):-1;
             if (dateOfBirth != -1) {
                 pet.setBirthNumber(dateOfBirth);
             } else {
@@ -533,6 +476,21 @@ public class PetStatisticImpl {
 
         // Lưu tất cả các đối tượng Pet đã cập nhật
         petRepository.saveAll(pets);
+    }
+    @Transactional
+    public List<Pet> syncDateOfBirthWithPetIds( List<Pet> pets) {
+        // Lấy tất cả các đối tượng Pet từ cơ sở dữ liệu
+
+        // Cập nhật ngày sinh cho từng đối tượng Pet
+        pets.forEach(pet -> {
+            Long dateOfBirth = calculateBirthDate(pet.getName())!=null ? Long.valueOf(calculateBirthDate(pet.getName())):-1;
+            if (dateOfBirth != -1) {
+                pet.setBirthNumber(dateOfBirth);
+            } else {
+                pet.setBirthNumber(null); // Hoặc không thực hiện gì nếu không hợp lệ
+            }
+        });
+        return pets;
     }
 
 
@@ -605,7 +563,7 @@ public class PetStatisticImpl {
 
         int day;
         try {
-            day = Integer.parseInt(dayStr);
+            day = 01;
         } catch (NumberFormatException e) {
             return null;
         }
@@ -632,5 +590,26 @@ public class PetStatisticImpl {
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
         return dateTime.format(formatter);
+    }
+
+
+    public double calculateAge(Date birthDate) throws DateTimeParseException {
+        if (birthDate == null) {
+            return 0.0;
+        }
+
+        // Convert Date to LocalDate
+        LocalDate birthLocalDate = birthDate.toLocalDate();
+
+
+        // Get the current date
+        LocalDate currentDate = LocalDate.now();
+
+        // Calculate the period between birthDate and currentDate
+        Period period = Period.between(birthLocalDate, currentDate);
+
+        // Convert age to decimal (years + months/12)
+        double age = period.getYears() + period.getMonths() / 12.0;
+        return age;
     }
 }

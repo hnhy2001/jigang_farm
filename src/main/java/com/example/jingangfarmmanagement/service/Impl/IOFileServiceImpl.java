@@ -47,6 +47,8 @@ public class IOFileServiceImpl implements IOFileService {
     @Autowired
     MaterialsRepository materialsRepository;
     @Autowired
+    PetStatisticImpl petStatistic;
+    @Autowired
     private EntityManager entityManager;
     @Autowired
     private PetService petService;
@@ -160,6 +162,7 @@ public class IOFileServiceImpl implements IOFileService {
                     // Batch processing: save every batchSize pets
                     if ((i + 1) % batchSize == 0 || i == petFileImportDtos.size() - 1) {
                         petRepository.saveAll(pets);
+                        petStatistic.syncDateOfBirthWithPetIds(pets);
                         farms.clear();
                         cages.clear();
                         pets.clear();

@@ -34,8 +34,11 @@ public class PetStatisticController  {
                                         @RequestParam(required = false) List<Integer> status,
                                         @RequestParam(required = false) List<Long> cageId,
                                         @RequestParam(required = false) List<Long> farmId,
-                                        @RequestParam(required = false) Integer age) {  // Change int to Integer
-        return petStatisticService.petStatistic( endDate, sex, status, cageId, farmId, age);
+                                        @RequestParam(required = false) Double fromAge,
+                                        @RequestParam(required = false) Double toAge){
+        double fromAgeValue = (fromAge != null) ? fromAge : 0.0;
+        double toAgeValue = (toAge != null) ? toAge : Double.MAX_VALUE;
+        return petStatisticService.petStatistic( endDate, sex, status, cageId, farmId, fromAgeValue,toAgeValue);
     }
 
     @GetMapping("/total/death")
@@ -45,18 +48,29 @@ public class PetStatisticController  {
                                                         @RequestParam(required = false)  List<Integer> status,
                                                         @RequestParam(required = false) List<Long> cageId,
                                                         @RequestParam(required = false) List<Long> farmId,
-                                                        @RequestParam(required = false) Integer age) {
-        return petStatisticService.getPetDeathPerDay(startDate,endDate,sex,status,cageId,farmId,age);
+                                                        @RequestParam(required = false) Double fromAge,
+                                                        @RequestParam(required = false) Double toAge) {
+        // Set default values if parameters are not provided
+        double fromAgeValue = (fromAge != null) ? fromAge : 0.0;
+        double toAgeValue = (toAge != null) ? toAge : Double.MAX_VALUE;
+        return petStatisticService.getPetDeathPerDay(startDate,endDate,sex,status,cageId,farmId,fromAgeValue,toAgeValue);
     }
     @GetMapping("/total/born")
-    public List<PetDeathStatisticDto> petStatisticBorn(@RequestParam(required = false) Long startDate,
-                                                        @RequestParam(required = false) Long endDate,
-                                                        @RequestParam(required = false) List<Integer> sex,
-                                                        @RequestParam(required = false)  List<Integer> status,
-                                                        @RequestParam(required = false) List<Long> cageId,
-                                                        @RequestParam(required = false) List<Long> farmId,
-                                                        @RequestParam(required = false) Integer age) {
-        return petStatisticService.getPetBornPerDay(startDate,endDate,sex,status,cageId,farmId,age);
+    public List<PetDeathStatisticDto> petStatisticBorn(
+            @RequestParam(required = false) Long startDate,
+            @RequestParam(required = false) Long endDate,
+            @RequestParam(required = false) List<Integer> sex,
+            @RequestParam(required = false) List<Integer> status,
+            @RequestParam(required = false) List<Long> cageId,
+            @RequestParam(required = false) List<Long> farmId,
+            @RequestParam(required = false) Double fromAge,
+            @RequestParam(required = false) Double toAge) {
+
+        // Set default values if parameters are not provided
+        double fromAgeValue = (fromAge != null) ? fromAge : 0.0;
+        double toAgeValue = (toAge != null) ? toAge : Double.MAX_VALUE;
+
+        return petStatisticService.getPetBornPerDay(startDate, endDate, sex, status, cageId, farmId, fromAgeValue, toAgeValue);
     }
     @GetMapping("/sync")
     public void syncDateOfBirth() {
