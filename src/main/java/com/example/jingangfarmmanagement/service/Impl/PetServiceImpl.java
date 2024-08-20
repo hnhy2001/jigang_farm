@@ -114,7 +114,7 @@ public class PetServiceImpl extends BaseServiceImpl<Pet> implements PetService {
             pet.setPetCondition(1);
         }
         petStatistic.syncDateOfBirthWithPetIds(List.of(pet));
-        pet.setName(generateName(pet.getSex()));
+        pet.setName(pet.getName());
         return new BaseResponse(200, "Thêm mới vật nuôi thành công", petRepository.save(pet));
     }
 
