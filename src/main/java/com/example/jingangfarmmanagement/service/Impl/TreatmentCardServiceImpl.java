@@ -56,20 +56,24 @@ public class TreatmentCardServiceImpl extends BaseServiceImpl<TreatmentCard> imp
             treatmentCard.setResultTypeCardDate(req.getResultTypeCard()==1 || req.getResultTypeCard()==2 ? DateUtil.getCurrenDateTime(): 0);
             treatmentCard.setStatus(1);
             treatmentCard.setCreateDate(req.getCreateDate());
-            List<Uilness> uilnesses = new ArrayList<>();
-            for(var uilnessReq : req.getUlinessName()){
-                if (uilnessRepository.findByName(uilnessReq)!=null) {
-                    Uilness existUilness = uilnessRepository.findByName(uilnessReq);
-                    uilnesses.add(existUilness);           }
-                else{
-                    Uilness uilness =new Uilness();
-                    uilness.setName(uilnessReq);
-                    uilness.setScore(1);
-                    uilness.setStatus(1);
-                    uilnessRepository.save(uilness);
-                    uilnesses.add(uilness);
-                }}
-            treatmentCard.setUilnesses(uilnesses);
+            if(req.getResultTypeCard()==2){
+                treatmentCard.setUilnesses(new ArrayList<>());
+            }else{
+                List<Uilness> uilnesses = new ArrayList<>();
+                for(var uilnessReq : req.getUlinessName()){
+                    if (uilnessRepository.findByName(uilnessReq)!=null) {
+                        Uilness existUilness = uilnessRepository.findByName(uilnessReq);
+                        uilnesses.add(existUilness);           }
+                    else{
+                        Uilness uilness =new Uilness();
+                        uilness.setName(uilnessReq);
+                        uilness.setScore(1);
+                        uilness.setStatus(1);
+                        uilnessRepository.save(uilness);
+                        uilnesses.add(uilness);
+                    }}
+                treatmentCard.setUilnesses(uilnesses);
+            }
             List<Pet> pets = new ArrayList<>();
             for (var petId : req.getPetIds()) {
                 Pet pet = petRepository.findById(petId).orElseThrow();
@@ -97,20 +101,25 @@ public class TreatmentCardServiceImpl extends BaseServiceImpl<TreatmentCard> imp
         treatmentCard.setCreateDate(req.getCreateDate());
         List<Uilness> existingUilnesses = treatmentCard.getUilnesses();
         existingUilnesses.clear();
-        List<Uilness> uilnesses = new ArrayList<>();
-        for(var uilnessReq : req.getUlinessName()){
-            if (uilnessRepository.findByName(uilnessReq)!=null) {
-                Uilness existUilness = uilnessRepository.findByName(uilnessReq);
-                uilnesses.add(existUilness);           }
-            else{
-                Uilness uilness =new Uilness();
-                uilness.setName(uilnessReq);
-                uilness.setScore(1);
-                uilness.setStatus(1);
-                uilnessRepository.save(uilness);
-                uilnesses.add(uilness);
-            }}
-        treatmentCard.setUilnesses(uilnesses);
+        if(req.getResultTypeCard()==2) {
+            treatmentCard.setUilnesses(new ArrayList<>());
+        }else{
+            List<Uilness> uilnesses = new ArrayList<>();
+            for(var uilnessReq : req.getUlinessName()){
+                if (uilnessRepository.findByName(uilnessReq)!=null) {
+                    Uilness existUilness = uilnessRepository.findByName(uilnessReq);
+                    uilnesses.add(existUilness);           }
+                else{
+                    Uilness uilness =new Uilness();
+                    uilness.setName(uilnessReq);
+                    uilness.setScore(1);
+                    uilness.setStatus(1);
+                    uilnessRepository.save(uilness);
+                    uilnesses.add(uilness);
+                }}
+            treatmentCard.setUilnesses(uilnesses);
+        }
+
         List<Pet> existingPets = treatmentCard.getPets();
         existingPets.clear();
         for (var petId : req.getPetIds()) {
