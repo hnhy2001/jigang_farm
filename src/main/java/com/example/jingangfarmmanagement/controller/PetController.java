@@ -71,5 +71,10 @@ public class PetController extends BaseController<Pet> {
     public BaseResponse statisticQuantityUninessType(@RequestBody StatisticQuantityUnilessReq req){
         return  petService.statisticQuantityUnilnessType(req);
     }
+    @PostMapping("/get-all")
+    public BaseResponse findAllPet(){
+        return  petService.findAllPet();
+    }
+
 
 }

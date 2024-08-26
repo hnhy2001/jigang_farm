@@ -190,6 +190,10 @@ public class PetServiceImpl extends BaseServiceImpl<Pet> implements PetService {
     public Pet getWomenPetByNumbersOfMonth(String month) {
         return petRepository.findWomenPetByNunbersOfMonth(month);
     }
+    @Override
+    public BaseResponse findAllPet() {
+        return new BaseResponse(200, "Lấy vật nuôi thành công",  petRepository.findAll());
+    }
 
 
     @Override

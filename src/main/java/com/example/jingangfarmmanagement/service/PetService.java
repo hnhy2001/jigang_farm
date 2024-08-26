@@ -30,5 +30,6 @@ public interface PetService extends BaseService<Pet> {
     public Pet getWomenPetByNumbersOfMonth(String month);
     public BaseResponse statisticQuantityUnilness(StatisticQuantityUnilessReq req);
     public BaseResponse statisticQuantityUnilnessType(StatisticQuantityUnilessReq req);
+    public BaseResponse findAllPet();
 
 }
