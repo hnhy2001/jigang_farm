@@ -22,6 +22,7 @@ public class LogServiceImpl extends BaseServiceImpl<Log> implements LogService {
 
     public void logAction(ELogType type, String logMessage, String result) {
         Log logEntry = new Log();
+        logEntry.setStatus(1);
         logEntry.setType(type);
         logEntry.setLog(logMessage);
         logEntry.setFileName(null);
