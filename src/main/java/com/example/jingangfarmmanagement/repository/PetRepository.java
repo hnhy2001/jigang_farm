@@ -20,17 +20,20 @@ public interface PetRepository extends BaseRepository<Pet>, JpaSpecificationExec
             "join Farm f on c.farm.id = f.id " +
             "where p.name=:name " +
             "AND c.name=:cageName " +
-            "AND f.name=:farmName ")
+            "AND f.name=:farmName " +
+            "AND p.status !=-1 ")
     Pet findByCageAndFarmAndName( String name,String cageName, String farmName);
     @Query("select p from Pet p join p.cage c join c.farm f " +
             "where (:cageId is null or c.id = (:cageId )) " +
+            "AND p.status !=-1 " +
             "and (:startDate is null or p.createDate >= :startDate ) " +
             "and (:endDate is null or p.createDate <= :endDate )")
     List<Pet> findByCageId(Long cageId, Long startDate, Long endDate);
     @Query("select p from Pet p join p.cage c join c.farm f " +
             "where f.id = :farmId " +
             "and (:startDate is null or p.createDate >= :startDate) " +
-            "and (:endDate is null or p.createDate <= :endDate)")
+            "and (:endDate is null or p.createDate <= :endDate)" +
+            "AND p.status !=-1 ")
     List<Pet> findByFarmId(  Long farmId, Long startDate, Long endDate);
 
     @Query(value = "SELECT * FROM pet " +

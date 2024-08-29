@@ -4,6 +4,7 @@ import com.example.jingangfarmmanagement.model.BaseResponse;
 import com.example.jingangfarmmanagement.model.req.TreatmentCardReq;
 import com.example.jingangfarmmanagement.repository.*;
 import com.example.jingangfarmmanagement.repository.entity.*;
+import com.example.jingangfarmmanagement.repository.entity.Enum.ELogType;
 import com.example.jingangfarmmanagement.service.TreatmentCardService;
 import com.example.jingangfarmmanagement.uitl.Constant;
 import com.example.jingangfarmmanagement.uitl.DateUtil;
@@ -41,6 +42,8 @@ public class TreatmentCardServiceImpl extends BaseServiceImpl<TreatmentCard> imp
 
     @Value("${minio.bucket-name}")
     private String bucketName;
+    @Autowired
+    private LogServiceImpl logService;
 
     @Override
     protected BaseRepository<TreatmentCard> getRepository() {
@@ -81,6 +84,11 @@ public class TreatmentCardServiceImpl extends BaseServiceImpl<TreatmentCard> imp
             }
             treatmentCard.setPets(pets);
             treatmentCardRepository.save(treatmentCard);
+
+//            logService.logAction(ELogType.UPDATE_PET,
+//                    "Tạo phiếu điều trị con vật " + savedPet.getName() + " chuồng "+ savedPet.getCage().getName() + " trại " + savedPet.getCage().getFarm().getName() + " thành công: Dữ liệu thay đổi"+changeLog,
+//                    "success");
+
             return new BaseResponse(200, "OK", treatmentCard);
         } catch (Exception e) {
             return new BaseResponse(500, "Internal Server Error", null);

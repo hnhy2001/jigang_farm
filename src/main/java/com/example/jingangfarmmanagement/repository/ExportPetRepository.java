@@ -32,27 +32,27 @@ public interface ExportPetRepository extends BaseRepository<ExportPet> {
     @Query(value = "select ep from ExportPet ep " +
             "join Pet p on ep.petId = p.id " +
             "join Cage c on p.cage.id = c.id " +
-            "where (:cageId is null or c.id = :cageId)" +
-            "and (:name is null or p.name like %:name%) " +
-            "and (:code is null or p.code like %:code%) " +
+            "where (:cageId is null or c.id = :cageId) " +
+            "and (:name is null or p.name like concat('%', :name, '%')) " +
+            "and (:code is null or p.code like concat('%', :code, '%')) " +
             "and (:sex is null or p.sex = :sex) " +
             "and (:age is null or p.age = :age) " +
             "and (:type is null or ep.type = :type) " +
             "and (:startExportDate is null or ep.exportDate >= :startExportDate) " +
             "and (:endExportDate is null or ep.exportDate <= :endExportDate) " +
-            "and (:note is null or ep.note like %:note%)",
+            "and (:note is null or ep.note like concat('%', :note, '%'))",
             countQuery = "select count(ep) from ExportPet ep " +
                     "join Pet p on ep.petId = p.id " +
                     "join Cage c on p.cage.id = c.id " +
-                    "where (:cageId is null or c.id = :cageId)" +
-                    "and (:name is null or p.name like %:name%) " +
-                    "and (:code is null or p.code like %:code%) " +
+                    "where (:cageId is null or c.id = :cageId) " +
+                    "and (:name is null or p.name like concat('%', :name, '%')) " +
+                    "and (:code is null or p.code like concat('%', :code, '%')) " +
                     "and (:sex is null or p.sex = :sex) " +
                     "and (:age is null or p.age = :age) " +
                     "and (:type is null or ep.type = :type) " +
                     "and (:startExportDate is null or ep.exportDate >= :startExportDate) " +
                     "and (:endExportDate is null or ep.exportDate <= :endExportDate) " +
-                    "and (:note is null or ep.note like %:note%)")
+                    "and (:note is null or ep.note like concat('%', :note, '%'))")
     Page<ExportPet> searchExportPet(
             @Param("cageId") Long cageId,
             @Param("name") String name,
@@ -65,4 +65,5 @@ public interface ExportPetRepository extends BaseRepository<ExportPet> {
             @Param("note") String note,
             Pageable pageable
     );
+
 }

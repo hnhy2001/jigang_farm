@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+    <Appenders>
+        <!-- JDBC Appender for logging into the database -->
+        <JDBC name="databaseAppender" tableName="log">
+            <DataSource>
+                <DriverClassName>com.mysql.cj.jdbc.Driver</DriverClassName>
+                <ConnectionURL>jdbc:mysql://103.75.184.157:3306/jingang_farm_management</ConnectionURL>
+                <UserName>login01</UserName>
+                <Password>lAdI@0509!@#</Password>
+            </DataSource>
+
+            <!-- Columns configuration -->
+            <Column name="time_log" isEventTimestamp="true"/>
+            <Column name="type" pattern="%level"/>
+            <Column name="log" pattern="%message"/>
+            <Column name="file_name" pattern="%logger"/>
+            <Column name="result" pattern="%ex{full}"/>
+        </JDBC>
+
+        <!-- Console Appender (optional for debugging) -->
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} %-5p %c{1}:%L - %m%n"/>
+        </Console>
+    </Appenders>
+
+    <Loggers>
+        <!-- Root Logger -->
+        <Root level="info">
+            <AppenderRef ref="databaseAppender"/>
+            <AppenderRef ref="Console"/>
+        </Root>
+    </Loggers>
+</Configuration>
