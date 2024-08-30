@@ -28,4 +28,7 @@ public class PetFileImportDto {
     private String parentDad;
     @ExcelProperty(value="Mẹ")
     private String parentMom;
+    @ExcelProperty(value="Ghi chú")
+    private String note;
+
 }

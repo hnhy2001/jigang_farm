@@ -409,8 +409,9 @@ public class IOFileServiceImpl implements IOFileService {
                 .map(name -> name)
                 .collect(Collectors.joining(","));
         pet.setUilness(result);
-        pet.setParentDad(dto.getParentDad());
-        pet.setParentMon(dto.getParentMom());
+        pet.setParentDad(dto.getParentDad()!=null ? dto.getParentDad(): null);
+        pet.setParentMon(dto.getParentMom()!=null ? dto.getParentMom(): null);
+        pet.setNote(dto.getNote()!=null ? dto.getNote(): null);
         pet.setUpdateHeathDate(DateUtil.getCurrenDateTime());
         pet.setPetCondition(dto.getUilness() != null ? 2 : 1);
         if(dto.getStatus()==null){
@@ -449,8 +450,9 @@ public class IOFileServiceImpl implements IOFileService {
                 .map(name -> name)
                 .collect(Collectors.joining(","));
         pet.setUilness(result);
-        pet.setParentDad(dto.getParentDad());
-        pet.setParentMon(dto.getParentMom());
+        pet.setParentDad(dto.getParentDad()!=null ? dto.getParentDad(): null);
+        pet.setParentMon(dto.getParentMom()!=null ? dto.getParentMom(): null);
+        pet.setNote(dto.getNote()!=null ? dto.getNote(): null);
         pet.setCreateDate(com.example.jingangfarmmanagement.uitl.DateUtil.getCurrenDateTime());
         pet.setPetCondition(dto.getUilness() != null ? 2 : 1);
         if(dto.getStatus()==null){

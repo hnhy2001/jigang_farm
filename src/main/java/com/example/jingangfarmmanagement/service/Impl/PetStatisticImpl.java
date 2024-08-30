@@ -466,7 +466,7 @@ public class PetStatisticImpl {
 
         // Cập nhật ngày sinh cho từng đối tượng Pet
         pets.forEach(pet -> {
-            Long dateOfBirth = calculateBirthDate(pet.getName())!=null ? Long.valueOf(calculateBirthDate(pet.getName())):-1;
+            Long dateOfBirth = calculateBirthDate(pet.getName(), pet.getCreateDate())!=null ? Long.valueOf(calculateBirthDate(pet.getName(),pet.getCreateDate())):-1;
             if (dateOfBirth != -1) {
                 pet.setBirthNumber(dateOfBirth);
             } else {
@@ -483,7 +483,7 @@ public class PetStatisticImpl {
 
         // Cập nhật ngày sinh cho từng đối tượng Pet
         pets.forEach(pet -> {
-            Long dateOfBirth = calculateBirthDate(pet.getName())!=null ? Long.valueOf(calculateBirthDate(pet.getName())):-1;
+            Long dateOfBirth = calculateBirthDate(pet.getName(),pet.getCreateDate())!=null ? Long.valueOf(calculateBirthDate(pet.getName(),pet.getCreateDate())):-1;
             if (dateOfBirth != -1) {
                 pet.setBirthNumber(dateOfBirth);
             } else {
@@ -494,14 +494,14 @@ public class PetStatisticImpl {
     }
 
 
-    public  String calculateBirthDate(String dateStr) {
+    public  String calculateBirthDate(String dateStr,Long createDate) {
         // Xử lý định dạng yymmxxx
         if (dateStr != null && dateStr.matches("\\d{6}\\d{1,3}")) {
-            return formatDate(calculateDateFromYymmxxx(dateStr));
+            return formatDate(calculateDateFromYymmxxx(dateStr,createDate));
         }
 
         if (dateStr != null && dateStr.matches("\\d{2}\\d{2}-.*")) {
-            LocalDateTime date = calculateDateFromYymXxxCnx(dateStr);
+            LocalDateTime date = calculateDateFromYymXxxCnx(dateStr,createDate);
             return formatDate(date);
         }
 
@@ -514,7 +514,7 @@ public class PetStatisticImpl {
      * @param yymmxxx Chuỗi định dạng yymmxxx (ví dụ: "0803058").
      * @return Đối tượng LocalDateTime đại diện cho ngày sinh hoặc null nếu ngày sinh không hợp lệ.
      */
-    private static LocalDateTime calculateDateFromYymmxxx(String yymmxxx) {
+    private static LocalDateTime calculateDateFromYymmxxx(String yymmxxx,Long createDate) {
         if (yymmxxx.length() != 7) {
             return null;
         }
@@ -528,8 +528,8 @@ public class PetStatisticImpl {
 
             yyyy = "20" + yy;
 
-
-        int day=01;
+        String createDateStr = createDate.toString();
+        int day=Integer.parseInt(createDateStr.substring(6, 8));
 
         LocalDate birthDate;
         try {
@@ -546,7 +546,7 @@ public class PetStatisticImpl {
      * @param yymmXxxCnx Chuỗi định dạng yym-x-xx-cnx (ví dụ: "080-5-15-CN6").
      * @return Đối tượng LocalDateTime đại diện cho ngày sinh hoặc null nếu ngày sinh không hợp lệ.
      */
-    private static LocalDateTime calculateDateFromYymXxxCnx(String yymmXxxCnx) {
+    private static LocalDateTime calculateDateFromYymXxxCnx(String yymmXxxCnx,Long createDate) {
         String[] parts = yymmXxxCnx.split("-");
         if (parts.length < 3) {
             return null;
@@ -563,7 +563,8 @@ public class PetStatisticImpl {
 
         int day;
         try {
-            day = 01;
+            String createDateStr = createDate.toString();
+            day = Integer.parseInt(createDateStr.substring(6, 8));
         } catch (NumberFormatException e) {
             return null;
         }
