@@ -27,6 +27,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class TreatmentCardServiceImpl extends BaseServiceImpl<TreatmentCard> implements TreatmentCardService {
@@ -51,6 +52,7 @@ public class TreatmentCardServiceImpl extends BaseServiceImpl<TreatmentCard> imp
     }
     @Override
     public BaseResponse createTreatment(TreatmentCardReq req) {
+        List<String> petInfos =new ArrayList<>();
         try {
             TreatmentCard treatmentCard = new TreatmentCard();
             treatmentCard.setCode(req.getCode());
@@ -84,60 +86,82 @@ public class TreatmentCardServiceImpl extends BaseServiceImpl<TreatmentCard> imp
             }
             treatmentCard.setPets(pets);
             treatmentCardRepository.save(treatmentCard);
+             petInfos = pets.stream().map(pet-> {
+                return pet.getName()+ " "+ pet.getCage().getName()+ " "+ pet.getCage().getFarm().getName();
+            }).collect(Collectors.toList());
 
-//            logService.logAction(ELogType.UPDATE_PET,
-//                    "Tạo phiếu điều trị con vật " + savedPet.getName() + " chuồng "+ savedPet.getCage().getName() + " trại " + savedPet.getCage().getFarm().getName() + " thành công: Dữ liệu thay đổi"+changeLog,
-//                    "success");
+            logService.logAction(ELogType.CREATE_TREATMENT_CARD,
+                    "Tạo phiếu điều trị con vật " + petInfos + " thành công \n",
+                    "success");
 
             return new BaseResponse(200, "OK", treatmentCard);
         } catch (Exception e) {
+            logService.logAction(ELogType.CREATE_TREATMENT_CARD,
+                    "Tạo phiếu điều trị con vật " + petInfos + " thất bai \n" + e.getMessage(),
+                    "fail");
             return new BaseResponse(500, "Internal Server Error", null);
         }
     }
     @Override
     @Transactional
     public BaseResponse updateTreatment(Long treatmentCardId, TreatmentCardReq req) {
-        TreatmentCard treatmentCard = treatmentCardRepository.findById(treatmentCardId)
-                .orElseThrow(() -> new EntityNotFoundException("Treatment card not found"));
+        List<String> petInfos = new ArrayList<>();
+        try {
+            TreatmentCard treatmentCard = treatmentCardRepository.findById(treatmentCardId)
+                    .orElseThrow(() -> new EntityNotFoundException("Treatment card not found"));
 
-        // Update the properties
-        treatmentCard.setCode(req.getCode());
-        treatmentCard.setNote(req.getNote());
-        treatmentCard.setStatus(1);
-        treatmentCard.setResultTypeCard(req.getResultTypeCard());
-        treatmentCard.setResultTypeCardDate(req.getResultTypeCard()==1 || req.getResultTypeCard()==2 ? DateUtil.getCurrenDateTime(): 0);
-        treatmentCard.setCreateDate(req.getCreateDate());
-        List<Uilness> existingUilnesses = treatmentCard.getUilnesses();
-        existingUilnesses.clear();
-        if(req.getResultTypeCard()==2) {
-            treatmentCard.setUilnesses(new ArrayList<>());
-        }else{
-            List<Uilness> uilnesses = new ArrayList<>();
-            for(var uilnessReq : req.getUlinessName()){
-                if (uilnessRepository.findByName(uilnessReq)!=null) {
-                    Uilness existUilness = uilnessRepository.findByName(uilnessReq);
-                    uilnesses.add(existUilness);           }
-                else{
-                    Uilness uilness =new Uilness();
-                    uilness.setName(uilnessReq);
-                    uilness.setScore(1);
-                    uilness.setStatus(1);
-                    uilnessRepository.save(uilness);
-                    uilnesses.add(uilness);
-                }}
-            treatmentCard.setUilnesses(uilnesses);
-        }
+            // Update the properties
+            treatmentCard.setCode(req.getCode());
+            treatmentCard.setNote(req.getNote());
+            treatmentCard.setStatus(1);
+            treatmentCard.setResultTypeCard(req.getResultTypeCard());
+            treatmentCard.setResultTypeCardDate(req.getResultTypeCard() == 1 || req.getResultTypeCard() == 2 ? DateUtil.getCurrenDateTime() : 0);
+            treatmentCard.setCreateDate(req.getCreateDate());
+            List<Uilness> existingUilnesses = treatmentCard.getUilnesses();
+            existingUilnesses.clear();
+            if (req.getResultTypeCard() == 2) {
+                treatmentCard.setUilnesses(new ArrayList<>());
+            } else {
+                List<Uilness> uilnesses = new ArrayList<>();
+                for (var uilnessReq : req.getUlinessName()) {
+                    if (uilnessRepository.findByName(uilnessReq) != null) {
+                        Uilness existUilness = uilnessRepository.findByName(uilnessReq);
+                        uilnesses.add(existUilness);
+                    } else {
+                        Uilness uilness = new Uilness();
+                        uilness.setName(uilnessReq);
+                        uilness.setScore(1);
+                        uilness.setStatus(1);
+                        uilnessRepository.save(uilness);
+                        uilnesses.add(uilness);
+                    }
+                }
+                treatmentCard.setUilnesses(uilnesses);
+            }
 
-        List<Pet> existingPets = treatmentCard.getPets();
-        existingPets.clear();
-        for (var petId : req.getPetIds()) {
-            Pet pet = petRepository.findById(petId)
-                    .orElseThrow(() -> new EntityNotFoundException(Constant.PET_NOT_FOUND));
-            existingPets.add(pet);
+            List<Pet> existingPets = treatmentCard.getPets();
+            existingPets.clear();
+            for (var petId : req.getPetIds()) {
+                Pet pet = petRepository.findById(petId)
+                        .orElseThrow(() -> new EntityNotFoundException(Constant.PET_NOT_FOUND));
+                existingPets.add(pet);
+            }
+            treatmentCard.setPets(existingPets);
+            treatmentCardRepository.save(treatmentCard);
+            petInfos = existingPets.stream().map(pet-> {
+                return pet.getName()+ " "+ pet.getCage().getName()+ " "+ pet.getCage().getFarm().getName();
+            }).collect(Collectors.toList());
+
+            logService.logAction(ELogType.UPDATE_TREATMENT_CARD,
+                    "Cập nhật phiếu điều trị con vật " + petInfos + " thành công \n",
+                    "success");
+            return new BaseResponse(200, "OK", treatmentCard);
+        }catch (Exception e) {
+            logService.logAction(ELogType.UPDATE_TREATMENT_CARD,
+                    "Cập nhật phiếu điều trị con vật " + petInfos + " thất bai \n" + e.getMessage(),
+                    "fail");
+            return new BaseResponse(500, "Internal Server Error", null);
         }
-        treatmentCard.setPets(existingPets);
-        treatmentCardRepository.save(treatmentCard);
-        return new BaseResponse(200, "OK", treatmentCard);
     }
     @Override
     public Page<TreatmentCard> findTreatmentHistoriesByPet(List<Long> petIds, int page, int size) {

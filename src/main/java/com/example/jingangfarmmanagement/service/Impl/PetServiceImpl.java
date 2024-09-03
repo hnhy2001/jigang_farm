@@ -146,11 +146,11 @@ public class PetServiceImpl extends BaseServiceImpl<Pet> implements PetService {
             pet.setName(pet.getName());
             Pet savedPet = petRepository.save(pet);
             logger.info("Pet saved successfully with name: {}", savedPet.getName());
-            logService.logAction(ELogType.CREATE_PET,"Thêm thông tin con vật "+ savedPet.getName()+ " chuồng "+ savedPet.getCage().getName()+" trại "+savedPet.getCage().getFarm().getName()+" thành công ","success" );
+            logService.logAction(ELogType.CREATE_PET,"Thêm thông tin con vật "+ savedPet.getName()+ " chuồng "+ savedPet.getCage().getName()+" trại "+savedPet.getCage().getFarm().getName()+" thành công \n","success" );
             return new BaseResponse(200, "Thêm mới vật nuôi thành công", savedPet);
         } catch (Exception e) {
             logger.error("Error occurred while creating pet: {}", e.getMessage(), e);
-            logService.logAction(ELogType.CREATE_PET,"Thêm thông tin con vật "+ pet.getName()+ " chuồng "+ pet.getCage().getName()+" trại "+pet.getCage().getFarm().getName()+" thất bại "+ e.getMessage(),"fail" );
+            logService.logAction(ELogType.CREATE_PET,"Thêm thông tin con vật "+ pet.getName()+ " chuồng "+ pet.getCage().getName()+" trại "+pet.getCage().getFarm().getName()+" thất bại \n"+ e.getMessage(),"fail" );
             return new BaseResponse(500, "Có lỗi xảy ra khi thêm mới vật nuôi", null);
         }
     }
