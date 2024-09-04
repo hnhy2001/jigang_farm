@@ -12,10 +12,13 @@ import com.example.jingangfarmmanagement.repository.entity.*;
 import com.example.jingangfarmmanagement.model.BaseResponse;
 import com.example.jingangfarmmanagement.model.LoginResponse;
 import com.example.jingangfarmmanagement.repository.*;
+import com.example.jingangfarmmanagement.repository.entity.Enum.ELogType;
 import com.example.jingangfarmmanagement.service.*;
 import com.example.jingangfarmmanagement.uitl.DateUtil;
 import cz.jirutka.rsql.parser.RSQLParser;
 import cz.jirutka.rsql.parser.ast.Node;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -38,6 +41,7 @@ import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl extends BaseServiceImpl<User> implements UserService {
+    private static final Logger logger = LogManager.getLogger(UserService.class);
     private static final String DELETED_FILTER =";status>-1" ;
     @Autowired
     private UserRepository userRepository;
@@ -53,6 +57,8 @@ public class UserServiceImpl extends BaseServiceImpl<User> implements UserServic
 
     @Autowired
     private UserRoleService userRoleService;
+    @Autowired
+    private LogServiceImpl logService;
 
     @Autowired
     private ModelMapper modelMapper;
@@ -120,60 +126,84 @@ public class UserServiceImpl extends BaseServiceImpl<User> implements UserServic
     }
     @Override
     public BaseResponse customCreate(User user) throws Exception {
-        if (user.getUserName() == null){
-            return new BaseResponse().fail("Tài khoản không được để trống");
-        }
-        if (user.getPassword() == null){
-            return new BaseResponse().fail("Mật khẩu không được để trống");
-        }
+        User result = new User();
+        try {
+            if (user.getUserName() == null) {
+                return new BaseResponse().fail("Tài khoản không được để trống");
+            }
+            if (user.getPassword() == null) {
+                return new BaseResponse().fail("Mật khẩu không được để trống");
+            }
 
-        if (userRepository.findByUserName(user.getUserName()).isPresent()){
-            return new BaseResponse().fail("Tài khoản đã tồn tại");
+            if (userRepository.findByUserName(user.getUserName()).isPresent()) {
+                return new BaseResponse().fail("Tài khoản đã tồn tại");
+            }
+            user.setCreateDate(DateUtil.getCurrenDateTime());
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
+            List<UserRole> userRoles = new ArrayList<>();
+            result = super.create(user);
+            User finalResult = result;
+            result.getRole().forEach(e -> {
+                UserRole userRole = new UserRole();
+                userRole.setUser(finalResult);
+                userRole.setRole(e);
+                userRoles.add(userRole);
+            });
+            userRoleRepository.saveAll(userRoles);
+            logService.logAction(ELogType.CREATE_USER,
+                    "Tạo thông tin tài khoản " + result.getUserName() + " thành công" ,
+                    "success");
+            return new BaseResponse().success(result);
+        }catch (Exception e){
+            logger.error("Error occurred while create account: {}", e.getMessage(), e);
+            logService.logAction(ELogType.CREATE_USER,
+                    "Tạo thông tin tài khoản  " + result.getUserName() + " thất bại" + e.getMessage(),
+                    "fail");
+            return new BaseResponse(500, "Có lỗi xảy ra khi tạo tài khoản", null);
         }
-        user.setCreateDate(DateUtil.getCurrenDateTime());
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        List<UserRole> userRoles = new ArrayList<>();
-        User result = super.create(user);
-        result.getRole().forEach(e -> {
-            UserRole userRole = new UserRole();
-            userRole.setUser(result);
-            userRole.setRole(e);
-            userRoles.add(userRole);
-        });
-        userRoleRepository.saveAll(userRoles);
-        return new BaseResponse().success(result);
     }
 
     @Override
     public BaseResponse customUpdate(Long id, UserReq user) {
-        if (user.getUserName() == null) {
-            return new BaseResponse().fail("Tài khoản không được để trống");
-        }
+        try {
+            if (user.getUserName() == null) {
+                return new BaseResponse().fail("Tài khoản không được để trống");
+            }
 
-        Optional<User> userExistOptional = userRepository.findById(id);
-        if (userExistOptional.isEmpty()) {
-            return new BaseResponse().fail("Không tồn tại người dùng");
-        }
-        User existingUser = userExistOptional.get();
-        existingUser.setUpdateDate(DateUtil.getCurrenDateTime());
-        existingUser.setUserName(user.getUserName());
-        existingUser.setFullName(user.getFullName());
-        existingUser.setAddress(user.getAddress());
-        existingUser.setEmail(user.getEmail());
+            Optional<User> userExistOptional = userRepository.findById(id);
+            if (userExistOptional.isEmpty()) {
+                return new BaseResponse().fail("Không tồn tại người dùng");
+            }
+            User existingUser = userExistOptional.get();
+            existingUser.setUpdateDate(DateUtil.getCurrenDateTime());
+            existingUser.setUserName(user.getUserName());
+            existingUser.setFullName(user.getFullName());
+            existingUser.setAddress(user.getAddress());
+            existingUser.setEmail(user.getEmail());
 
 
-        List<UserRole> existingUserRoles = userRoleRepository.findAllByUser(existingUser);
-        userRoleRepository.deleteAllInBatch(existingUserRoles);
-        List<UserRole> newUserRoles = new ArrayList<>();
-        for (var role : user.getRoleId()) {
-            UserRole userRole = new UserRole();
-            userRole.setUser(existingUser);
-            userRole.setRole(roleRepository.findById(role).get());
-            newUserRoles.add(userRole);
+            List<UserRole> existingUserRoles = userRoleRepository.findAllByUser(existingUser);
+            userRoleRepository.deleteAllInBatch(existingUserRoles);
+            List<UserRole> newUserRoles = new ArrayList<>();
+            for (var role : user.getRoleId()) {
+                UserRole userRole = new UserRole();
+                userRole.setUser(existingUser);
+                userRole.setRole(roleRepository.findById(role).get());
+                newUserRoles.add(userRole);
+            }
+            userRoleRepository.saveAllAndFlush(newUserRoles);
+            userRepository.saveAndFlush(existingUser);
+            logService.logAction(ELogType.UPDATE_USER,
+                    "Cập nhật thông tin tài khoản " + user.getUserName() + " thành công" ,
+                    "success");
+            return new BaseResponse().success(existingUser);
+        }catch (Exception e){
+            logger.error("Error occurred while create account: {}", e.getMessage(), e);
+            logService.logAction(ELogType.UPDATE_USER,
+                    "Cập nhật thông tin tài khoản  " + user.getUserName() + " thất bại" + e.getMessage(),
+                    "fail");
+            return new BaseResponse(500, "Có lỗi xảy ra khi tạo tài khoản", null);
         }
-        userRoleRepository.saveAllAndFlush(newUserRoles);
-        userRepository.saveAndFlush(existingUser);
-        return new BaseResponse().success(existingUser);
     }
 
 
