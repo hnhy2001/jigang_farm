@@ -96,6 +96,7 @@ public class ExportPetServiceImpl extends BaseServiceImpl<ExportPet> implements 
                     Optional<Pet> pet = petRepository.findById(exportPet.getPetId());
 
                     ExportPetRes exportPetRes = new ExportPetRes();
+                    exportPetRes.setId(exportPet.getId());
                     exportPetRes.setExportDate(exportPet.getExportDate());
                     exportPetRes.setReasonExport(exportPet.getReasonExport());
                     exportPetRes.setExportDate(exportPet.getExportDate());
@@ -134,6 +135,7 @@ public class ExportPetServiceImpl extends BaseServiceImpl<ExportPet> implements 
         List<ExportPetRes> exportPetResList = exportPets.getContent().stream().map(exportPet -> {
             Optional<Pet> pet = petRepository.findById(exportPet.getPetId());
             ExportPetRes exportPetRes = new ExportPetRes();
+            exportPetRes.setId(exportPet.getId());
             exportPetRes.setExportDate(exportPet.getExportDate());
             exportPetRes.setReasonExport(exportPet.getReasonExport());
             exportPetRes.setExportDate(exportPet.getExportDate());

@@ -13,6 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ExportPetRes {
+    private Long id;
     private Pet pet;
     private String reasonExport;
     private Long exportDate;
