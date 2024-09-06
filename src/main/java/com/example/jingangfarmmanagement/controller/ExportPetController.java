@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
 @CrossOrigin
@@ -45,9 +46,13 @@ public class ExportPetController extends BaseController<ExportPet> {
             @RequestParam(required = false) Long endExportDate,
             @RequestParam(required = false) String note,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id") String sortBy,  // Sort by field
+            @RequestParam(defaultValue = "asc") String sortDirection
     ) {
-        Pageable pageable = PageRequest.of(page, size);
+        Sort sort = Sort.by(sortBy);
+        sort = "desc".equalsIgnoreCase(sortDirection) ? sort.descending() : sort.ascending();
+        Pageable pageable = PageRequest.of(page, size, sort);
         Page<ExportPetRes> resultPage = exportPetService.searchExportPet(cageId, name, code, sex, age, type ,startExportDate,endExportDate, note, pageable);
         return new BaseResponse(200, "Lấy dữ liệu thành công!",resultPage);
     }

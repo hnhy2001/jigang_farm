@@ -482,14 +482,14 @@ public class PetStatisticImpl {
         // Lấy tất cả các đối tượng Pet từ cơ sở dữ liệu
 
         // Cập nhật ngày sinh cho từng đối tượng Pet
-        pets.forEach(pet -> {
+        for(var pet :pets){
             Long dateOfBirth = calculateBirthDate(pet.getName(),pet.getCreateDate())!=null ? Long.valueOf(calculateBirthDate(pet.getName(),pet.getCreateDate())):-1;
             if (dateOfBirth != -1) {
                 pet.setBirthNumber(dateOfBirth);
             } else {
                 pet.setBirthNumber(null); // Hoặc không thực hiện gì nếu không hợp lệ
             }
-        });
+        }
         return pets;
     }
 

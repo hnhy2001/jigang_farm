@@ -159,65 +159,67 @@ public class PetServiceImpl extends BaseServiceImpl<Pet> implements PetService {
 
     @Override
     public BaseResponse updatePet(Pet pet) {
+        Optional<Pet> entityMy = null;
         try {
-            Pet entityMy = petRepository.getById(pet.getId());
-            Pet existingPet = petRepository.findByCageAndFarmAndName(pet.getName(), entityMy.getCage().getName(), entityMy.getCage().getFarm().getName());
+            entityMy = petRepository.findById(pet.getId());
+            Pet entity = entityMy.orElseThrow(() -> new RuntimeException("Pet not found"));
+            Pet existingPet = petRepository.findByCageAndFarmAndName(pet.getName(), entity.getCage().getName(), entity.getCage().getFarm().getName());
 
             if (existingPet != null && !existingPet.getId().equals(pet.getId())) {
                 return new BaseResponse(500, "Tên vật nuôi đã tồn tại", null);
             }
 
-            Pet originalPet = new Pet();
-            ObjectMapperUtils.map(entityMy, originalPet);
-            ObjectMapperUtils.map(pet, entityMy);
-            pet.setUpdateDate(DateUtil.getCurrenDateTime());
-            pet.setUpdateHeathDate(DateUtil.getCurrenDateTime());
-            pet.setLastDateUpdate(DateUtil.getCurrenDateTime());
-            pet.setPregnantDateUpdate(DateUtil.getCurrenDateTime());
-            petStatistic.syncDateOfBirthWithPetIds(List.of(pet));
-            pet.setPetCondition(1);
-            pet.setStatus(pet.getUilness() == null || pet.getUilness().isBlank() ? 2 : 1);
+            ObjectMapperUtils.map(pet, entity);
+            entity.setUpdateDate(DateUtil.getCurrenDateTime());
+            entity.setUpdateHeathDate(DateUtil.getCurrenDateTime());
+            entity.setLastDateUpdate(DateUtil.getCurrenDateTime());
+            entity.setPregnantDateUpdate(DateUtil.getCurrenDateTime());
+            entity.setCreateDate(entity.getCreateDate());
+            entity.setCage(entity.getCage());
+            petStatistic.syncDateOfBirthWithPetIds(List.of(entity));
+            entity.setPetCondition(1);
+            entity.setStatus(pet.getUilness() == null || pet.getUilness().isBlank() ? 2 : 1);
 
             // Save the updated pet
-            Pet savedPet = petRepository.save(entityMy);
+            Pet savedPet = petRepository.save(entity);
 
             // Log changes
-            StringBuilder changeLog = new StringBuilder("Cập nhật: " + savedPet.getName() + " ");
-            if (!originalPet.getName().equals(savedPet.getName())) {
-                changeLog.append("Name: '").append(originalPet.getName()).append("' -> '").append(savedPet.getName()).append("'; ");
+            StringBuilder changeLog = new StringBuilder("Cập nhật: " + entity.getName() + " ");
+            if (!entity.getName().equals(savedPet.getName())) {
+                changeLog.append("Name: '").append(entity.getName()).append("' -> '").append(savedPet.getName()).append("'; ");
             }
-            if (!originalPet.getCage().getName().equals(savedPet.getCage().getName())) {
-                changeLog.append("Cage: '").append(originalPet.getCage().getName()).append("' -> '").append(savedPet.getCage().getName()).append("'; ");
+            if (!entity.getCage().getName().equals(savedPet.getCage().getName())) {
+                changeLog.append("Cage: '").append(entity.getCage().getName()).append("' -> '").append(savedPet.getCage().getName()).append("'; ");
             }
-            if (!originalPet.getUilness().equals(savedPet.getUilness())) {
-                changeLog.append("Bệnh: '").append(originalPet.getUilness()).append("' -> '").append(savedPet.getUilness()).append("'; ");
+            if (!entity.getUilness().equals(savedPet.getUilness())) {
+                changeLog.append("Bệnh: '").append(entity.getUilness()).append("' -> '").append(savedPet.getUilness()).append("'; ");
             }
-            if (!(originalPet.getWeight() ==savedPet.getWeight())) {
-                changeLog.append("Cân nặng: '").append(originalPet.getWeight()).append("' -> '").append(savedPet.getWeight()).append("'; ");
+            if (!(entity.getWeight() == savedPet.getWeight())) {
+                changeLog.append("Cân nặng: '").append(entity.getWeight()).append("' -> '").append(savedPet.getWeight()).append("'; ");
             }
-            if (!(Objects.equals(originalPet.getParentDad(), savedPet.getParentDad()))) {
-                changeLog.append("Mã cha: '").append(originalPet.getParentDad()).append("' -> '").append(savedPet.getParentDad()).append("'; ");
+            if (!(Objects.equals(entity.getParentDad(), savedPet.getParentDad()))) {
+                changeLog.append("Mã cha: '").append(entity.getParentDad()).append("' -> '").append(savedPet.getParentDad()).append("'; ");
             }
-            if (!(Objects.equals(originalPet.getParentMon(), savedPet.getParentMon()))) {
-                changeLog.append("Mã mẹ: '").append(originalPet.getParentMon()).append("' -> '").append(savedPet.getParentMon()).append("'; ");
+            if (!(Objects.equals(entity.getParentMon(), savedPet.getParentMon()))) {
+                changeLog.append("Mã mẹ: '").append(entity.getParentMon()).append("' -> '").append(savedPet.getParentMon()).append("'; ");
             }
-            // Add other fields as needed
 
             logger.info(changeLog.toString());
 
             logService.logAction(ELogType.UPDATE_PET,
-                    "Cập nhật thông tin con vật " + savedPet.getName() + " chuồng "+ savedPet.getCage().getName() + " trại " + savedPet.getCage().getFarm().getName() + " thành công: Dữ liệu thay đổi"+changeLog,
+                    "Cập nhật thông tin con vật " + savedPet.getName() + " chuồng " + savedPet.getCage().getName() + " trại " + savedPet.getCage().getFarm().getName() + " thành công: Dữ liệu thay đổi" + changeLog,
                     "success");
 
             return new BaseResponse(200, "Cập nhật vật nuôi thành công", savedPet);
         } catch (Exception e) {
             logger.error("Error occurred while updating pet: {}", e.getMessage(), e);
             logService.logAction(ELogType.UPDATE_PET,
-                    "Cập nhật thông tin con vật " + pet.getName() + " chuồng " + pet.getCage().getName() + " trại " + pet.getCage().getFarm().getName() + " thất bại" + e.getMessage(),
+                    "Cập nhật thông tin con vật " + entityMy.get().getName() + " chuồng " + entityMy.get().getCage().getName() + " trại " + entityMy.get().getCage().getFarm().getName() + " thất bại" + e.getMessage(),
                     "fail");
             return new BaseResponse(500, "Có lỗi xảy ra khi cập nhật vật nuôi", null);
         }
     }
+
     @Override
     public BaseResponse updatePetWeight(UpdateWeightPetReq updateWeightPet) {
         List<Pet> pets = petRepository.findByIdIn(updateWeightPet.getPetIds());
@@ -270,7 +272,8 @@ public class PetServiceImpl extends BaseServiceImpl<Pet> implements PetService {
     }
     @Override
     public BaseResponse findAllPet() {
-        return new BaseResponse(200, "Lấy vật nuôi thành công",  petRepository.findAll());
+        List<Pet> petList= petRepository.findAll().stream().filter(pet -> pet.getStatus()!=-1).collect(Collectors.toList());
+        return new BaseResponse(200, "Lấy vật nuôi thành công",  petList);
     }
 
     @Override

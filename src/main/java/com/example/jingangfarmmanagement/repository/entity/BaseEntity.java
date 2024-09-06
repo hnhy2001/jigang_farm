@@ -14,6 +14,8 @@ import java.time.ZonedDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
+@Getter
+@Setter
 @MappedSuperclass
 @EntityListeners({AuditingEntityListener.class})
 public class BaseEntity {
