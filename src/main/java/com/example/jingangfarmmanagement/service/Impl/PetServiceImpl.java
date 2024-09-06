@@ -63,6 +63,8 @@ public class PetServiceImpl extends BaseServiceImpl<Pet> implements PetService {
     private LogRepository logRepository;
     @Autowired
     private LogServiceImpl logService;
+    @Autowired
+    private FarmRepository farmRepository;
 
     @Override
     protected BaseRepository<Pet> getRepository() {
@@ -270,7 +272,6 @@ public class PetServiceImpl extends BaseServiceImpl<Pet> implements PetService {
     public BaseResponse findAllPet() {
         return new BaseResponse(200, "Lấy vật nuôi thành công",  petRepository.findAll());
     }
-
 
     @Override
     public BaseResponse findPetWithCageAndFarm(List<Long> cageIds, List<Long> farmIds, Long startDate, Long endDate) {
@@ -483,5 +484,47 @@ public class PetServiceImpl extends BaseServiceImpl<Pet> implements PetService {
         } else {
             return false;
         }
+    }
+
+
+    @Override
+    public BaseResponse changeCageByName(ChangeCageByNameReq req) {
+        if (req.getCageName() == null || req.getPetName() == null || req.getFarmName() == null){
+            return new BaseResponse().builder().code(501).message("Thất bại").result("Tên trại tên chuồng và tên pet không được để trống").build();
+        }
+        List<Farm> farmList = farmRepository.findAllByName(req.getFarmName());
+        if (farmList.isEmpty()){
+            return new BaseResponse().builder().code(502).message("Thất bại").result("Không có trại nào phù hợp với tên bạn nhập").build();
+        }
+        if (farmList.size() > 1){
+            return new BaseResponse().builder().code(503).message("Thất bại").result("Có 2 trại ứng với tên bạn nhập").build();
+        }
+        List<Cage> cageList = cageRepository.findAllByNameAndFarm(req.getCageName(), farmList.get(0));
+        if (cageList.isEmpty()){
+            return new BaseResponse().builder().code(504).message("Thất bại").result("Không có chuồng nào phù hợp với tên bạn nhập").build();
+        }
+        if (cageList.size() > 1){
+            return new BaseResponse().builder().code(505).message("Thất bại").result("Có 2 chuồng ứng với tên bạn nhập").build();
+        }
+        List<Pet> petList = new ArrayList<>();
+        if (req.getCage() != null){
+            petList = petRepository.findAllByNameAndStatusAndCage(req.getPetName(), 1, req.getCage());
+        }
+
+        if (req.getCage() == null){
+            petList = petRepository.findAllByNameAndStatus(   req.getPetName(), 1);
+        }
+
+        if (petList.isEmpty()){
+            return new BaseResponse().builder().code(504).message("Thất bại").result("Không có pet nào phù hợp với tên bạn nhập").build();
+        }
+        if (petList.size() > 1){
+            return new BaseResponse().builder().code(505).message("Thất bại").result("Có 2 pet ứng với tên bạn nhập").build();
+        }
+        Cage cage = cageList.get(0);
+        Pet pet = petList.get(0);
+        pet.setCage(cage);
+        petRepository.save(pet);
+        return new BaseResponse().success("Chuyển pet " + pet.getName() + " sang chuồng " + pet.getCage().getName() + " thành công");
     }
 }

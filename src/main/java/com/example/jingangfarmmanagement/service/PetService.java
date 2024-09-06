@@ -31,5 +31,6 @@ public interface PetService extends BaseService<Pet> {
     public BaseResponse statisticQuantityUnilness(StatisticQuantityUnilessReq req);
     public BaseResponse statisticQuantityUnilnessType(StatisticQuantityUnilessReq req);
     public BaseResponse findAllPet();
+    public BaseResponse changeCageByName(ChangeCageByNameReq changeCageReq);
 
 }

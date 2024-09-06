@@ -1,10 +1,7 @@
 package com.example.jingangfarmmanagement.controller;
 
 import com.example.jingangfarmmanagement.model.BaseResponse;
-import com.example.jingangfarmmanagement.model.req.ChangeCageReq;
-import com.example.jingangfarmmanagement.model.req.ChangeStatusPetReq;
-import com.example.jingangfarmmanagement.model.req.StatisticQuantityUnilessReq;
-import com.example.jingangfarmmanagement.model.req.UpdateWeightPetReq;
+import com.example.jingangfarmmanagement.model.req.*;
 import com.example.jingangfarmmanagement.repository.entity.Pet;
 import com.example.jingangfarmmanagement.service.BaseService;
 import com.example.jingangfarmmanagement.service.PetService;
@@ -74,6 +71,11 @@ public class PetController extends BaseController<Pet> {
     @PostMapping("/get-all")
     public BaseResponse findAllPet(){
         return  petService.findAllPet();
+    }
+
+    @PostMapping("/change-cage-by-name")
+    public BaseResponse changeCageByName(@RequestBody ChangeCageByNameReq req){
+        return petService.changeCageByName(req);
     }
 
 

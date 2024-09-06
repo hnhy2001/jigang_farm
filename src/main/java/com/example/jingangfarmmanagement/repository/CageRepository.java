@@ -15,4 +15,5 @@ public interface CageRepository extends BaseRepository<Cage>, JpaSpecificationEx
    List<Cage> findAllByFarmAndStatus(Farm farm, int status);
    @Query("Select c from Cage c, Farm f where c.farm.id=f.id and c.name = :cageName and f.name= :farmName ")
    Cage findByNameAndFarmName(String cageName,String farmName);
+   List<Cage> findAllByNameAndFarm(String cageName,Farm farm);
 }

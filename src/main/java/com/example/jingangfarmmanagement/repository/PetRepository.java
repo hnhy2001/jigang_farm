@@ -1,5 +1,6 @@
 package com.example.jingangfarmmanagement.repository;
 
+import com.example.jingangfarmmanagement.repository.entity.Cage;
 import com.example.jingangfarmmanagement.repository.entity.Pet;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -45,6 +46,9 @@ public interface PetRepository extends BaseRepository<Pet>, JpaSpecificationExec
             "WHERE id = (SELECT MAX(id) FROM pet WHERE SUBSTRING(name, 1, 4) = :month) " +
             "AND CAST(RIGHT(name, 1) AS UNSIGNED) % 2 = 0", nativeQuery = true)
     Pet findWomenPetByNunbersOfMonth(String month);
+
+    List<Pet> findAllByNameAndStatus(String name, int status);
+    List<Pet> findAllByNameAndStatusAndCage(String name, int status, Cage cage);
 
 
 
