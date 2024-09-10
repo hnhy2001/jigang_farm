@@ -47,8 +47,8 @@ public interface PetRepository extends BaseRepository<Pet>, JpaSpecificationExec
             "AND CAST(RIGHT(name, 1) AS UNSIGNED) % 2 = 0", nativeQuery = true)
     Pet findWomenPetByNunbersOfMonth(String month);
 
-    List<Pet> findAllByNameAndStatus(String name, int status);
-    List<Pet> findAllByNameAndStatusAndCage(String name, int status, Cage cage);
+    List<Pet> findAllByName(String name);
+    List<Pet> findAllByNameAndCage(String name, Cage cage);
 
 
 

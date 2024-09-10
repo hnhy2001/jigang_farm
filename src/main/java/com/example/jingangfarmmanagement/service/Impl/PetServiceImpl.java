@@ -511,11 +511,11 @@ public class PetServiceImpl extends BaseServiceImpl<Pet> implements PetService {
         }
         List<Pet> petList = new ArrayList<>();
         if (req.getCage() != null){
-            petList = petRepository.findAllByNameAndStatusAndCage(req.getPetName(), 1, req.getCage());
+            petList = petRepository.findAllByNameAndCage(req.getPetName(), req.getCage());
         }
 
         if (req.getCage() == null){
-            petList = petRepository.findAllByNameAndStatus(   req.getPetName(), 1);
+            petList = petRepository.findAllByName( req.getPetName());
         }
 
         if (petList.isEmpty()){
@@ -523,6 +523,9 @@ public class PetServiceImpl extends BaseServiceImpl<Pet> implements PetService {
         }
         if (petList.size() > 1){
             return new BaseResponse().builder().code(505).message("Thất bại").result("Có 2 pet ứng với tên bạn nhập").build();
+        }
+        if (petList.get(0).getStatus() < 0){
+            return new BaseResponse().builder().code(504).message("Thất bại").result("Pet bạn nhập có thể đã chết").build();
         }
         Cage cage = cageList.get(0);
         Pet pet = petList.get(0);
