@@ -6,7 +6,12 @@ import com.example.jingangfarmmanagement.model.req.TreatmentCardReq;
 import com.example.jingangfarmmanagement.repository.entity.TreatmentCard;
 import com.example.jingangfarmmanagement.service.BaseService;
 import com.example.jingangfarmmanagement.service.TreatmentCardService;
+import org.ehcache.shadow.org.terracotta.offheapstore.paging.Page;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -35,5 +40,21 @@ public class TreatmentCardController extends BaseController<TreatmentCard>{
                                                     @RequestParam int page,
                                                     @RequestParam int size){
         return new BaseResponse(200, "Lấy dữ liệu thành công!", treatmentCardService.findTreatmentHistoriesByPet(petIds,page,size));
+    }
+    @GetMapping("/search/custom")
+    public BaseResponse searchTreatmentCards(
+            @RequestParam(required = false) String code,
+            @RequestParam(required = false) String createBy,
+            @RequestParam(required = false) String uilnessName,
+            @RequestParam(required = false) String petName,
+            @RequestParam(required = false) Long startDate,
+            @RequestParam(required = false) Long endDate,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        return treatmentCardService.searchTreatmentCards(
+                code, createBy, uilnessName, petName, startDate, endDate, pageable);
     }
 }

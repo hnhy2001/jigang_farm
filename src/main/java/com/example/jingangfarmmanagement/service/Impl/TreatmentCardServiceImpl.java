@@ -193,4 +193,16 @@ public class TreatmentCardServiceImpl extends BaseServiceImpl<TreatmentCard> imp
         });
         return req;
     }
+    public BaseResponse searchTreatmentCards(
+            String code,
+            String createBy,
+            String uilnessName,
+            String petName,
+            Long startDate,
+            Long endDate,
+            Pageable pageable) {
+        Page<TreatmentCard> treatmentCardPage
+                = treatmentCardRepository.searchTreatmentCards(code, 1, createBy, uilnessName, petName, startDate, endDate, pageable);
+        return new BaseResponse(200,"OK",treatmentCardPage);
+    }
 }
