@@ -5,6 +5,7 @@ import org.hibernate.validator.constraints.UniqueElements;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -36,5 +37,10 @@ public class User extends BaseEntity {
 //    @NotNull()
 //    @JoinColumn(name = "role")
 //    private Role role;
-
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(name = "permission",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "cage_id")
+    )
+    private List<Cage> cages = new ArrayList<>();
 }

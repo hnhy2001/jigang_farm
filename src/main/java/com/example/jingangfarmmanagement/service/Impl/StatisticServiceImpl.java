@@ -34,6 +34,8 @@ public class StatisticServiceImpl implements StatisticService {
 
     @Autowired
     UilnessService uilnessService;
+    @Autowired
+    PermissionCageService permissionCageService;
 
     @Override
     public BaseResponse statisticPetWithAge(StatisticPetWithAge statisticPetWithAge) {
@@ -129,10 +131,16 @@ public class StatisticServiceImpl implements StatisticService {
 
 
     @Override
-    public BaseResponse statisticFarm(SearchReq req) throws Exception {
+    public BaseResponse statisticFarm(SearchReq req, Long userId) throws Exception {
         Page<Farm> farmPage = farmService.search(req);
         List<Farm> farmList = farmPage.getContent();
-        if (farmList.isEmpty()){
+        List<Cage> cagePermissions= permissionCageService.getPermissionCageByUserId(userId);
+        List<Farm> farms = cagePermissions.stream()
+                .map(Cage::getFarm)
+                .filter(farmList::contains)
+                .distinct()
+                .collect(Collectors.toList());
+        if (farms.isEmpty()){
             return new BaseResponse().fail("Không có trại nào!");
         }
         List<Cage> cageList = cageService.getAll();
@@ -142,7 +150,7 @@ public class StatisticServiceImpl implements StatisticService {
         List<Uilness> uilnessList = uilnessService.getAll();
         List<Pet> petList = petService.getAll();
         List<StatisticByFarmRes> results = new ArrayList<>();
-        farmList.forEach(e -> {
+        farms.forEach(e -> {
             StatisticByFarmRes result = new StatisticByFarmRes();
             result.setFarm(e);
             result.setTotalFemale(0);
@@ -220,16 +228,21 @@ public class StatisticServiceImpl implements StatisticService {
     }
 
     @Override
-    public BaseResponse statisticCage(SearchReq req) throws Exception {
+    public BaseResponse statisticCage(SearchReq req,Long userId) throws Exception {
         Page<Cage> cagePage = cageService.search(req);
         List<Cage> cageList = cagePage.getContent();
-        if (cageList.isEmpty()){
+        List<Cage> cagePermissions= permissionCageService.getPermissionCageByUserId(userId);
+        List<Cage> cages = cagePermissions.stream()
+                .filter(cageList::contains)
+                .distinct()
+                .collect(Collectors.toList());
+        if (cages.isEmpty()){
             return new BaseResponse().success("Không có chuồng nào thuộc trại này");
         }
         List<Uilness> uilnessList = uilnessService.getAll();
         List<Pet> petList = petService.getAll();
         List<ResultStatisticByCageRes> results = new ArrayList<>();
-            cageList.forEach(cage -> {
+        cages.forEach(cage -> {
                 ResultStatisticByCageRes result = new ResultStatisticByCageRes();
                 result.setCage(cage);
                 result.setTotalFemale(0);

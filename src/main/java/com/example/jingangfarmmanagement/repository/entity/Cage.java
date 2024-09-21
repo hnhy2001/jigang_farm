@@ -36,4 +36,7 @@ public class Cage extends BaseEntity{
 
     @Column(name = "warning")
     private String warning;
+    @ManyToMany(mappedBy = "cages")
+    @JsonIgnore
+    private List<User> users;
 }

@@ -18,12 +18,12 @@ public class StatisticController {
     StatisticService statisticService;
 
     @GetMapping("farm")
-    public BaseResponse statisticWithFarm(SearchReq req) throws Exception {
-        return statisticService.statisticFarm(req);
+    public BaseResponse statisticWithFarm(SearchReq req,@RequestParam Long userId) throws Exception {
+        return statisticService.statisticFarm(req,userId);
     }
 
     @GetMapping("cage")
-    public BaseResponse statisticWithCage(SearchReq req) throws Exception {
-        return statisticService.statisticCage(req);
+    public BaseResponse statisticWithCage(SearchReq req,@RequestParam Long userId) throws Exception {
+        return statisticService.statisticCage(req,userId);
     }
 }
