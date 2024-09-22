@@ -4,10 +4,7 @@ import com.example.jingangfarmmanagement.model.BaseResponse;
 import com.example.jingangfarmmanagement.model.req.SearchReq;
 import com.example.jingangfarmmanagement.model.req.StatisticPetWithAge;
 import com.example.jingangfarmmanagement.model.response.*;
-import com.example.jingangfarmmanagement.repository.entity.Cage;
-import com.example.jingangfarmmanagement.repository.entity.Farm;
-import com.example.jingangfarmmanagement.repository.entity.Pet;
-import com.example.jingangfarmmanagement.repository.entity.Uilness;
+import com.example.jingangfarmmanagement.repository.entity.*;
 import com.example.jingangfarmmanagement.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -134,12 +131,17 @@ public class StatisticServiceImpl implements StatisticService {
     public BaseResponse statisticFarm(SearchReq req, Long userId) throws Exception {
         Page<Farm> farmPage = farmService.search(req);
         List<Farm> farmList = farmPage.getContent();
-        List<Cage> cagePermissions= permissionCageService.getPermissionCageByUserId(userId);
-        List<Farm> farms = cagePermissions.stream()
-                .map(Cage::getFarm)
-                .filter(farmList::contains)
-                .distinct()
-                .collect(Collectors.toList());
+        List<Farm> farms;
+        if(userId == null) {
+            farms = farmList;
+        } else {
+            List<Cage> cagePermissions= permissionCageService.getPermissionCageByUserId(userId);
+            farms = cagePermissions.stream()
+            .map(Cage::getFarm)
+            .filter(farmList::contains)
+            .distinct()
+            .collect(Collectors.toList());
+        }
         if (farms.isEmpty()){
             return new BaseResponse().fail("Không có trại nào!");
         }
@@ -228,14 +230,19 @@ public class StatisticServiceImpl implements StatisticService {
     }
 
     @Override
-    public BaseResponse statisticCage(SearchReq req,Long userId) throws Exception {
+    public BaseResponse statisticCage(SearchReq req, Long userId) throws Exception {
         Page<Cage> cagePage = cageService.search(req);
         List<Cage> cageList = cagePage.getContent();
-        List<Cage> cagePermissions= permissionCageService.getPermissionCageByUserId(userId);
-        List<Cage> cages = cagePermissions.stream()
-                .filter(cageList::contains)
-                .distinct()
-                .collect(Collectors.toList());
+        List<Cage> cages;
+        if(userId == null) {
+            cages = cageList;
+        } else {
+            List<Cage> cagePermissions= permissionCageService.getPermissionCageByUserId(userId);
+            cages = cagePermissions.stream()
+            .filter(cageList::contains)
+            .distinct()
+            .collect(Collectors.toList());
+        }
         if (cages.isEmpty()){
             return new BaseResponse().success("Không có chuồng nào thuộc trại này");
         }

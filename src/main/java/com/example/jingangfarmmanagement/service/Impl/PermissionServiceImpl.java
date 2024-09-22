@@ -24,13 +24,15 @@ public class PermissionServiceImpl implements PermissionCageService {
     @Override
     public BaseResponse addPermission(PermissionCageReq reqs) {
         try {
-             User user = userRepository.findById(reqs.getUserId()).orElseThrow(() -> new RuntimeException("User not found with ID: " + reqs.getUserId()));
-             // Find or throw exception
-             List<Cage> cages = reqs.getCageIds().stream()
-                     .map(cageId -> cageRepository.findById(cageId)
-                             .orElseThrow(() -> new RuntimeException("Cage not found with ID: " + cageId))).collect(Collectors.toList());
-             user.setCages(cages);
-             userRepository.save(user);
+             for (Long userId: reqs.getUserId()) {
+                 User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found with ID: " + reqs.getUserId()));
+                 // Find or throw exception
+                 List<Cage> cages = reqs.getCageIds().stream()
+                         .map(cageId -> cageRepository.findById(cageId)
+                                 .orElseThrow(() -> new RuntimeException("Cage not found with ID: " + cageId))).collect(Collectors.toList());
+                 user.setCages(cages);
+                 userRepository.save(user);
+             }
             return new BaseResponse(200, "OK", null);
         } catch (Exception e) {
             return new BaseResponse(500, "Internal Server Error", null);
@@ -39,32 +41,35 @@ public class PermissionServiceImpl implements PermissionCageService {
     @Override
     public BaseResponse updatePermission(PermissionCageReq reqs) {
         try {
-            User user = userRepository.findById(reqs.getUserId())
-                    .orElseThrow(() -> new RuntimeException("User not found with ID: " + reqs.getUserId()));
+            for(Long userId: reqs.getUserId()) {
+                User user = userRepository.findById(userId)
+                        .orElseThrow(() -> new RuntimeException("User not found with ID: " + reqs.getUserId()));
 
-            List<Cage> cages = reqs.getCageIds().stream()
-                    .map(cageId -> cageRepository.findById(cageId)
-                            .orElseThrow(() -> new RuntimeException("Cage not found with ID: " + cageId)))
-                    .collect(Collectors.toList());
+                List<Cage> cages = reqs.getCageIds().stream()
+                        .map(cageId -> cageRepository.findById(cageId)
+                                .orElseThrow(() -> new RuntimeException("Cage not found with ID: " + cageId)))
+                        .collect(Collectors.toList());
 
-            user.setCages(cages);
-            userRepository.save(user);
+                user.setCages(cages);
+                userRepository.save(user);
+            }
             return new BaseResponse(200, "Permissions updated successfully", null);
         } catch (Exception e) {
             return new BaseResponse(500, "Internal Server Error", null);
         }
     }
     @Override
-    public BaseResponse removePermission(List<Long> userIds) {
+    public BaseResponse removePermission(PermissionCageReq permissionCageReq) {
         try {
-            for (var userId : userIds) {
+            for (var userId : permissionCageReq.getUserId()) {
                 User user = userRepository.findById(userId)
                         .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
 
-                List<Cage> cagesToRemove = user.getCages().stream()
-                        .map(cage -> cageRepository.findById(cage.getId())
-                                .orElseThrow(() -> new RuntimeException("Cage not found with ID: " + cage)))
-                        .collect(Collectors.toList());
+//                List<Cage> cagesToRemove = user.getCages().stream()
+//                        .map(cage -> cageRepository.findById(cage.getId())
+//                                .orElseThrow(() -> new RuntimeException("Cage not found with ID: " + cage)))
+//                        .collect(Collectors.toList());
+                List<Cage> cagesToRemove = user.getCages().stream().filter(cage -> permissionCageReq.getCageIds().contains(cage.getId())).collect(Collectors.toList());
                 user.getCages().removeAll(cagesToRemove);
                 userRepository.save(user);
             }

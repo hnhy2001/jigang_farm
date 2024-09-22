@@ -6,6 +6,6 @@ import java.util.List;
 
 @Data
 public class PermissionCageReq {
-    private Long userId;
+    private List<Long> userId;
     private List<Long> cageIds;
 }

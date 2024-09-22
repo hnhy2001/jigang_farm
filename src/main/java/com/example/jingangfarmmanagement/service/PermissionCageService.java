@@ -13,7 +13,7 @@ import java.util.List;
 public interface PermissionCageService {
     public BaseResponse addPermission(PermissionCageReq reqs);
     public BaseResponse updatePermission(PermissionCageReq reqs);
-    public BaseResponse removePermission(List<Long> userIds);
+    public BaseResponse removePermission(PermissionCageReq reqs);
     public BaseResponse getPermissionCages(List<Long> userIds);
     public List<Cage> getPermissionCageByUserId(Long userId);
     public BaseResponse getPermissionCageByUserIdAndFarmId(Long farmId);

@@ -33,8 +33,8 @@ public class PermissionCageController  {
 
     // Remove permissions
     @DeleteMapping("/remove")
-    public BaseResponse removePermission(@RequestBody List<Long> userIds) {
-        return permissionCageService.removePermission(userIds);
+    public BaseResponse removePermission(@RequestBody PermissionCageReq reqs) {
+        return permissionCageService.removePermission(reqs);
     }
 
 
