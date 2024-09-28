@@ -1,6 +1,5 @@
 package com.example.jingangfarmmanagement.service.Impl;
 
-import com.example.jingangfarmmanagement.config.logger.Loggable;
 import com.example.jingangfarmmanagement.constants.Status;
 import com.example.jingangfarmmanagement.model.BaseResponse;
 import com.example.jingangfarmmanagement.model.req.*;
@@ -13,8 +12,6 @@ import com.example.jingangfarmmanagement.query.CustomRsqlVisitor;
 import com.example.jingangfarmmanagement.repository.*;
 import com.example.jingangfarmmanagement.repository.entity.*;
 import com.example.jingangfarmmanagement.repository.entity.Enum.ELogType;
-import com.example.jingangfarmmanagement.service.CageService;
-import com.example.jingangfarmmanagement.service.FarmService;
 import com.example.jingangfarmmanagement.service.PetService;
 import com.example.jingangfarmmanagement.service.UilnessService;
 import com.example.jingangfarmmanagement.uitl.DateUtil;
@@ -23,6 +20,11 @@ import cz.jirutka.rsql.parser.RSQLParser;
 import cz.jirutka.rsql.parser.ast.Node;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -30,6 +32,8 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.format.DateTimeParseException;
@@ -177,7 +181,7 @@ public class PetServiceImpl extends BaseServiceImpl<Pet> implements PetService {
             entity.setCreateDate(entity.getCreateDate());
             entity.setCage(entity.getCage());
             petStatistic.syncDateOfBirthWithPetIds(List.of(entity));
-            entity.setPetCondition(1);
+            entity.setPetCondition(pet.getPetCondition());
             entity.setStatus(pet.getUilness() == null || pet.getUilness().isBlank() ? 2 : 1);
 
             // Save the updated pet
@@ -532,5 +536,48 @@ public class PetServiceImpl extends BaseServiceImpl<Pet> implements PetService {
         pet.setCage(cage);
         petRepository.save(pet);
         return new BaseResponse().success("Chuyển pet " + pet.getName() + " sang chuồng " + pet.getCage().getName() + " thành công");
+    }
+    @Override
+    public void exportToExcel(String filePath) throws IOException {
+        List<Pet> petList= petRepository.findAll().stream().filter(pet -> pet.getStatus()!=-1).collect(Collectors.toList());
+        Workbook workbook = new XSSFWorkbook();
+        Sheet sheet = workbook.createSheet("Pets");
+
+        // Create header row
+        Row headerRow = sheet.createRow(0);
+        String[] columnHeaders = {"Trại","Chuồng","Tên vật nuôi","Loại","Tháng tuổi","Cân nặng","Giới tính","Tình trạng bệnh","Tình trạng vật nuôi","Cha","Mẹ","Ghi chú"};
+        for (int i = 0; i < columnHeaders.length; i++) {
+            Cell cell = headerRow.createCell(i);
+            cell.setCellValue(columnHeaders[i]);
+        }
+
+        // Write Pet data
+        int rowNum = 1;
+        for (Pet pet : petList) {
+            Row row = sheet.createRow(rowNum++);
+            row.createCell(0).setCellValue(pet.getCage().getFarm().getName());
+            row.createCell(1).setCellValue(pet.getCage().getName());
+            row.createCell(2).setCellValue(pet.getName());
+            row.createCell(3).setCellValue(pet.getType());
+            row.createCell(4).setCellValue(pet.getAge());
+            row.createCell(5).setCellValue(pet.getWeight());
+            row.createCell(6).setCellValue(pet.getSex());
+            row.createCell(7).setCellValue(pet.getUilness());
+            row.createCell(8).setCellValue(pet.getStatus());
+            row.createCell(9).setCellValue(pet.getParentDad());
+            row.createCell(10).setCellValue(pet.getParentMon());
+            row.createCell(11).setCellValue(pet.getNote());
+
+        }
+        // Adjust column widths
+        for (int i = 0; i < columnHeaders.length; i++) {
+            sheet.autoSizeColumn(i);
+        }
+
+        // Write the output to a file
+        try (FileOutputStream fileOut = new FileOutputStream(filePath)) {
+            workbook.write(fileOut);
+        }
+        workbook.close();
     }
 }

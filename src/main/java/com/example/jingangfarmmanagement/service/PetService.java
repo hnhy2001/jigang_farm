@@ -2,11 +2,11 @@ package com.example.jingangfarmmanagement.service;
 
 import com.example.jingangfarmmanagement.model.BaseResponse;
 import com.example.jingangfarmmanagement.model.req.*;
-import com.example.jingangfarmmanagement.projection.FarmProjection;
 import com.example.jingangfarmmanagement.projection.PetProjection;
 import com.example.jingangfarmmanagement.repository.entity.Pet;
 import org.springframework.data.domain.Page;
 
+import java.io.IOException;
 import java.util.List;
 
 public interface PetService extends BaseService<Pet> {
@@ -32,5 +32,6 @@ public interface PetService extends BaseService<Pet> {
     public BaseResponse statisticQuantityUnilnessType(StatisticQuantityUnilessReq req);
     public BaseResponse findAllPet();
     public BaseResponse changeCageByName(ChangeCageByNameReq changeCageReq);
+    public void exportToExcel(String filePath) throws IOException;
 
 }
