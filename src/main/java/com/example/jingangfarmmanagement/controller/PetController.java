@@ -8,6 +8,7 @@ import com.example.jingangfarmmanagement.service.Impl.EmailServiceImpl;
 import com.example.jingangfarmmanagement.service.PetService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.mail.MessagingException;
 import java.io.FileNotFoundException;
@@ -94,41 +95,37 @@ public class PetController extends BaseController<Pet> {
         return petService.changeCageByName(req);
     }
 
-    @GetMapping("/exportAndEmailExcel")
-    public String exportPetsAndSendEmail() {
+    @PostMapping("/uploadAndEmailExcel")
+    public String uploadPetsAndSendEmail(@RequestParam("file") MultipartFile file) {
         try {
-            // Step 1: Get the directory and ensure it exists
-            String directoryPath = System.getProperty("user.home") + "/pet_exports";
-            File directory = new File(directoryPath);
-            if (!directory.exists()) {
-                directory.mkdirs();
+            // Step 1: Validate the file is not empty
+            if (file.isEmpty()) {
+                throw new IllegalArgumentException("File is empty!");
             }
 
-            // Step 2: Define the file name with the current date
-            String currentDate = LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
-            String filePath = new File(directory, "pets_" + currentDate + ".xlsx").getAbsolutePath();
-
-            // Step 3: Create the Excel file (this method should write the file)
-            petService.exportToExcel(filePath);
-
-            // Step 4: Check if the file exists after creation
-            File file = new File(filePath);
-            if (!file.exists()) {
-                throw new FileNotFoundException("File not found: " + filePath);
+            // Step 2: Get the original filename
+            String originalFilename = file.getOriginalFilename();
+            if (originalFilename == null || !originalFilename.endsWith(".xlsx")) {
+                throw new IllegalArgumentException("Invalid file type, expected an Excel file!");
             }
 
-            // Step 5: Send the email with the attachment
+            // Step 3: Save the file temporarily to a location (optional, if needed)
+            // You can save the file to a temporary directory or process it directly from the MultipartFile object
+
+            // Step 4: Send the email with the file as attachment
             emailService.sendEmailWithAttachment(
                     "tcnhpts@gmail.com",
-                    "Danh sách vật nuôi ngày " + currentDate,
-                    "Tải xuống danh sách vật nuôi ",
-                    filePath
+                    "Danh sách vật nuôi từ file đính kèm",
+                    "Tải xuống danh sách vật nuôi từ file đính kèm.",
+                    file
             );
 
-            return "Email with Excel attachment sent successfully!";
+            return "Email with uploaded Excel attachment sent successfully!";
         } catch (IOException | MessagingException e) {
             e.printStackTrace();
             return "Error occurred while sending email!";
+        } catch (IllegalArgumentException e) {
+            return e.getMessage();
         }
     }
 }
