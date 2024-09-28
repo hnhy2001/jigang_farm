@@ -19,7 +19,7 @@ public class EmailServiceImpl {
     @Autowired
     private JavaMailSender mailSender;
 
-    public void sendEmailWithAttachment(String toEmail, String subject, String body, MultipartFile file) throws MessagingException, IOException {
+    public void sendEmailWithAttachment(String toEmail, String subject, String body, String attachmentPath) throws MessagingException {
         MimeMessage mimeMessage = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true);
 
@@ -27,11 +27,9 @@ public class EmailServiceImpl {
         helper.setSubject(subject);
         helper.setText(body);
 
-        // Attach the file from MultipartFile
-        String filename = file.getOriginalFilename();
-        helper.addAttachment(filename, file);
-
-        // Send the email
+        // Attachment
+        FileSystemResource file = new FileSystemResource(new File(attachmentPath));
+        helper.addAttachment(Objects.requireNonNull(file.getFilename()), file);
         mailSender.send(mimeMessage);
     }
 

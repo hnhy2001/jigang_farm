@@ -538,8 +538,8 @@ public class PetServiceImpl extends BaseServiceImpl<Pet> implements PetService {
         return new BaseResponse().success("Chuyển pet " + pet.getName() + " sang chuồng " + pet.getCage().getName() + " thành công");
     }
     @Override
-    public void exportToExcel(String filePath) throws IOException {
-        List<Pet> petList= petRepository.findAll().stream().filter(pet -> pet.getStatus()!=-1).collect(Collectors.toList());
+    public void exportToExcel( List<Pet> pets ,String filePath) throws IOException {
+//        List<Pet> petList= petRepository.findAll().stream().filter(pet -> pet.getStatus()!=-1).collect(Collectors.toList());
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet("Pets");
 
@@ -553,7 +553,7 @@ public class PetServiceImpl extends BaseServiceImpl<Pet> implements PetService {
 
         // Write Pet data
         int rowNum = 1;
-        for (Pet pet : petList) {
+        for (Pet pet : pets) {
             Row row = sheet.createRow(rowNum++);
             row.createCell(0).setCellValue(pet.getCage().getFarm().getName());
             row.createCell(1).setCellValue(pet.getCage().getName());

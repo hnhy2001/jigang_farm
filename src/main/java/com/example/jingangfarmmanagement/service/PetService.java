@@ -32,6 +32,6 @@ public interface PetService extends BaseService<Pet> {
     public BaseResponse statisticQuantityUnilnessType(StatisticQuantityUnilessReq req);
     public BaseResponse findAllPet();
     public BaseResponse changeCageByName(ChangeCageByNameReq changeCageReq);
-    public void exportToExcel(String filePath) throws IOException;
+    public void exportToExcel( List<Pet> pets,String filePath) throws IOException;
 
 }
