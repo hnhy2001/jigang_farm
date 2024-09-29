@@ -95,7 +95,7 @@ public class PetController extends BaseController<Pet> {
         return petService.changeCageByName(req);
     }
 
-    @GetMapping("/exportAndEmailExcel")
+    @PostMapping("/exportAndEmailExcel")
     public String exportPetsAndSendEmail(@RequestBody List<Pet> pets) {
         try {
             // Step 1: Get the directory and ensure it exists
