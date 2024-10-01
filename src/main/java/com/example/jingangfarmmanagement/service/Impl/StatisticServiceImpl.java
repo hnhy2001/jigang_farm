@@ -128,56 +128,57 @@ public class StatisticServiceImpl implements StatisticService {
 
 
     @Override
-    public BaseResponse statisticFarm(SearchReq req, Long userId) throws Exception {
+    public BaseResponse statisticFarm(SearchReq req, Long userId, boolean calculation) throws Exception {
         Page<Farm> farmPage = farmService.search(req);
         List<Farm> farmList = farmPage.getContent();
         List<Farm> farms;
-        if(userId == null) {
-            farms = farmList;
-        } else {
-            List<Cage> cagePermissions= permissionCageService.getPermissionCageByUserId(userId);
-            farms = cagePermissions.stream()
-            .map(Cage::getFarm)
-            .filter(farmList::contains)
-            .distinct()
-            .collect(Collectors.toList());
-        }
-        if (farms.isEmpty()){
-            return new BaseResponse().fail("Không có trại nào!");
-        }
-        List<Cage> cageList = cageService.getAll();
-        if (cageList.isEmpty()){
-            return new BaseResponse().success("Không có chuồng nào thuộc trại này");
-        }
-        List<Uilness> uilnessList = uilnessService.getAll();
-        List<Pet> petList = petService.getAll();
         List<StatisticByFarmRes> results = new ArrayList<>();
-        farms.forEach(e -> {
-            StatisticByFarmRes result = new StatisticByFarmRes();
-            result.setFarm(e);
-            result.setTotalFemale(0);
-            result.setTotalMale(0);
-            result.setTotalPet(0);
-            result.setPetLive(0);
-            result.setPetDie(0);
+        if(calculation) {
+            if (userId == null) {
+                farms = farmList;
+            } else {
+                List<Cage> cagePermissions = permissionCageService.getPermissionCageByUserId(userId);
+                farms = cagePermissions.stream()
+                        .map(Cage::getFarm)
+                        .filter(farmList::contains)
+                        .distinct()
+                        .collect(Collectors.toList());
+            }
+            if (farms.isEmpty()) {
+                return new BaseResponse().fail("Không có trại nào!");
+            }
+            List<Cage> cageList = cageService.getAll();
+            if (cageList.isEmpty()) {
+                return new BaseResponse().success("Không có chuồng nào thuộc trại này");
+            }
+            List<Uilness> uilnessList = uilnessService.getAll();
+            List<Pet> petList = petService.getAll();
+            farms.forEach(e -> {
+                StatisticByFarmRes result = new StatisticByFarmRes();
+                result.setFarm(e);
+                result.setTotalFemale(0);
+                result.setTotalMale(0);
+                result.setTotalPet(0);
+                result.setPetLive(0);
+                result.setPetDie(0);
 //            result.setPetUilness(0);
 //            result.setPetNomal(0);
-            result.setStatisticPetByAgeList(createStatisticByAge());
-            result.setStatisticPetByWeightList(createStatisticByWeight());
-            result.setStatisticStatusUilnessPetList(createStatisticStatusUilnessPet());
-            getCageList(e, cageList).forEach(cage -> {
-                getPetList(cage, petList).forEach(pet -> {
-                    result.setTotalPet(result.getTotalPet() + 1);
-                    if (pet.getSex() == 1){
-                        result.setTotalMale(result.getTotalMale() + 1);
-                    }else {
-                        result.setTotalFemale(result.getTotalFemale() + 1);
-                    }
-                    if (pet.getStatus() == -1){
-                        result.setPetDie(result.getPetDie()+1);
-                    }else {
-                        result.setPetLive(result.getPetLive()+1);
-                    }
+                result.setStatisticPetByAgeList(createStatisticByAge());
+                result.setStatisticPetByWeightList(createStatisticByWeight());
+                result.setStatisticStatusUilnessPetList(createStatisticStatusUilnessPet());
+                getCageList(e, cageList).forEach(cage -> {
+                    getPetList(cage, petList).forEach(pet -> {
+                        result.setTotalPet(result.getTotalPet() + 1);
+                        if (pet.getSex() == 1) {
+                            result.setTotalMale(result.getTotalMale() + 1);
+                        } else {
+                            result.setTotalFemale(result.getTotalFemale() + 1);
+                        }
+                        if (pet.getStatus() == -1) {
+                            result.setPetDie(result.getPetDie() + 1);
+                        } else {
+                            result.setPetLive(result.getPetLive() + 1);
+                        }
 //                    if (pet.getUilness() != null || !pet.getUilness().equals("")){
 //                        result.setPetUilness(result.getPetUilness()+1);
 //                    }else {
@@ -188,68 +189,89 @@ public class StatisticServiceImpl implements StatisticService {
 //                            age.setQuantity(age.getQuantity() + 1);
 //                        }
 //                    });
-                    result.getStatisticPetByWeightList().forEach(weight -> {
-                        if (pet.getWeight() >= weight.getFrom() && pet.getWeight() < weight.getTo()){
-                            weight.setQuantity(weight.getQuantity() + 1);
+                        result.getStatisticPetByWeightList().forEach(weight -> {
+                            if (pet.getWeight() >= weight.getFrom() && pet.getWeight() < weight.getTo()) {
+                                weight.setQuantity(weight.getQuantity() + 1);
+                            }
+                        });
+                        if (!uilnessList.isEmpty() && pet.getStatus() != -1) {
+                            if (pet.getUilness() == null) {
+                                result.getStatisticStatusUilnessPetList().get(0).setTotalPet(result.getStatisticStatusUilnessPetList().get(0).getTotalPet() + 1);
+                                if (pet.getSex() == 1) {
+                                    result.getStatisticStatusUilnessPetList().get(0).setTotalMale(result.getStatisticStatusUilnessPetList().get(0).getTotalMale() + 1);
+                                } else {
+                                    result.getStatisticStatusUilnessPetList().get(0).setTotalFemale(result.getStatisticStatusUilnessPetList().get(0).getTotalFemale() + 1);
+                                }
+                            } else {
+                                String[] uilnesses = pet.getUilness().split(",");
+                                AtomicInteger uilnessCheckPoint = new AtomicInteger(0);
+                                Arrays.stream(uilnesses).forEach(uilnessCode -> {
+                                    uilnessList.forEach(uilness -> {
+                                        if (uilnessCode.contains(uilness.getName())) {
+                                            if (uilness.getScore() >= uilnessCheckPoint.get()) {
+                                                uilnessCheckPoint.set(uilness.getScore());
+                                            }
+                                        }
+                                    });
+                                });
+                                result.getStatisticStatusUilnessPetList().get(uilnessCheckPoint.get()).setTotalPet(result.getStatisticStatusUilnessPetList().get(uilnessCheckPoint.get()).getTotalPet() + 1);
+                                if (pet.getSex() == 1) {
+                                    result.getStatisticStatusUilnessPetList().get(uilnessCheckPoint.get()).setTotalMale(result.getStatisticStatusUilnessPetList().get(uilnessCheckPoint.get()).getTotalMale() + 1);
+                                } else {
+                                    result.getStatisticStatusUilnessPetList().get(uilnessCheckPoint.get()).setTotalFemale(result.getStatisticStatusUilnessPetList().get(uilnessCheckPoint.get()).getTotalFemale() + 1);
+                                }
+                            }
                         }
                     });
-                    if (!uilnessList.isEmpty() && pet.getStatus() != -1){
-                        if (pet.getUilness() == null){
-                            result.getStatisticStatusUilnessPetList().get(0).setTotalPet(result.getStatisticStatusUilnessPetList().get(0).getTotalPet() + 1);
-                            if (pet.getSex() == 1){
-                                result.getStatisticStatusUilnessPetList().get(0).setTotalMale(result.getStatisticStatusUilnessPetList().get(0).getTotalMale() + 1);
-                            }else {
-                                result.getStatisticStatusUilnessPetList().get(0).setTotalFemale(result.getStatisticStatusUilnessPetList().get(0).getTotalFemale() + 1);
-                            }
-                        }else {
-                            String[] uilnesses = pet.getUilness().split(",");
-                            AtomicInteger uilnessCheckPoint = new AtomicInteger(0);
-                            Arrays.stream(uilnesses).forEach(uilnessCode -> {
-                                uilnessList.forEach(uilness -> {
-                                    if (uilnessCode.contains(uilness.getName())){
-                                        if (uilness.getScore() >= uilnessCheckPoint.get()){
-                                            uilnessCheckPoint.set(uilness.getScore());
-                                        }
-                                    }
-                                });
-                            });
-                            result.getStatisticStatusUilnessPetList().get(uilnessCheckPoint.get()).setTotalPet(result.getStatisticStatusUilnessPetList().get(uilnessCheckPoint.get()).getTotalPet() + 1);
-                            if (pet.getSex() == 1){
-                                result.getStatisticStatusUilnessPetList().get(uilnessCheckPoint.get()).setTotalMale(result.getStatisticStatusUilnessPetList().get(uilnessCheckPoint.get()).getTotalMale() + 1);
-                            }else {
-                                result.getStatisticStatusUilnessPetList().get(uilnessCheckPoint.get()).setTotalFemale(result.getStatisticStatusUilnessPetList().get(uilnessCheckPoint.get()).getTotalFemale() + 1);
-                            }
-                        }
-                    }
                 });
+                results.add(result);
             });
-            results.add(result);
-        });
+        }
+        else {
+            if (userId == null) {
+                farms = farmList;
+            } else {
+                List<Cage> cagePermissions = permissionCageService.getPermissionCageByUserId(userId);
+                farms = cagePermissions.stream()
+                        .map(Cage::getFarm)
+                        .filter(farmList::contains)
+                        .distinct()
+                        .collect(Collectors.toList());
+            }
+            if (farms.isEmpty()) {
+                return new BaseResponse().fail("Không có trại nào!");
+            }
+            for(var farm:farms){
+                StatisticByFarmRes res = new StatisticByFarmRes(farm,0,0,0,0,0,new ArrayList<>(),new ArrayList<>(),new ArrayList<>());
+                results.add(res);
+            }
+        }
         Page<StatisticByFarmRes> res = new PageImpl<>(results, farmPage.getPageable(), farmPage.getTotalElements());
         return new BaseResponse().success(res);
     }
 
     @Override
-    public BaseResponse statisticCage(SearchReq req, Long userId) throws Exception {
+    public BaseResponse statisticCage(SearchReq req, Long userId, boolean calculation) throws Exception {
         Page<Cage> cagePage = cageService.search(req);
         List<Cage> cageList = cagePage.getContent();
         List<Cage> cages;
-        if(userId == null) {
-            cages = cageList;
-        } else {
-            List<Cage> cagePermissions= permissionCageService.getPermissionCageByUserId(userId);
-            cages = cagePermissions.stream()
-            .filter(cageList::contains)
-            .distinct()
-            .collect(Collectors.toList());
-        }
-        if (cages.isEmpty()){
-            return new BaseResponse().success("Không có chuồng nào thuộc trại này");
-        }
-        List<Uilness> uilnessList = uilnessService.getAll();
-        List<Pet> petList = petService.getAll();
         List<ResultStatisticByCageRes> results = new ArrayList<>();
-        cages.forEach(cage -> {
+        if(calculation){
+            if(userId == null) {
+                cages = cageList;
+            } else {
+                List<Cage> cagePermissions= permissionCageService.getPermissionCageByUserId(userId);
+                cages = cagePermissions.stream()
+                        .filter(cageList::contains)
+                        .distinct()
+                        .collect(Collectors.toList());
+            }
+            if (cages.isEmpty()){
+                return new BaseResponse().success("Không có chuồng nào thuộc trại này");
+            }
+            List<Uilness> uilnessList = uilnessService.getAll();
+            List<Pet> petList = petService.getAll();
+            cages.forEach(cage -> {
                 ResultStatisticByCageRes result = new ResultStatisticByCageRes();
                 result.setCage(cage);
                 result.setTotalFemale(0);
@@ -321,6 +343,22 @@ public class StatisticServiceImpl implements StatisticService {
                 });
                 results.add(result);
             });
+        }else{
+            if(userId == null) {
+                cages = cageList;
+            } else {
+                List<Cage> cagePermissions= permissionCageService.getPermissionCageByUserId(userId);
+                cages = cagePermissions.stream()
+                        .filter(cageList::contains)
+                        .distinct()
+                        .collect(Collectors.toList());
+            }
+            for(var cage:cages){
+                ResultStatisticByCageRes res = new ResultStatisticByCageRes(cage,0,0,0,0,0,new ArrayList<>(),new ArrayList<>(),new ArrayList<>());
+                results.add(res);
+            }
+        }
+
         Page<ResultStatisticByCageRes> res = new PageImpl<>(results, cagePage.getPageable(), cagePage.getTotalElements());
         return new BaseResponse().success(res);
     }
