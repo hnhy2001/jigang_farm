@@ -6,11 +6,9 @@ import com.example.jingangfarmmanagement.repository.entity.Farm;
 import com.example.jingangfarmmanagement.service.BaseService;
 import com.example.jingangfarmmanagement.service.FarmService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @CrossOrigin
 @RestController
@@ -24,4 +22,21 @@ public class FarmController extends BaseController<Farm> {
     protected BaseService<Farm> getService() {
         return farmService;
     }
+    @GetMapping("/custom/search")
+    public Page<Farm> customSearch(@RequestParam String filter,
+                                   @RequestParam(defaultValue = "0") int page,
+                                   @RequestParam(defaultValue = "10") int size,
+                                   @RequestParam String sort,
+                                   @RequestParam(required = true) Long userId) {
+        // Create the SearchReq object
+        SearchReq req = new SearchReq();
+        req.setFilter(filter);
+        req.setPage(page);
+        req.setSize(size);
+        req.setSort(sort);
+
+        // Call the service and pass the request and userId
+        return farmService.customSearch(req, userId);
+    }
+
 }

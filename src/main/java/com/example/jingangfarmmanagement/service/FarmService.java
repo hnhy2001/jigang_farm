@@ -9,6 +9,6 @@ import org.springframework.data.domain.Page;
 import java.util.List;
 
 public interface FarmService extends BaseService<Farm> {
-    Page<FarmProjection> customSearch(SearchReq req);
+    public Page<Farm> customSearch(SearchReq req,Long userId);
     List<Farm> findByFilter();
 }

@@ -11,7 +11,7 @@ import org.springframework.data.domain.Page;
 import java.util.List;
 
 public interface CageService extends BaseService<Cage>{
-    Page<CageProjection> customSearch(SearchReq req);
+    public Page<Cage> customSearch(SearchReq req,Long userId);
     BaseResponse quantityPet();
     List<Cage> getByFarm(Farm farm);
 }
