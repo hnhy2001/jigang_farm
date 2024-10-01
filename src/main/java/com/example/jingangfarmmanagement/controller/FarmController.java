@@ -27,15 +27,12 @@ public class FarmController extends BaseController<Farm> {
                                    @RequestParam(defaultValue = "0") int page,
                                    @RequestParam(defaultValue = "10") int size,
                                    @RequestParam String sort,
-                                   @RequestParam(required = true) Long userId) {
-        // Create the SearchReq object
+                                   @RequestParam(required = false) Long userId) {
         SearchReq req = new SearchReq();
         req.setFilter(filter);
         req.setPage(page);
         req.setSize(size);
         req.setSort(sort);
-
-        // Call the service and pass the request and userId
         return farmService.customSearch(req, userId);
     }
 
