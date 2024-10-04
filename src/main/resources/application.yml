@@ -41,4 +41,6 @@ minio:
   secret-key: Fwt3hY72wZhkabM7kGfIqryyhpIpJtEoun1api0K
   bucket-name: jfarm
 
-
+java:
+  awt:
+    headless: true

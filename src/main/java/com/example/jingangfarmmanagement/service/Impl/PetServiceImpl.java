@@ -173,43 +173,58 @@ public class PetServiceImpl extends BaseServiceImpl<Pet> implements PetService {
                 return new BaseResponse(500, "Tên vật nuôi đã tồn tại", null);
             }
 
-            ObjectMapperUtils.map(pet, entity);
+            StringBuilder changeLog = new StringBuilder("Cập nhật: " + pet.getName() + " ");
+            boolean isUpdated = false;
+
+            // Check and update individual fields, logging changes
+            if (!entity.getName().equals(pet.getName())) {
+                changeLog.append("Name: '").append(entity.getName()).append("' -> '").append(pet.getName()).append("'; ");
+                entity.setName(pet.getName());
+                isUpdated = true;
+            }
+            if (!entity.getCage().getName().equals(pet.getCage().getName())) {
+                changeLog.append("Cage: '").append(entity.getCage().getName()).append("' -> '").append(pet.getCage().getName()).append("'; ");
+                entity.setCage(pet.getCage());
+                isUpdated = true;
+            }
+            if (!Objects.equals(entity.getUilness(), pet.getUilness())) {
+                changeLog.append("Bệnh: '").append(entity.getUilness()).append("' -> '").append(pet.getUilness()).append("'; ");
+                entity.setUilness(pet.getUilness());
+                isUpdated = true;
+            }
+            if (entity.getWeight() != pet.getWeight()) {
+                changeLog.append("Cân nặng: '").append(entity.getWeight()).append("' -> '").append(pet.getWeight()).append("'; ");
+                entity.setWeight(pet.getWeight());
+                isUpdated = true;
+            }
+            if (!Objects.equals(entity.getParentDad(), pet.getParentDad())) {
+                changeLog.append("Mã cha: '").append(entity.getParentDad()).append("' -> '").append(pet.getParentDad()).append("'; ");
+                entity.setParentDad(pet.getParentDad());
+                isUpdated = true;
+            }
+            if (!Objects.equals(entity.getParentMon(), pet.getParentMon())) {
+                changeLog.append("Mã mẹ: '").append(entity.getParentMon()).append("' -> '").append(pet.getParentMon()).append("'; ");
+                entity.setParentMon(pet.getParentMon());
+                isUpdated = true;
+            }
+
+            if (!isUpdated) {
+                return new BaseResponse(304, "Không có thay đổi nào cần cập nhật", null); // No changes found
+            }
+
+            // Set update dates and other fields
             entity.setUpdateDate(DateUtil.getCurrenDateTime());
             entity.setUpdateHeathDate(DateUtil.getCurrenDateTime());
             entity.setLastDateUpdate(DateUtil.getCurrenDateTime());
             entity.setPregnantDateUpdate(DateUtil.getCurrenDateTime());
             entity.setCreateDate(entity.getCreateDate());
-            entity.setCage(entity.getCage());
             petStatistic.syncDateOfBirthWithPetIds(List.of(entity));
             entity.setPetCondition(pet.getPetCondition());
             entity.setStatus(pet.getUilness() == null || pet.getUilness().isBlank() ? 2 : 1);
 
-            // Save the updated pet
-            Pet savedPet = petRepository.save(entity);
-
-            // Log changes
-            StringBuilder changeLog = new StringBuilder("Cập nhật: " + entity.getName() + " ");
-            if (!entity.getName().equals(savedPet.getName())) {
-                changeLog.append("Name: '").append(entity.getName()).append("' -> '").append(savedPet.getName()).append("'; ");
-            }
-            if (!entity.getCage().getName().equals(savedPet.getCage().getName())) {
-                changeLog.append("Cage: '").append(entity.getCage().getName()).append("' -> '").append(savedPet.getCage().getName()).append("'; ");
-            }
-            if (!entity.getUilness().equals(savedPet.getUilness())) {
-                changeLog.append("Bệnh: '").append(entity.getUilness()).append("' -> '").append(savedPet.getUilness()).append("'; ");
-            }
-            if (!(entity.getWeight() == savedPet.getWeight())) {
-                changeLog.append("Cân nặng: '").append(entity.getWeight()).append("' -> '").append(savedPet.getWeight()).append("'; ");
-            }
-            if (!(Objects.equals(entity.getParentDad(), savedPet.getParentDad()))) {
-                changeLog.append("Mã cha: '").append(entity.getParentDad()).append("' -> '").append(savedPet.getParentDad()).append("'; ");
-            }
-            if (!(Objects.equals(entity.getParentMon(), savedPet.getParentMon()))) {
-                changeLog.append("Mã mẹ: '").append(entity.getParentMon()).append("' -> '").append(savedPet.getParentMon()).append("'; ");
-            }
-
+            // Log the change and save the pet
             logger.info(changeLog.toString());
-
+            Pet savedPet = petRepository.save(entity);
             logService.logAction(ELogType.UPDATE_PET,
                     "Cập nhật thông tin con vật " + savedPet.getName() + " chuồng " + savedPet.getCage().getName() + " trại " + savedPet.getCage().getFarm().getName() + " thành công: Dữ liệu thay đổi" + changeLog,
                     "success");
@@ -217,9 +232,11 @@ public class PetServiceImpl extends BaseServiceImpl<Pet> implements PetService {
             return new BaseResponse(200, "Cập nhật vật nuôi thành công", savedPet);
         } catch (Exception e) {
             logger.error("Error occurred while updating pet: {}", e.getMessage(), e);
-            logService.logAction(ELogType.UPDATE_PET,
-                    "Cập nhật thông tin con vật " + entityMy.get().getName() + " chuồng " + entityMy.get().getCage().getName() + " trại " + entityMy.get().getCage().getFarm().getName() + " thất bại" + e.getMessage(),
-                    "fail");
+            if (entityMy.isPresent()) {
+                logService.logAction(ELogType.UPDATE_PET,
+                        "Cập nhật thông tin con vật " + entityMy.get().getName() + " chuồng " + entityMy.get().getCage().getName() + " trại " + entityMy.get().getCage().getFarm().getName() + " thất bại" + e.getMessage(),
+                        "fail");
+            }
             return new BaseResponse(500, "Có lỗi xảy ra khi cập nhật vật nuôi", null);
         }
     }
