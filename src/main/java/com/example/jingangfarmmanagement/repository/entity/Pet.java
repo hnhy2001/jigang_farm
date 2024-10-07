@@ -61,7 +61,10 @@ public class Pet extends BaseEntity{
 //    )
 //    private List<Uilness> uilnesses = new ArrayList<>();
     private String uilness;
-
+    @Column(name = "lock_parent_dad")
+    private boolean lockParentDad;
+    @Column(name = "lock_parent_mom")
+    private boolean lockParentMom;
     @Column(name = "parent_dad")
     private String parentDad;
     @Column(name = "parent_mom")

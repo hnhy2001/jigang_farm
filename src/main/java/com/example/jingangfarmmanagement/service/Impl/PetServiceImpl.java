@@ -207,7 +207,16 @@ public class PetServiceImpl extends BaseServiceImpl<Pet> implements PetService {
                 entity.setParentMon(pet.getParentMon());
                 isUpdated = true;
             }
-
+            if (!Objects.equals(entity.isLockParentDad(), pet.isLockParentDad())) {
+                changeLog.append("Lock mã cha: '").append(entity.isLockParentDad()).append("' -> '").append(pet.isLockParentDad()).append("'; ");
+                entity.setLockParentDad(pet.isLockParentDad());  // Use setter method
+                isUpdated = true;
+            }
+            if (!Objects.equals(entity.isLockParentMom(), pet.isLockParentMom())) {
+                changeLog.append("Lock mã cha: '").append(entity.isLockParentMom()).append("' -> '").append(pet.isLockParentMom()).append("'; ");
+                entity.setLockParentMom(pet.isLockParentMom());  // Use setter method
+                isUpdated = true;
+            }
             if (!isUpdated) {
                 return new BaseResponse(304, "Không có thay đổi nào cần cập nhật", null); // No changes found
             }
