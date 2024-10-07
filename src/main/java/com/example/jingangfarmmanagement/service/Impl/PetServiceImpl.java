@@ -213,7 +213,7 @@ public class PetServiceImpl extends BaseServiceImpl<Pet> implements PetService {
                 isUpdated = true;
             }
             if (!Objects.equals(entity.isLockParentMom(), pet.isLockParentMom())) {
-                changeLog.append("Lock mã cha: '").append(entity.isLockParentMom()).append("' -> '").append(pet.isLockParentMom()).append("'; ");
+                changeLog.append("Lock mã mẹ: '").append(entity.isLockParentMom()).append("' -> '").append(pet.isLockParentMom()).append("'; ");
                 entity.setLockParentMom(pet.isLockParentMom());  // Use setter method
                 isUpdated = true;
             }
