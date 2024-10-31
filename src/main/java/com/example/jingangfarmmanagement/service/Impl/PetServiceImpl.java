@@ -363,7 +363,7 @@ public class PetServiceImpl extends BaseServiceImpl<Pet> implements PetService {
         Node rootNode = new RSQLParser().parse(filter);
         Specification<Pet> spec = rootNode.accept(new CustomRsqlVisitor<>());
 //        List<Pet> allData = petRepository.findAll(spec);
-        List<Pet> allData = getStatisticData(petRepository.findAll(spec), req.getFromAge(), req.getToAge());
+        List<Pet> allData = getStatisticData(petRepository.findAll(spec), req.getFromAge(), req.getToAge(), req.getFromWeight(), req.getToWeight());
         List<Uilness> uilnessList = uilnessService.getAll();
         List<StatisticQuantityUnilessItemRes> itemResList = new ArrayList<>();
         for(int i = 0; i <= 6 ; i++) {
@@ -391,7 +391,7 @@ public class PetServiceImpl extends BaseServiceImpl<Pet> implements PetService {
         Node rootNode = new RSQLParser().parse(filter);
         Specification<Pet> spec = rootNode.accept(new CustomRsqlVisitor<>());
 //        List<Pet> allData = petRepository.findAll(spec);
-        List<Pet> allData = getStatisticData(petRepository.findAll(spec), req.getFromAge(), req.getToAge());
+        List<Pet> allData = getStatisticData(petRepository.findAll(spec), req.getFromAge(), req.getToAge(), req.getFromAge(), req.getToWeight());
         List<Uilness> uilnessList = uilnessService.getAll();
         Set<String> itemSet = new HashSet<>();
 
@@ -425,10 +425,10 @@ public class PetServiceImpl extends BaseServiceImpl<Pet> implements PetService {
         return new BaseResponse().success(result);
     }
 
-    public List<Pet> getStatisticData(List<Pet> data, double fromAge, double toAge){
+    public List<Pet> getStatisticData(List<Pet> data, double fromAge, double toAge, double fromWeight, double toWeight){
         List<Pet> result = new ArrayList<>();
         data.stream().forEach(e -> {
-            if (calculateAge(e.getName()) <= toAge && calculateAge(e.getName()) >= fromAge){
+            if (calculateAge(e.getName()) <= toAge && calculateAge(e.getName()) >= fromAge && e.getWeight() <= toWeight && e.getWeight() >= fromWeight){
                 result.add(e);
             }
         });
@@ -503,6 +503,7 @@ public class PetServiceImpl extends BaseServiceImpl<Pet> implements PetService {
 
     public Boolean checkRegex(String input){
         // Regex để kiểm tra chuỗi có 7 ký tự và đều là số
+        if(input == null) return false;
         String regex = "^\\d{2}(0[1-9]|1[0-2])\\d{3}$";
 
         // Tạo Pattern từ regex
@@ -512,11 +513,7 @@ public class PetServiceImpl extends BaseServiceImpl<Pet> implements PetService {
         Matcher matcher = pattern.matcher(input);
 
         // Kiểm tra xem chuỗi có khớp với regex không
-        if (matcher.matches()) {
-            return true;
-        } else {
-            return false;
-        }
+        return matcher.matches();
     }
 
 

@@ -20,4 +20,6 @@ public class StatisticQuantityUnilessReq {
     private double fromAge;
     private double toAge;
     private Farm farm;
+    private double fromWeight;
+    private double toWeight;
 }

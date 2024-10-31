@@ -35,10 +35,14 @@ public class PetStatisticController  {
                                         @RequestParam(required = false) List<Long> cageId,
                                         @RequestParam(required = false) List<Long> farmId,
                                         @RequestParam(required = false) Double fromAge,
-                                        @RequestParam(required = false) Double toAge){
+                                        @RequestParam(required = false) Double toAge,
+                                        @RequestParam(required = false) Double fromWeight,
+                                        @RequestParam(required = false) Double toWeight){
         double fromAgeValue = (fromAge != null) ? fromAge : 0.0;
         double toAgeValue = (toAge != null) ? toAge : Double.MAX_VALUE;
-        return petStatisticService.petStatistic( endDate, sex, status, cageId, farmId, fromAgeValue,toAgeValue);
+        double fromWeightValue = (fromWeight != null) ? fromWeight : 0.0;
+        double toWeightValue = (toWeight != null) ? toWeight : 100.0;
+        return petStatisticService.petStatistic( endDate, sex, status, cageId, farmId, fromAgeValue,toAgeValue, fromWeightValue, toWeightValue);
     }
 
     @GetMapping("/total/death")
@@ -49,11 +53,15 @@ public class PetStatisticController  {
                                                         @RequestParam(required = false) List<Long> cageId,
                                                         @RequestParam(required = false) List<Long> farmId,
                                                         @RequestParam(required = false) Double fromAge,
-                                                        @RequestParam(required = false) Double toAge) {
+                                                        @RequestParam(required = false) Double toAge,
+                                                        @RequestParam(required = false) Double fromWeight,
+                                                        @RequestParam(required = false) Double toWeight) {
         // Set default values if parameters are not provided
         double fromAgeValue = (fromAge != null) ? fromAge : 0.0;
         double toAgeValue = (toAge != null) ? toAge : Double.MAX_VALUE;
-        return petStatisticService.getPetDeathPerDay(startDate,endDate,sex,status,cageId,farmId,fromAgeValue,toAgeValue);
+        double fromWeightValue = (fromWeight != null) ? fromWeight : 0.0;
+        double toWeightValue = (toWeight != null) ? toWeight : 100.0;
+        return petStatisticService.getPetDeathPerDay(startDate,endDate,sex,status,cageId,farmId,fromAgeValue,toAgeValue,fromWeightValue, toWeightValue);
     }
     @GetMapping("/total/born")
     public List<PetDeathStatisticDto> petStatisticBorn(
@@ -64,13 +72,17 @@ public class PetStatisticController  {
             @RequestParam(required = false) List<Long> cageId,
             @RequestParam(required = false) List<Long> farmId,
             @RequestParam(required = false) Double fromAge,
-            @RequestParam(required = false) Double toAge) {
+            @RequestParam(required = false) Double toAge,
+            @RequestParam(required = false) Double fromWeight,
+            @RequestParam(required = false) Double toWeight) {
 
         // Set default values if parameters are not provided
         double fromAgeValue = (fromAge != null) ? fromAge : 0.0;
         double toAgeValue = (toAge != null) ? toAge : Double.MAX_VALUE;
+        double fromWeightValue = (fromWeight != null) ? fromWeight : 0.0;
+        double toWeightValue = (toWeight != null) ? toWeight : 100.0;
 
-        return petStatisticService.getPetBornPerDay(startDate, endDate, sex, status, cageId, farmId, fromAgeValue, toAgeValue);
+        return petStatisticService.getPetBornPerDay(startDate, endDate, sex, status, cageId, farmId, fromAgeValue, toAgeValue, fromWeightValue, toWeightValue);
     }
     @GetMapping("/sync")
     public void syncDateOfBirth() {
