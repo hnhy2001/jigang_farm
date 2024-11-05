@@ -437,8 +437,15 @@ public class PetServiceImpl extends BaseServiceImpl<Pet> implements PetService {
 
     public String getFilter(StatisticQuantityUnilessReq req){
         String filter = "";
-        if (req.getSex() != 999){
-            filter = filter.concat("sex==" + req.getSex()).concat(";");
+        if (req.getSex() != null){
+//            filter = filter.concat("sex==" + req.getSex()).concat(";");
+            if(!req.getSex().isEmpty()) {
+                AtomicReference<String> filterSex = new AtomicReference<>("sex=in=(");
+                req.getSex().stream().forEach(e -> {
+                    filterSex.set(filterSex.get() + e + ",");
+                });
+                filter = filter.concat(filterSex.get().substring(0, filterSex.get().length() - 1) + ")").concat(";");
+            }
         }
         if (req.getStatusList() != null){
             if (!req.getStatusList().isEmpty()){
@@ -450,24 +457,22 @@ public class PetServiceImpl extends BaseServiceImpl<Pet> implements PetService {
             }
         }
         if(req.getCage() != null){
-            filter = filter.concat("cage.id==" + req.getCage().getId()).concat(";");
+            if(!req.getCage().isEmpty()) {
+                AtomicReference<String> filterCage = new AtomicReference<>("cage.id=in=(");
+                req.getCage().stream().forEach(e -> {
+                    filterCage.set(filterCage.get() + e + ",");
+                });
+                filter = filter.concat(filterCage.get().substring(0, filterCage.get().length() - 1) + ")").concat(";");
+            }
         }
 
         if(req.getFarm() != null){
-            SearchReq cageSearch = new SearchReq();
-            cageSearch.setFilter(("farm.id==" + req.getFarm().getId()).concat(";status>-1"));
-            cageSearch.setPage(0);
-            cageSearch.setSize(9999999);
-            cageSearch.setSort("id,asc");
-            Node rootNode = new RSQLParser().parse(cageSearch.getFilter());
-            Specification<Cage> spec = rootNode.accept(new CustomRsqlVisitor<>());
-            List<Cage> cageList  = cageRepository.findAll(spec);
-            if (!cageList.isEmpty()){
-                AtomicReference<String> filterCage = new AtomicReference<>("cage.id=in=(");
-                cageList.stream().forEach(e -> {
-                    filterCage.set(filterCage.get() + e.getId() + ",");
+            if(!req.getFarm().isEmpty()) {
+                AtomicReference<String> filterFarm = new AtomicReference<>("cage.farm.id=in=(");
+                req.getFarm().stream().forEach(e -> {
+                    filterFarm.set(filterFarm.get() + e + ",");
                 });
-                filter = filter.concat(filterCage.get().substring(0, filterCage.get().length() - 1) + ")").concat(";");
+                filter = filter.concat(filterFarm.get().substring(0, filterFarm.get().length() - 1) + ")").concat(";");
             }
         }
         return filter.concat("status>-1").concat(";createDate>=" + req.getStartDate()).concat(";createDate<=" + req.getEndDate());

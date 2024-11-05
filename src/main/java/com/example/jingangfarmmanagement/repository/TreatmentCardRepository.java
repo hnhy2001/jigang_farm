@@ -57,7 +57,7 @@ public interface TreatmentCardRepository extends BaseRepository<TreatmentCard> {
         "AND ((:startDate IS NULL AND :endDate IS NULL) \n" +
         "OR treatmentc0_.created_date BETWEEN :startDate AND :endDate) " +
         "ORDER BY treatmentc0_.id DESC",
-        countQuery = "SELECT COUNT(DISTINCT treatmentc0_.*) \n" +
+        countQuery = "SELECT COUNT(DISTINCT treatmentc0_.id) \n" +
                 "FROM treatment_card treatmentc0_ \n" +
                 "INNER JOIN treatment_card_uiless uilnesses1_ ON treatmentc0_.id = uilnesses1_.treatment_card_id \n" +
                 "INNER JOIN uilness uilness2_ ON uilnesses1_.uilness_id = uilness2_.id \n" +

@@ -44,6 +44,8 @@ public class Materials extends BaseEntity {
     private String indications;
     @Column(name="treatment")
     private String treatment;
+    @Column(name="assign")
+    private String assign;
 //
 //    @Transient
 //    private Long unitPridce = 0L;
