@@ -161,6 +161,7 @@ public class StatisticServiceImpl implements StatisticService {
                 result.setTotalPet(0);
                 result.setPetLive(0);
                 result.setPetDie(0);
+                result.setUndefinedPet(0);
 //            result.setPetUilness(0);
 //            result.setPetNomal(0);
                 result.setStatisticPetByAgeList(createStatisticByAge());
@@ -171,8 +172,10 @@ public class StatisticServiceImpl implements StatisticService {
                         result.setTotalPet(result.getTotalPet() + 1);
                         if (pet.getSex() == 1) {
                             result.setTotalMale(result.getTotalMale() + 1);
-                        } else {
+                        } else if(pet.getSex() == 0){
                             result.setTotalFemale(result.getTotalFemale() + 1);
+                        } else {
+                            result.setUndefinedPet(result.getUndefinedPet() + 1);
                         }
                         if (pet.getStatus() == -1) {
                             result.setPetDie(result.getPetDie() + 1);
@@ -242,7 +245,7 @@ public class StatisticServiceImpl implements StatisticService {
                 return new BaseResponse().fail("Không có trại nào!");
             }
             for(var farm:farms){
-                StatisticByFarmRes res = new StatisticByFarmRes(farm,0,0,0,0,0,new ArrayList<>(),new ArrayList<>(),new ArrayList<>());
+                StatisticByFarmRes res = new StatisticByFarmRes(farm,0,0,0,0,0, 0,new ArrayList<>(),new ArrayList<>(),new ArrayList<>());
                 results.add(res);
             }
         }
@@ -279,6 +282,7 @@ public class StatisticServiceImpl implements StatisticService {
                 result.setTotalPet(0);
                 result.setPetLive(0);
                 result.setPetDie(0);
+                result.setUndefinedPet(0);
 //                result.setPetUilness(0);
 //                result.setPetNomal(0);
                 result.setStatisticPetByAgeList(createStatisticByAge());
@@ -289,8 +293,10 @@ public class StatisticServiceImpl implements StatisticService {
                     result.setTotalPet(result.getTotalPet() + 1);
                     if (pet.getSex() == 1){
                         result.setTotalMale(result.getTotalMale() + 1);
-                    }else {
+                    } else if(pet.getSex() == 0){
                         result.setTotalFemale(result.getTotalFemale() + 1);
+                    } else {
+                        result.setUndefinedPet(result.getUndefinedPet() + 1);
                     }
                     if (pet.getStatus() == -1){
                         result.setPetDie(result.getPetDie()+1);
@@ -354,7 +360,7 @@ public class StatisticServiceImpl implements StatisticService {
                         .collect(Collectors.toList());
             }
             for(var cage:cages){
-                ResultStatisticByCageRes res = new ResultStatisticByCageRes(cage,0,0,0,0,0,new ArrayList<>(),new ArrayList<>(),new ArrayList<>());
+                ResultStatisticByCageRes res = new ResultStatisticByCageRes(cage,0,0,0,0,0, 0,new ArrayList<>(),new ArrayList<>(),new ArrayList<>());
                 results.add(res);
             }
         }

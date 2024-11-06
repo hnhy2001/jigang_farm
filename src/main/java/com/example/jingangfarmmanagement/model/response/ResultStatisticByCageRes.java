@@ -17,6 +17,7 @@ public class ResultStatisticByCageRes {
     private int totalFemale;
     private int petDie;
     private int petLive;
+    private int undefinedPet;
 //    private int petUilness;
 //    private int petNomal;
     private List<StatisticPetByAge> statisticPetByAgeList;
