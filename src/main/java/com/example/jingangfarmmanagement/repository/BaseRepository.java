@@ -7,12 +7,9 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 
 import java.util.List;
 
-import java.util.UUID;
-
 @NoRepositoryBean
-public interface BaseRepository<T> extends JpaSpecificationExecutor<T>, PagingAndSortingRepository<T, String>, JpaRepository<T, String> {
+public interface BaseRepository<T> extends JpaSpecificationExecutor<T>, PagingAndSortingRepository<T, Long>, JpaRepository<T, Long> {
     List<T> findAll();
-    T findById(UUID id);
+    T findAllById(Long id);
     List<T> findAllByStatus(int status);
 }
-

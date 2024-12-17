@@ -41,7 +41,7 @@ public class UserController extends BaseController<User> {
     }
 
     @PutMapping("/update/custom")
-    public BaseResponse customUpdate(@RequestParam String id, @RequestBody UserReq user) {
+    public BaseResponse customUpdate(@RequestParam Long id, @RequestBody UserReq user) {
         return userService.customUpdate(id,user);
     }
     @GetMapping("/search/custom")
@@ -49,7 +49,7 @@ public class UserController extends BaseController<User> {
         return new BaseResponse(200, "Lấy dữ liệu thành công!", userService.searchUser(req));
     }
     @GetMapping("/detail/custom")
-    public BaseResponse getUserById(@RequestParam String id) {
+    public BaseResponse getUserById(@RequestParam Long id) {
         return new BaseResponse(200, "Lấy dữ liệu thành công!", userService.getUserById(id));
     }
 

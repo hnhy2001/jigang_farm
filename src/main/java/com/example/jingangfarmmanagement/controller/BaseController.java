@@ -26,7 +26,7 @@ public abstract class BaseController<T extends BaseEntity> {
     }
 
     @GetMapping("/detail")
-    public BaseResponse getById(@RequestParam(value = "id") String id) throws Exception {
+    public BaseResponse getById(@RequestParam(value = "id") Long id) throws Exception {
         return new BaseResponse(200, "Lấy dữ liệu thành công!", this.getService().getById(id));
     }
 
@@ -37,7 +37,7 @@ public abstract class BaseController<T extends BaseEntity> {
 
 
     @DeleteMapping("/delete")
-    public BaseResponse deleteById(@RequestParam(name = "id") String id) {
+    public BaseResponse deleteById(@RequestParam(name = "id") Long id) {
         this.getService().delete(id);
         return new BaseResponse(200, "Xóa thành công!");
     }

@@ -33,5 +33,14 @@ public class User extends BaseEntity {
     @Transient
     private List<Role> role;
 
-
+//    @ManyToOne()
+//    @NotNull()
+//    @JoinColumn(name = "role")
+//    private Role role;
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(name = "permission",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "cage_id")
+    )
+    private List<Cage> cages = new ArrayList<>();
 }

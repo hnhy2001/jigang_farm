@@ -13,7 +13,7 @@ public interface UserService extends BaseService<User> {
     BaseResponse customCreate(User user) throws Exception;
     BaseResponse changePassword(ChangePasswordReq changePasswordReq);
     User getUserByUsername(String username);
-    public BaseResponse customUpdate(String id, UserReq user);
+    public BaseResponse customUpdate(Long id, UserReq user);
     public Page<UserRes> searchUser(SearchReq req);
-    public BaseResponse getUserById(String id);
+    public BaseResponse getUserById(Long id);
 }

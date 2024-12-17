@@ -14,7 +14,7 @@ public class UserReq {
      String fullName;
      int status;
      String address;
-     List<String> roleId;
+     List<Long> roleId;
      String email;
 
 }
