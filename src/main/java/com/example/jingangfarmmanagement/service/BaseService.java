@@ -13,13 +13,13 @@ public interface BaseService<T extends BaseEntity> {
 
     T update(T t) throws Exception;
 
-    T getById(Long id) throws Exception;
+    T getById(String id) throws Exception;
 
     List<T> getByActive();
 
     List<T> getAll();
 
-    void delete(Long id);
+    void delete(String id);
 
     void createAll(List<T> entities);
 }

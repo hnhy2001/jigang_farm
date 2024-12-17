@@ -1,6 +1,5 @@
 package com.example.jingangfarmmanagement.model;
 
-import com.example.jingangfarmmanagement.repository.entity.Function;
 import com.example.jingangfarmmanagement.repository.entity.Role;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -17,7 +16,6 @@ public class LoginResponse {
     private String token;
     private String userName;
     private String fullName;
-    private Long userId;
+    private String userId;
     private List<Role> role;
-    private List<Function> functions;
 }

@@ -9,6 +9,6 @@ import lombok.Value;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ChangePasswordReq {
-    private Long userId;
+    private String userId;
     private String newPassword;
 }

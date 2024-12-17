@@ -4,8 +4,6 @@ package com.example.jingangfarmmanagement.service.Impl;
 import com.example.jingangfarmmanagement.config.jwt.JwtTokenProvider;
 import com.example.jingangfarmmanagement.constants.Status;
 import com.example.jingangfarmmanagement.model.req.*;
-import com.example.jingangfarmmanagement.model.response.MaterialRes;
-import com.example.jingangfarmmanagement.model.response.TreatmentHistoryRes;
 import com.example.jingangfarmmanagement.model.response.UserRes;
 import com.example.jingangfarmmanagement.query.CustomRsqlVisitor;
 import com.example.jingangfarmmanagement.repository.entity.*;
@@ -27,12 +25,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import javax.persistence.EntityNotFoundException;
-import javax.transaction.Transactional;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -49,24 +44,19 @@ public class UserServiceImpl extends BaseServiceImpl<User> implements UserServic
     @Autowired
     private RoleRepository roleRepository;
 
-    @Autowired
-    private HistoryService historyService;
 
     @Autowired
     private UserRoleRepository userRoleRepository;
 
     @Autowired
     private UserRoleService userRoleService;
-    @Autowired
-    private LogServiceImpl logService;
+
 
     @Autowired
     private ModelMapper modelMapper;
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
     private BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-    @Autowired
-    private FunctionRoleService functionRoleService;
 
     @Override
     protected BaseRepository<User> getRepository() {
@@ -95,35 +85,18 @@ public class UserServiceImpl extends BaseServiceImpl<User> implements UserServic
         if (!isValidPassword(user.getPassword(), loginRequest.getPassword())) {
             return new BaseResponse(500, "Mật khẩu không chính xác", null);
         }
-        History history = new History();
-        history.setUser(userOptional.get());
-        history.setDescription("Login");
-        historyService.create(history);
+
         LoginResponse loginResponse = new LoginResponse();
         loginResponse.setToken(jwtTokenProvider.generateToken(user.getUserName()));
         loginResponse.setUserName(user.getUserName());
         loginResponse.setFullName(user.getFullName());
-        loginResponse.setUserId(user.getId());
-        loginResponse.setFunctions(getListFunction(user));
+        loginResponse.setUserId(String.valueOf(user.getId()));
         List<Role> role = userRoleRepository.findAllByUser(user).stream().map(UserRole::getRole).collect(Collectors.toList());
         loginResponse.setRole(role);
         return new BaseResponse(200, "OK", loginResponse);
     }
 
-    List<Function> getListFunction(User user){
-        List<UserRole> roleList = userRoleService.getUserRoleByUserId(user);
-        List<Function> result = new ArrayList<>();
-        roleList.stream().forEach(e -> {
-            List<FunctionRole> functionRoleList = functionRoleService.getByRole(e.getRole());
-            functionRoleList.stream().forEach(functionRole -> {
-                if(functionRole.getStatus() == 1){
-                    result.add(functionRole.getFunction());
 
-                }
-            });
-        });
-        return result;
-    }
     @Override
     public BaseResponse customCreate(User user) throws Exception {
         User result = new User();
@@ -150,21 +123,15 @@ public class UserServiceImpl extends BaseServiceImpl<User> implements UserServic
                 userRoles.add(userRole);
             });
             userRoleRepository.saveAll(userRoles);
-            logService.logAction(ELogType.CREATE_USER,
-                    "Tạo thông tin tài khoản " + result.getUserName() + " thành công" ,
-                    "success");
             return new BaseResponse().success(result);
         }catch (Exception e){
             logger.error("Error occurred while create account: {}", e.getMessage(), e);
-            logService.logAction(ELogType.CREATE_USER,
-                    "Tạo thông tin tài khoản  " + result.getUserName() + " thất bại" + e.getMessage(),
-                    "fail");
             return new BaseResponse(500, "Có lỗi xảy ra khi tạo tài khoản", null);
         }
     }
 
     @Override
-    public BaseResponse customUpdate(Long id, UserReq user) {
+    public BaseResponse customUpdate(String id, UserReq user) {
         try {
             if (user.getUserName() == null) {
                 return new BaseResponse().fail("Tài khoản không được để trống");
@@ -193,15 +160,10 @@ public class UserServiceImpl extends BaseServiceImpl<User> implements UserServic
             }
             userRoleRepository.saveAllAndFlush(newUserRoles);
             userRepository.saveAndFlush(existingUser);
-            logService.logAction(ELogType.UPDATE_USER,
-                    "Cập nhật thông tin tài khoản " + user.getUserName() + " thành công" ,
-                    "success");
+
             return new BaseResponse().success(existingUser);
         }catch (Exception e){
             logger.error("Error occurred while create account: {}", e.getMessage(), e);
-            logService.logAction(ELogType.UPDATE_USER,
-                    "Cập nhật thông tin tài khoản  " + user.getUserName() + " thất bại" + e.getMessage(),
-                    "fail");
             return new BaseResponse(500, "Có lỗi xảy ra khi tạo tài khoản", null);
         }
     }
@@ -210,12 +172,12 @@ public class UserServiceImpl extends BaseServiceImpl<User> implements UserServic
 
     @Override
     public BaseResponse changePassword(ChangePasswordReq changePasswordReq) {
-        User user = userRepository.findAllById(changePasswordReq.getUserId());
+        Optional<User> user = userRepository.findById(changePasswordReq.getUserId());
         if (user == null){
             return new BaseResponse().fail("Tài khoản không tồn tại");
         }
-        user.setPassword(passwordEncoder.encode(changePasswordReq.getNewPassword()));
-        userRepository.save(user);
+        user.get().setPassword(passwordEncoder.encode(changePasswordReq.getNewPassword()));
+        userRepository.save(user.get());
         return new BaseResponse().success("Thay đổi mật khẩu thành công");
     }
 
@@ -237,7 +199,7 @@ public class UserServiceImpl extends BaseServiceImpl<User> implements UserServic
         List<UserRes> userResList= new ArrayList<>();
         for(var user : users){
             UserRes userRes =new UserRes();
-            userRes.setId(user.getId());
+            userRes.setId(String.valueOf(user.getId()));
             userRes.setUserName(user.getUserName());
             userRes.setFullName(user.getFullName());
             userRes.setAddress(user.getAddress());
@@ -253,11 +215,11 @@ public class UserServiceImpl extends BaseServiceImpl<User> implements UserServic
         return new PageImpl<>(userResList, pageable, users.getTotalElements());
     }
     @Override
-    public BaseResponse getUserById(Long id){
+    public BaseResponse getUserById(String id){
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
         UserRes userRes =new UserRes();
-        userRes.setId(user.getId());
+        userRes.setId(String.valueOf(user.getId()));
         userRes.setUserName(user.getUserName());
         userRes.setFullName(user.getFullName());
         userRes.setAddress(user.getAddress());

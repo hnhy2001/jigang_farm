@@ -13,7 +13,7 @@ import java.util.List;
 @Setter
 @Getter
 public class UserRes {
-    private Long id;
+    private String id;
     private String userName;
     private String password;
     private String email;
